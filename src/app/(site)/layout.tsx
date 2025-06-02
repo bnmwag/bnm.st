@@ -3,6 +3,7 @@ import { VercelToolbar } from "@vercel/toolbar/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import config from "@/payload.config";
 import "./globals.css";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { Footer } from "@/components/footer";
 import ReactLenis from "lenis/react";
 import { getPayload } from "payload";
@@ -39,6 +40,7 @@ export default async function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
+				<VercelAnalytics />
 				<ReactLenis root>
 					{children}
 					<Footer />
