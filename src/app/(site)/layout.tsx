@@ -43,6 +43,13 @@ export default async function RootLayout({
 				<VercelAnalytics />
 				<Lenis root={true} options={{}}>
 					{children}
+					<div className="bg-red-500">
+						{JSON.stringify(
+							{ shouldMountToolbar, user, NODE_ENV: process.env.NODE_ENV },
+							null,
+							2,
+						)}
+					</div>
 					<Footer />
 				</Lenis>
 				{shouldMountToolbar && <VercelToolbar />}
