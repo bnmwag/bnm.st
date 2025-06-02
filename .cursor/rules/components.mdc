@@ -1,0 +1,148 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Component creation rules
+globs: "**/*.tsx,**/*.jsx"
+alwaysApply: false
+---
+---
+description: Component creation guidelines
+globs: *.tsx, *.jsx, *.css, *.js, *.ts
+---
+
+## Imports and Dependencies
+
+1. **Utility Functions**
+   - Use `cn` from `clsx` for className conditionals
+   ```tsx
+   import cn from 'clsx'
+   
+   function MyComponent({ className }) {
+     return <div className={cn(s.component, className)} />
+   }
+   ```
+
+2. **Animation Libraries**
+   - Use `gsap` for complex animations
+   - Use `lenis` for smooth scrolling
+   - Use `tempus` for timing utilities
+   - Use `hamo` for DOM utilities
+
+3. **Import order and path alias**
+   - Always use the `@/...` alias
+   - Import order from packages
+     - `next`
+     - `next/...`
+     - blank line
+     - `react`
+     - `react/...`
+     - blank line
+     - `other-libs`
+     - `other-libs/...`
+     - `@other-libs-with-at`
+     - `@other-libs-with-at/...`
+     - blank line
+     - `@/internal/imports/...`
+
+## Component Structure
+
+1. **Client Components**
+   - Add 'use client' directive for client components
+   ```tsx
+   'use client'
+   
+   import { useState } from 'react'
+   ```
+
+2. **Props Interface**
+   - Define props interface at the top of the file
+   - Extend HTML attributes when appropriate
+   - Use proper type imports
+   ```tsx
+   import type { ComponentProps } from 'react'
+   
+   interface ButtonProps extends ComponentProps<'button'> {
+     variant?: 'primary' | 'secondary'
+     size?: 'sm' | 'md' | 'lg'
+   }
+   ```
+
+3. **React 19 Ref Handling**
+   - In React 19, ref is passed as a regular prop (no forwardRef needed)
+   ```tsx
+   // Old pattern (React 18)
+   // const Button = forwardRef<HTMLButtonElement, ButtonProps>(...)
+   
+   // New pattern (React 19)
+   function Button({ ref, variant = 'primary', ...props }: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) {
+     return <button ref={ref} {...props} />
+   }
+   ```
+
+4. **Functional Component Decleration and export**
+   - Use named function declarations for components with the FC typing imported as type from React
+   - Export the component never as default
+   ```tsx
+   import type { FC } from "react"
+
+   export const Button: FC<ButtonProps> = ({ variant = 'primary', size = 'md', ...props }) => {
+     // component logic
+   }
+   ```
+
+## WebGL Components
+
+1. **Three.js Integration**
+   - Use React Three Fiber for Three.js integration
+   - Import components from `@react-three/drei` for common 3D needs
+   ```tsx
+   import { Canvas } from '@/webgl/components/canvas'
+   import { useThree } from '@react-three/fiber'
+   import { OrbitControls } from '@react-three/drei'
+   ```
+
+2. **WebGL Structure**
+   - Separate Three.js components from React components
+   - Use a `.webgl.tsx` file for Three.js specific logic
+   ```tsx
+   // component.tsx
+   import { WebGL } from './component.webgl'
+   
+   // component.webgl.tsx
+   export const WebGL = () => {
+     // Three.js specific code
+   }
+   ```
+
+## Performance Best Practices
+
+1. **Code Splitting**
+   - Use `next/dynamic` for heavy components
+   ```tsx
+   import dynamic from 'next/dynamic'
+   
+   const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
+     loading: () => <div>Loading...</div>,
+     ssr: false // if needed
+   })
+   ```
+
+3. **Memoization and React Compiler**
+   - The React Compiler is enabled in this project and automatically optimizes most component re-renders and memoization.
+   - **Avoid manual use of `useMemo`, `useCallback`, and `React.memo` unless you have a proven edge case** (e.g., non-serializable dependencies, refs, or when the compiler cannot optimize).
+   - Refer to the [React Compiler documentation](mdc:https:/react.dev/reference/react/compiler) for best practices and up-to-date guidance.
+
+## Error Handling
+
+1. **Error Boundaries**
+   - Implement error boundaries for critical sections
+   - Provide meaningful fallback UI
+
+2. **Loading States**
+   - Always handle loading states
+   - Use Suspense boundaries where appropriate
+
+Last updated: 2025-06-02
