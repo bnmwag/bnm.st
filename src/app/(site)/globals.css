@@ -30,3 +30,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@utility inline-link {
+  position: relative;
+
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    border-radius: 0.25rem;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.640s cubic-bezier(1, 0, 0, 1);
+    will-change: transform;
+  }
+
+  &:hover {
+    &:before {
+      transform-origin: left;
+      transform: scaleX(1);
+    }
+  }
+}

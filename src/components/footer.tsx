@@ -13,26 +13,17 @@ export const Footer: FC = () => {
 				<nav>
 					<ul className="space-y-4">
 						<li>
-							<Link
-								href="/resume"
-								className="text-foreground-muted hover:underline hover:text-white transition-colors duration-300"
-							>
+							<Link href="/resume" className="text-white inline-link">
 								Resume
 							</Link>
 						</li>
 						<li>
-							<Link
-								href="/imprint"
-								className="text-foreground-muted hover:underline hover:text-white transition-colors duration-300"
-							>
+							<Link href="/imprint" className="text-white inline-link">
 								Imprint
 							</Link>
 						</li>
 						<li>
-							<Link
-								href="/privacy"
-								className="text-foreground-muted hover:underline hover:text-white transition-colors duration-300"
-							>
+							<Link href="/privacy" className="text-white inline-link">
 								Privacy
 							</Link>
 						</li>
