@@ -1,8 +1,10 @@
 "use client";
 
 import type { FC } from "react";
+
 import { Canvas } from "@react-three/fiber";
-import { ShaderPlane } from "./shader-plane";
+
+import { ShaderPlane } from "@/components/gl";
 
 export const Scene: FC = () => {
 	return (

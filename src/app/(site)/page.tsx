@@ -1,7 +1,8 @@
-import { Scene } from "@/components/gl/scene";
-import { getProjects } from "@/data/get-projects";
 import type { Metadata, NextPage } from "next";
 import Link from "next/link";
+
+import { getProjects } from "@/data";
+import { Scene } from "@/components/gl";
 
 export const metadata: Metadata = {
 	title: "Benjamin Wagner :: Frontend Developer",

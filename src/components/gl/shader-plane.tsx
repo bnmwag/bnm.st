@@ -1,8 +1,12 @@
-import { useRef, useEffect, useMemo, type FC } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+"use client";
+
+import type { FC } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import * as THREE from "three";
-import { vertexShader } from "@/shaders/vertex.shader";
+import { useFrame, useThree } from "@react-three/fiber";
+
 import { fragmentShader } from "@/shaders/fragment.shader";
+import { vertexShader } from "@/shaders/vertex.shader";
 
 export const ShaderPlane: FC = () => {
 	const meshRef = useRef<THREE.Mesh>(null);
