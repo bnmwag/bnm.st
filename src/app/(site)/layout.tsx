@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { VercelToolbar } from "@vercel/toolbar/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/footer";
@@ -32,6 +33,7 @@ export default function RootLayout({
 				<ReactLenis root>
 					{children}
 					<Footer />
+					<VercelToolbar />
 				</ReactLenis>
 			</body>
 		</html>
