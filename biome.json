@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": [".next", ".vercel", ".vscode", "node_modules", "./src/payload-types.ts", "./src/app/(payload)/admin/importMap.js"]
+		"ignore": [".next", ".vercel", ".vscode", "node_modules", "./src/payload-types.ts", "./src/app/(payload)/**/*"]
 	},
 	"formatter": {
 		"enabled": true,
