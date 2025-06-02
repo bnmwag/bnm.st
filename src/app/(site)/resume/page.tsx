@@ -38,31 +38,22 @@ const ResumePage: NextPage = () => {
 				<div className="md:col-start-3 xl:col-start-4 md:col-span-5 space-y-8">
 					<div className="pb-4 space-y-2">
 						<div className="max-md:flex-col flex md:items-end justify-between">
-							<p className="text-balance">
-								CIC - Corporate Image Consulting GmbH, Traun
-							</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								MAY 2024 - PRESENT
-							</p>
+							<p className="text-balance">CIC - Corporate Image Consulting GmbH, Traun</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">MAY 2024 - PRESENT</p>
 						</div>
 						<p className="text-foreground-muted text-balance">
-							Developed and built websites from scratch using PHP and the
-							company's internal system, customizing and finalizing them
-							according to client requirements. Collaborated closely with
-							designers and project managers to deliver high-quality digital
-							solutions.
+							Developed and built websites from scratch using PHP and the company's internal system, customizing and finalizing
+							them according to client requirements. Collaborated closely with designers and project managers to deliver
+							high-quality digital solutions.
 						</p>
 					</div>
 					<div className="pb-4 space-y-2">
 						<div className="max-md:flex-col flex md:items-end justify-between">
 							<p className="text-balance">SPS-Marketing, Linz</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								JUN 2021 - MAR 2024
-							</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">JUN 2021 - MAR 2024</p>
 						</div>
 						<p className="text-foreground-muted text-balance">
-							Apprenticeship as a Media Specialist - Focus on Web Development,
-							awarded with distinction.
+							Apprenticeship as a Media Specialist - Focus on Web Development, awarded with distinction.
 						</p>
 					</div>
 				</div>
@@ -74,41 +65,26 @@ const ResumePage: NextPage = () => {
 				<div className="md:col-start-3 xl:col-start-4 md:col-span-5 space-y-8">
 					<div className="pb-4 space-y-2">
 						<div className="max-md:flex-col flex md:items-end justify-between">
-							<p className="text-balance">
-								Apprenticeship as a Media Specialist - Focus on Web Development
-							</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								JUN 2021 - MAR 2024
-							</p>
+							<p className="text-balance">Apprenticeship as a Media Specialist - Focus on Web Development</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">JUN 2021 - MAR 2024</p>
 						</div>
-						<p className="text-foreground-muted text-balance">
-							SPS-Marketing, Linz - Graduated with distinction.
-						</p>
+						<p className="text-foreground-muted text-balance">SPS-Marketing, Linz - Graduated with distinction.</p>
 					</div>
 					<div className="pb-4 space-y-2">
 						<div className="max-md:flex-col flex md:items-end justify-between">
-							<p className="text-balance">
-								Higher Technical Institute (HTL) Perg - Computer Science
-							</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								SEP 2019 - JAN 2021
-							</p>
+							<p className="text-balance">Higher Technical Institute (HTL) Perg - Computer Science</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">SEP 2019 - JAN 2021</p>
 						</div>
 						<p className="text-foreground-muted text-balance">
-							Attended for 1.5 years before transitioning into an
-							apprenticeship.
+							Attended for 1.5 years before transitioning into an apprenticeship.
 						</p>
 					</div>
 					<div className="pb-4 space-y-2">
 						<div className="max-md:flex-col flex md:items-end justify-between">
 							<p className="text-balance">New Middle School (NMS) Naarn</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								SEP 2015 - JUN 2019
-							</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">SEP 2015 - JUN 2019</p>
 						</div>
-						<p className="text-foreground-muted text-balance">
-							General secondary education.
-						</p>
+						<p className="text-foreground-muted text-balance">General secondary education.</p>
 					</div>
 				</div>
 			</div>
@@ -162,27 +138,20 @@ const ResumePage: NextPage = () => {
 									GBA Award 2022 - Magna cum laude
 								</a>
 							</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								2022
-							</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">2022</p>
 						</div>
 						<p className="text-foreground-muted text-balance">
-							Awarded for excellence in the field of media marketing with SPS
-							Marketing.
+							Awarded for excellence in the field of media marketing with SPS Marketing.
 						</p>
 					</div>
 					<div className="pb-4 space-y-2">
 						<div className="max-md:flex-col flex md:items-end justify-between">
-							<p className="text-balance">
-								Apprenticeship Award for Excellence
-							</p>
-							<p className="font-mono text-xs md:text-right whitespace-nowrap">
-								2024
-							</p>
+							<p className="text-balance">Apprenticeship Award for Excellence</p>
+							<p className="font-mono text-xs md:text-right whitespace-nowrap">2024</p>
 						</div>
 						<p className="text-foreground-muted text-balance">
-							Awarded for outstanding performance and distinction during
-							apprenticeship as a Media Specialist, Focus on Web Development.
+							Awarded for outstanding performance and distinction during apprenticeship as a Media Specialist, Focus on Web
+							Development.
 						</p>
 					</div>
 				</div>

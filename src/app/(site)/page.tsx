@@ -36,13 +36,11 @@ const IndexPage: NextPage = async () => {
 				<div className="space-y-12 max-md:max-w-md">
 					<h2>Frontend developer</h2>
 					<p className="text-foreground-muted">
-						Hi! I&apos;m Benjamin Wagner, a frontend developer based in Linz,
-						Austria. I am passionate about building intuitive and user-centric
-						digital experiences.
+						Hi! I&apos;m Benjamin Wagner, a frontend developer based in Linz, Austria. I am passionate about building intuitive
+						and user-centric digital experiences.
 						<br />
 						<br />
-						With expertise in PayloadCMS and Stripe, I'd love to help bring your
-						online vision to life. Let's connect!
+						With expertise in PayloadCMS and Stripe, I'd love to help bring your online vision to life. Let's connect!
 					</p>
 				</div>
 				<div className="space-y-12 max-md:max-w-md">
@@ -65,10 +63,7 @@ const IndexPage: NextPage = async () => {
 										className="absolute left-0 top-1/2 group-hover:-translate-y-1/2 translate-y-1/2 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 ease-cubic duration-300 transition-all"
 									>
 										<title>Arrow</title>
-										<path
-											fill="currentColor"
-											d="M6 6v2h8.59L5 17.59L6.41 19L16 9.41V18h2V6z"
-										/>
+										<path fill="currentColor" d="M6 6v2h8.59L5 17.59L6.41 19L16 9.41V18h2V6z" />
 									</svg>
 									<p className="group-hover:pl-8 ease-cubic duration-300 transition-all flex items-center gap-x-4">
 										<span>{project.name}</span>

@@ -13,10 +13,7 @@ export const ShaderPlane: FC = () => {
 	const { size, gl } = useThree();
 	const mouse = useRef(new THREE.Vector2());
 	const mouseDamp = useRef(new THREE.Vector2());
-	const resolution = useMemo(
-		() => new THREE.Vector2(size.width, size.height),
-		[size],
-	);
+	const resolution = useMemo(() => new THREE.Vector2(size.width, size.height), [size]);
 	const pixelRatio = Math.min(window.devicePixelRatio, 2);
 
 	const materialRef = useRef<THREE.ShaderMaterial>(null);

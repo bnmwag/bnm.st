@@ -31,9 +31,7 @@ export function Lenis({ root, options, children }: LenisProps) {
 				lerp: options?.lerp ?? 0.125,
 				autoRaf: false,
 				anchors: true,
-				prevent: (node: Element | null) =>
-					node?.nodeName === "VERCEL-LIVE-FEEDBACK" ||
-					node?.id === "theatrejs-studio-root",
+				prevent: (node: Element | null) => node?.nodeName === "VERCEL-LIVE-FEEDBACK" || node?.id === "theatrejs-studio-root",
 			}}
 		>
 			{children}
