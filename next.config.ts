@@ -1,7 +1,6 @@
-const withVercelToolbar = require("@vercel/toolbar/plugins/next")();
-const { withPayload } = require("@payloadcms/next/withPayload");
+import { withPayload } from "@payloadcms/next/withPayload";
+import type { NextConfig } from "next";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig: NextConfig = {};
 
-module.exports = withVercelToolbar(withPayload(nextConfig));
+export default withPayload(nextConfig);
