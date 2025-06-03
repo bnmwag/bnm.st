@@ -8,7 +8,7 @@ import { ShaderPlane } from "@/components/gl";
 
 export const Scene: FC = () => {
 	return (
-		<div className="!fixed !inset-0 -z-10">
+		<div className="!fixed !inset-0 -z-10 max-xl:hidden">
 			<Canvas
 				orthographic
 				dpr={[1, 2]}
