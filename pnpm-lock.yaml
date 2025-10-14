@@ -53,6 +53,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.0(react@19.2.0)
+      sharp:
+        specifier: ^0.34.4
+        version: 0.34.4
       tempus:
         specifier: ^1.0.0-dev.11
         version: 1.0.0-dev.15(react@19.2.0)
@@ -4660,8 +4663,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@img/colour@1.0.0':
-    optional: true
+  '@img/colour@1.0.0': {}
 
   '@img/sharp-darwin-arm64@0.34.4':
     optionalDependencies:
@@ -7341,8 +7343,7 @@ snapshots:
 
   secure-json-parse@2.7.0: {}
 
-  semver@7.7.3:
-    optional: true
+  semver@7.7.3: {}
 
   serialize-javascript@6.0.2:
     dependencies:
@@ -7376,7 +7377,6 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.4
       '@img/sharp-win32-ia32': 0.34.4
       '@img/sharp-win32-x64': 0.34.4
-    optional: true
 
   shebang-command@2.0.0:
     dependencies:
