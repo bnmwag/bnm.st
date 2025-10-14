@@ -28,7 +28,7 @@ const ResumePage: NextPage = () => {
 				</div>
 				<div className="space-y-8 md:col-span-5 md:col-start-3 xl:col-start-4">
 					Benjamin Wagner -<br />
-					Fullstack Experience Engineer
+					Fullstack Experience Developer
 				</div>
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12">
@@ -38,8 +38,25 @@ const ResumePage: NextPage = () => {
 				<div className="space-y-8 md:col-span-5 md:col-start-3 xl:col-start-4">
 					<div className="space-y-2 pb-4">
 						<div className="flex justify-between max-md:flex-col md:items-end">
+							<p className="text-balance">puka.studio - Puka GmbH, Linz</p>
+							<p className="whitespace-nowrap font-mono text-xs md:text-right">SEP 2025 - PRESENT</p>
+						</div>
+						<p className="text-balance text-foreground-muted">
+							As the Digital Experience Designer in this 2-person company, I handle all aspects of the digital experience like
+							designing, developing, testing, and launching websites, webshops, and apps.
+						</p>
+					</div>
+					<div className="space-y-2 pb-4">
+						<div className="flex justify-between max-md:flex-col md:items-end">
+							<p className="text-balance">Civilian Service</p>
+							<p className="whitespace-nowrap font-mono text-xs md:text-right">SEP 2024 - JUL 2025</p>
+						</div>
+						<p className="text-balance text-foreground-muted">Had a really nice time there.</p>
+					</div>
+					<div className="space-y-2 pb-4">
+						<div className="flex justify-between max-md:flex-col md:items-end">
 							<p className="text-balance">CIC - Corporate Image Consulting GmbH, Traun</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">MAY 2024 - PRESENT</p>
+							<p className="whitespace-nowrap font-mono text-xs md:text-right">MAY 2024 - AUG 2024</p>
 						</div>
 						<p className="text-balance text-foreground-muted">
 							Developed and built websites from scratch using PHP and the company's internal system, customizing and finalizing

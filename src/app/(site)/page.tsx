@@ -1,8 +1,8 @@
 import type { Metadata, NextPage } from "next";
 import Link from "next/link";
 
-import { getProjects } from "@/data";
 import { Scene } from "@/components/gl";
+import { getProjects } from "@/data";
 
 export const metadata: Metadata = {
 	title: "Benjamin Wagner :: Frontend Developer",
@@ -36,8 +36,8 @@ const IndexPage: NextPage = async () => {
 				<div className="space-y-12 max-md:max-w-md">
 					<h2>Frontend developer</h2>
 					<p className="text-foreground-muted">
-						Hi! I&apos;m Benjamin Wagner, a frontend developer based in Linz, Austria. I am passionate about building intuitive
-						and user-centric digital experiences.
+						Hi! I&apos;m Benjamin Wagner, a fullstack experience developer based in Linz, Austria. I am passionate about building
+						intuitive and user-centric digital experiences.
 						<br />
 						<br />
 						With expertise in PayloadCMS and Stripe, I'd love to help bring your online vision to life. Let's connect!
