@@ -2,6 +2,7 @@ import type { Metadata, NextPage } from "next";
 import Link from "next/link";
 
 import { Scene } from "@/components/gl";
+import { ProgressiveBlur } from "@/components/progressive-blur";
 import { getProjects } from "@/data";
 
 export const metadata: Metadata = {
@@ -29,7 +30,9 @@ const IndexPage: NextPage = async () => {
 	return (
 		<main className="relative z-10 grid grid-cols-1 gap-x-5 px-5 pt-[50svh] pb-[15svh] md:grid-cols-6 xl:grid-cols-12">
 			<div className="max-md:absolute max-md:top-5 max-md:left-5 max-md:h-full max-md:w-[calc(100%-40px)] md:col-span-2 xl:col-start-2">
-				<div className="fixed top-0 right-0 left-0 h-44 bg-gradient-to-b from-background to-transparent" />
+				<div className="fixed top-0 right-0 left-0 h-44 bg-gradient-to-b from-background to-transparent">
+					<ProgressiveBlur direction="top" className="!absolute pointer-events-none inset-0" />
+				</div>
 				<h1 className="sticky top-12">Benjamin Wagner</h1>
 			</div>
 			<div className="space-y-36 md:col-span-3 md:col-start-3 xl:col-start-4">
