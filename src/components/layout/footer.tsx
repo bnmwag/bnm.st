@@ -18,6 +18,11 @@ export const Footer: FC = () => {
 							</Link>
 						</li>
 						<li>
+							<Link href="https://sudoku.bnm.st" className="inline-link text-white">
+								Play some Sudoku
+							</Link>
+						</li>
+						<li>
 							<Link href="/imprint" className="inline-link text-white">
 								Imprint
 							</Link>
