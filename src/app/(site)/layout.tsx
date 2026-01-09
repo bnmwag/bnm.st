@@ -32,10 +32,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<VercelAnalytics />
-				<Lenis root={true} options={{}}>
-					{children}
-					<Footer />
-				</Lenis>
+				{children}
 			</body>
 		</html>
 	);
