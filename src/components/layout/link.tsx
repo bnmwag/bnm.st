@@ -7,6 +7,7 @@ import type { FC } from "react";
 
 interface ILinkProps extends LinkProps {
 	className?: string;
+	children: React.ReactNode;
 }
 
 export const Link: FC<ILinkProps> = ({ className, ...props }) => {

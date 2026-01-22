@@ -10,21 +10,21 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	return (
 		<header className={cn("fixed inset-x-0 top-0 z-40 pt-4 mix-blend-difference", className)} {...props}>
 			<div className="layout-grid">
-				<div className="col-span-2 flex items-start">
+				<div className="col-span-4 flex items-start md:col-span-2">
 					<Link href={"/"} className="inline-block text-caption">
 						Benjamin Wagner
 					</Link>
 				</div>
-				<div className="col-span-2">
+				<div className="col-span-2 max-md:hidden">
 					<p className="text-caption">Based in austria,</p>
 					<p className="text-caption">working worldwide.</p>
 				</div>
-				<div className="col-span-3">
+				<div className="col-span-3 max-md:hidden">
 					<p className="text-balance text-caption">
 						{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
 					</p>
 				</div>
-				<nav className="col-span-2 col-start-10">
+				<nav className="col-span-2 md:col-start-10">
 					<ul className="space-y-2">
 						<li className="block h-fit text-[clamp(.625rem,.5vw,.75rem)] leading-none ">
 							<Link
@@ -52,9 +52,9 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						</li>
 					</ul>
 				</nav>
-				<div className="col-start-12 flex items-start">
+				<div className="col-span-4 col-start-9 flex items-start md:col-span-2 md:col-start-12">
 					<Link
-						href={"info"}
+						href={"/info"}
 						className="w-full bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
 					>
 						Info

@@ -26,11 +26,7 @@ export const metadata: Metadata = {
 const IndexPage: NextPage = async () => {
 	const projects = await getProjects();
 
-	return (
-		<Wrapper>
-			<IndexPageClient projects={projects} />
-		</Wrapper>
-	);
+	return <IndexPageClient projects={projects} />;
 };
 
 export default IndexPage;

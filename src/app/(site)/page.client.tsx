@@ -1,6 +1,8 @@
 "use client";
 
 import { Media } from "@/components/layout/render-media";
+import { Wrapper } from "@/components/layout/wrapper";
+import { ProgressiveBlur } from "@/components/progressive-blur";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
@@ -16,6 +18,25 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const stackCounterRef = useRef(0);
 	const [hoverStack, setHoverStack] = useState<Array<{ id: number; key: string }>>([]);
+	const [isMobile, setIsMobile] = useState(false);
+	const [isTouchDevice, setIsTouchDevice] = useState(false);
+	const [clickedProjectId, setClickedProjectId] = useState<number | null>(null);
+
+	useEffect(() => {
+		const checkMobile = () => {
+			setIsMobile(window.innerWidth < 768);
+		};
+
+		const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+		setIsTouchDevice(hasTouch);
+
+		checkMobile();
+		window.addEventListener("resize", checkMobile);
+
+		return () => {
+			window.removeEventListener("resize", checkMobile);
+		};
+	}, []);
 
 	const handleEnter = (id: number) => {
 		if (leaveTimeoutRef.current) {
@@ -54,127 +75,246 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 		}, 80);
 	};
 
+	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, projectId: number) => {
+		if (isTouchDevice) {
+			if (clickedProjectId === projectId) {
+				return;
+			}
+
+			e.preventDefault();
+			setClickedProjectId(projectId);
+			handleEnter(projectId);
+		}
+	};
+
 	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			if (isTouchDevice && clickedProjectId !== null && containerRef.current) {
+				const linksContainer = containerRef.current.querySelector(".links-container");
+				if (linksContainer && !linksContainer.contains(e.target as Node)) {
+					setClickedProjectId(null);
+					setHoverStack([]);
+				}
+			}
+		};
+
+		document.addEventListener("click", handleClickOutside);
+
 		return () => {
+			document.removeEventListener("click", handleClickOutside);
 			if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
 		};
-	}, []);
+	}, [isTouchDevice, clickedProjectId]);
 
 	const getProjectById = (id: number) => projects.find((p) => p.id === id);
+	const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+
+	if (isMobile) {
+		return (
+			<Wrapper lenis={{ options: { infinite: true, syncTouch: true, touchMultiplier: 1 } }}>
+				<div className={cn("", className)} {...props}>
+					<div className="layout-grid h-svh items-center py-52">
+						<div className="col-span-4 row-start-1 row-end-1">
+							<p className="text-caption">Based in austria,</p>
+							<p className="text-caption">working worldwide.</p>
+						</div>
+						<div className="col-span-6 col-start-6 row-start-2 row-end-2">
+							<p className="text-balance text-caption">
+								{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
+							</p>
+						</div>
+					</div>
+					{projects.map((project, index) => (
+						<section key={`${project.id}-${index}`} className="relative flex h-[150vh] items-end">
+							<div className="absolute inset-0">
+								<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" />
+							</div>
+
+							<div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+							<ProgressiveBlur className="absolute! inset-x-0 bottom-0 h-1/2" blurIntensity={1} />
+
+							<div className="relative z-10 w-full p-6 pb-12 text-white">
+								<Link
+									href={project.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="mb-4 inline-block text-[clamp(2em,8vw,4em)] uppercase leading-[.8] tracking-[-.04em]"
+								>
+									{project.name}
+								</Link>
+
+								<div className="space-y-2">
+									{project.year && (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-white px-1 py-px text-black">YEAR</p>
+											<p>{project.year}</p>
+										</div>
+									)}
+									{project.copyright && (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-white px-1 py-px text-black">IMG BY</p>
+											<p>{project.copyright}</p>
+										</div>
+									)}
+									{project.awards?.length ? (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-white px-1 py-px text-black">AWARDS</p>
+											<p>{project.awards.join(", ")}</p>
+										</div>
+									) : null}
+									{project.services?.length ? (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-white px-1 py-px text-black">SERVICES</p>
+											<p>{project.services.join(", ")}</p>
+										</div>
+									) : null}
+								</div>
+							</div>
+						</section>
+					))}
+					<div className="layout-grid h-svh items-center py-52">
+						<div className="col-span-4 row-start-1 row-end-1">
+							<p className="text-caption">Based in austria,</p>
+							<p className="text-caption">working worldwide.</p>
+						</div>
+						<div className="col-span-6 col-start-6 row-start-2 row-end-2">
+							<p className="text-balance text-caption">
+								{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
+							</p>
+						</div>
+					</div>
+				</div>
+			</Wrapper>
+		);
+	}
 
 	return (
-		<section ref={containerRef} className={cn("h-svh", className)} {...props}>
-			<motion.div
-				animate={{
-					opacity: hoverStack.length > 0 ? 1 : 0,
-					pointerEvents: hoverStack.length > 0 ? "auto" : "none",
-				}}
-				transition={{
-					duration: 0.4,
-					ease: [0.87, 0, 0.13, 1],
-				}}
-				className="fixed inset-2 overflow-hidden"
-			>
-				<AnimatePresence initial={false}>
-					{hoverStack.map((item, index) => {
-						const project = getProjectById(item.id);
+		<Wrapper>
+			<section ref={containerRef} className={cn("h-svh", className)} {...props}>
+				<motion.div
+					animate={{
+						filter: hoverStack.length > 0 ? "blur(0px)" : "blur(120px)",
+						opacity: hoverStack.length > 0 ? 1 : 0,
+						pointerEvents: hoverStack.length > 0 ? "auto" : "none",
+					}}
+					transition={{
+						duration: 0.64,
+						ease: [0.87, 0, 0.13, 1],
+					}}
+					className="fixed inset-2 overflow-hidden"
+				>
+					<AnimatePresence initial={false}>
+						{hoverStack.map((item, index) => {
+							const project = getProjectById(item.id);
 
-						if (!project) return null;
+							if (!project) return null;
 
-						return (
+							return (
+								<motion.div
+									key={item.key}
+									className="absolute inset-0"
+									style={{ zIndex: index }}
+									initial={{
+										scale: 1.15,
+										clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)",
+									}}
+									animate={{
+										scale: 1,
+										clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+									}}
+									exit={{
+										opacity: 0,
+									}}
+									transition={{
+										duration: 0.64,
+										ease: [0.87, 0, 0.13, 1],
+									}}
+								>
+									<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" />
+								</motion.div>
+							);
+						})}
+					</AnimatePresence>
+				</motion.div>
+				<div className="layout-grid z-20 h-full py-4 mix-blend-difference ">
+					<div className="links-container col-span-6 flex flex-wrap gap-4 self-end">
+						{projects.map((project) => (
+							<div key={project.id} className="relative">
+								<Link
+									href={project.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									onClick={(e) => handleClick(e, project.id)}
+									onMouseEnter={() => !isTouchDevice && handleEnter(project.id)}
+									onMouseLeave={() => !isTouchDevice && handleLeave()}
+									className="project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100"
+								>
+									{project.name}
+								</Link>
+							</div>
+						))}
+					</div>
+					<div className="col-span-2 col-start-8 self-end">
+						{isTouchDevice ? (
+							<>
+								<p className="text-caption">Tap to preview</p>
+								<p className="text-caption">Tap again to visit</p>
+							</>
+						) : (
+							<>
+								<p className="text-caption">Hover to preview</p>
+								<p className="text-caption">Click to visit</p>
+							</>
+						)}
+					</div>
+					<div className="col-span-2 col-start-10 space-y-12 self-center">
+						{projects.map((project) => (
 							<motion.div
-								key={item.key}
-								className="absolute inset-0"
-								style={{ zIndex: index }}
-								initial={{
-									scale: 1.15,
-									clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)",
+								variants={{
+									hidden: {
+										opacity: 0,
+										filter: "blur(12px)",
+									},
+									show: {
+										opacity: 1,
+										filter: "blur(0)",
+									},
 								}}
-								animate={{
-									scale: 1,
-									clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-								}}
-								exit={{
-									opacity: 0,
-								}}
-								transition={{
-									duration: 0.64,
-									ease: [0.87, 0, 0.13, 1],
-								}}
+								initial="hidden"
+								animate={hoverStack[hoverStack.length - 1]?.id === project.id ? "show" : "hidden"}
+								transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
+								key={project.id}
+								className="space-y-2"
 							>
-								<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" />
+								{project.year && (
+									<div className="flex items-center gap-x-2 text-caption">
+										<p className="bg-foreground px-1 py-px text-background">YEAR</p>
+										<p>{project.year}</p>
+									</div>
+								)}
+								{project.copyright && (
+									<div className="flex items-center gap-x-2 text-caption">
+										<p className="bg-foreground px-1 py-px text-background">IMG BY</p>
+										<p>{project.copyright}</p>
+									</div>
+								)}
+								{project.awards?.length ? (
+									<div className="flex items-center gap-x-2 text-caption">
+										<p className="bg-foreground px-1 py-px text-background">AWARDS</p>
+										<p>{project.awards.join(", ")}</p>
+									</div>
+								) : null}
+								{project.services?.length ? (
+									<div className="flex items-center gap-x-2 text-caption">
+										<p className="bg-foreground px-1 py-px text-background">SERVICES</p>
+										<p>{project.services.join(", ")}</p>
+									</div>
+								) : null}
 							</motion.div>
-						);
-					})}
-				</AnimatePresence>
-			</motion.div>
-			<div className="layout-grid z-20 h-full py-4 mix-blend-difference ">
-				<div className="col-span-6 flex flex-wrap gap-4 self-end">
-					{projects.map((project) => (
-						<Link
-							key={project.id}
-							href={project.url}
-							target="_blank"
-							rel="noopener noreferrer"
-							onMouseEnter={() => handleEnter(project.id)}
-							onMouseLeave={handleLeave}
-							className="project-link | after:-inset-y-2 after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100"
-						>
-							{project.name}
-						</Link>
-					))}
+						))}
+					</div>
 				</div>
-				<div className="col-span-2 col-start-8 self-end">
-					<p className="text-caption">Hover to preview</p>
-					<p className="text-caption">Click to visit</p>
-				</div>
-				<div className="col-span-2 col-start-10 space-y-12 self-center">
-					{projects.map((project) => (
-						<motion.div
-							variants={{
-								hidden: {
-									opacity: 0,
-									filter: "blur(12px)",
-								},
-								show: {
-									opacity: 1,
-									filter: "blur(0)",
-								},
-							}}
-							initial="hidden"
-							animate={hoverStack[hoverStack.length - 1]?.id === project.id ? "show" : "hidden"}
-							transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
-							key={project.id}
-							className="space-y-2"
-						>
-							{project.year && (
-								<div className="flex items-center gap-x-2 text-caption">
-									<p className="bg-foreground px-1 py-px text-background">YEAR</p>
-									<p>{project.year}</p>
-								</div>
-							)}
-							{project.copyright && (
-								<div className="flex items-center gap-x-2 text-caption">
-									<p className="bg-foreground px-1 py-px text-background">IMG BY</p>
-									<p>{project.copyright}</p>
-								</div>
-							)}
-							{project.awards?.length ? (
-								<div className="flex items-center gap-x-2 text-caption">
-									<p className="bg-foreground px-1 py-px text-background">AWARDS</p>
-									<p>{project.awards.join(", ")}</p>
-								</div>
-							) : null}
-							{project.services?.length ? (
-								<div className="flex items-center gap-x-2 text-caption">
-									<p className="bg-foreground px-1 py-px text-background">SERVICES</p>
-									<p>{project.services.join(", ")}</p>
-								</div>
-							) : null}
-						</motion.div>
-					))}
-				</div>
-			</div>
-		</section>
+			</section>
+		</Wrapper>
 	);
 };
