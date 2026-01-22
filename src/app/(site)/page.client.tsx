@@ -5,81 +5,109 @@ import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import { Link } from "next-view-transitions";
-import { type ComponentProps, type FC, useState } from "react";
+import { type ComponentProps, type FC, useEffect, useRef, useState } from "react";
 
 interface IIndexPageClientProps extends ComponentProps<"div"> {
 	projects: Project[];
 }
 
 export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className, ...props }) => {
-	const [activeId, setActiveId] = useState<number | null>(null);
-	const [prevId, setPrevId] = useState<number | null>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const stackCounterRef = useRef(0);
+	const [hoverStack, setHoverStack] = useState<Array<{ id: number; key: string }>>([]);
 
 	const handleEnter = (id: number) => {
-		setPrevId(activeId);
-		setActiveId(id);
+		if (leaveTimeoutRef.current) {
+			clearTimeout(leaveTimeoutRef.current);
+			leaveTimeoutRef.current = null;
+		}
+
+		setHoverStack((prev) => {
+			if (prev.length > 0 && prev[prev.length - 1].id === id) {
+				return prev;
+			}
+
+			stackCounterRef.current += 1;
+			const newItem = { id, key: `${id}-${stackCounterRef.current}` };
+
+			return [...prev, newItem].slice(-5);
+		});
 	};
 
-	const handleLeaveAll = () => {
-		setActiveId(null);
+	const handleLeave = () => {
+		if (leaveTimeoutRef.current) {
+			clearTimeout(leaveTimeoutRef.current);
+		}
+
+		leaveTimeoutRef.current = setTimeout(() => {
+			if (containerRef.current) {
+				const links = containerRef.current.querySelectorAll(".project-link");
+				const isAnyLinkHovered = Array.from(links).some((link) => link.matches(":hover"));
+
+				if (!isAnyLinkHovered) {
+					setHoverStack([]);
+				}
+			}
+
+			leaveTimeoutRef.current = null;
+		}, 80);
 	};
 
-	const getProjectById = (id: number | null) => projects.find((p) => p.id === id);
+	useEffect(() => {
+		return () => {
+			if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
+		};
+	}, []);
+
+	const getProjectById = (id: number) => projects.find((p) => p.id === id);
 
 	return (
-		<section className={cn("h-svh", className)} {...props}>
-			<div className="fixed inset-2 overflow-hidden">
-				<AnimatePresence>
-					{prevId !== null && prevId !== activeId && activeId !== null && (
-						<motion.div
-							key={`prev-${prevId}`}
-							className="absolute inset-0 z-10"
-							exit={{
-								clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
-							}}
-							transition={{
-								duration: 0.64,
-								ease: [0.87, 0, 0.13, 1],
-							}}
-						>
-							<Media
-								resource={getProjectById(prevId)?.image}
-								className="h-full w-full"
-								imgClassName="h-full w-full object-cover"
-							/>
-						</motion.div>
-					)}
+		<section ref={containerRef} className={cn("h-svh", className)} {...props}>
+			<motion.div
+				animate={{
+					opacity: hoverStack.length > 0 ? 1 : 0,
+					pointerEvents: hoverStack.length > 0 ? "auto" : "none",
+				}}
+				transition={{
+					duration: 0.4,
+					ease: [0.87, 0, 0.13, 1],
+				}}
+				className="fixed inset-2 overflow-hidden"
+			>
+				<AnimatePresence initial={false}>
+					{hoverStack.map((item, index) => {
+						const project = getProjectById(item.id);
 
-					{activeId !== null && (
-						<motion.div
-							key={`active-${activeId}`}
-							className="absolute inset-0 z-20"
-							initial={{
-								scale: 1.25,
-								clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)",
-							}}
-							animate={{
-								scale: 1,
-								clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-							}}
-							exit={{
-								scale: 0.75,
-								clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
-							}}
-							transition={{
-								duration: 0.64,
-								ease: [0.87, 0, 0.13, 1],
-							}}
-						>
-							<Media
-								resource={getProjectById(activeId)?.image}
-								className="h-full w-full"
-								imgClassName="h-full w-full object-cover"
-							/>
-						</motion.div>
-					)}
+						if (!project) return null;
+
+						return (
+							<motion.div
+								key={item.key}
+								className="absolute inset-0"
+								style={{ zIndex: index }}
+								initial={{
+									scale: 1.15,
+									clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)",
+								}}
+								animate={{
+									scale: 1,
+									clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+								}}
+								exit={{
+									opacity: 0,
+								}}
+								transition={{
+									duration: 0.64,
+									ease: [0.87, 0, 0.13, 1],
+								}}
+							>
+								<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" />
+							</motion.div>
+						);
+					})}
 				</AnimatePresence>
-			</div>
+			</motion.div>
 			<div className="layout-grid z-20 h-full py-4 mix-blend-difference ">
 				<div className="col-span-6 flex flex-wrap gap-4 self-end">
 					{projects.map((project) => (
@@ -89,8 +117,8 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							target="_blank"
 							rel="noopener noreferrer"
 							onMouseEnter={() => handleEnter(project.id)}
-							onMouseLeave={handleLeaveAll}
-							className="after:-inset-y-2 after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100"
+							onMouseLeave={handleLeave}
+							className="project-link | after:-inset-y-2 after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100"
 						>
 							{project.name}
 						</Link>
@@ -114,7 +142,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								},
 							}}
 							initial="hidden"
-							animate={activeId === project.id ? "show" : "hidden"}
+							animate={hoverStack[hoverStack.length - 1]?.id === project.id ? "show" : "hidden"}
 							transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
 							key={project.id}
 							className="space-y-2"
