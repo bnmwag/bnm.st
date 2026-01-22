@@ -6,6 +6,11 @@ export const Projects: CollectionConfig = {
 	admin: { useAsTitle: "name" },
 	fields: [
 		{
+			name: "active",
+			type: "checkbox",
+			admin: { position: "sidebar" },
+		},
+		{
 			type: "row",
 			fields: [
 				{
@@ -19,6 +24,63 @@ export const Projects: CollectionConfig = {
 					type: "text",
 					admin: { width: "50%" },
 					required: true,
+				},
+			],
+		},
+		{
+			type: "upload",
+			name: "image",
+			relationTo: "media",
+		},
+		{
+			type: "text",
+			name: "copyright",
+		},
+		{
+			type: "row",
+			fields: [
+				{
+					name: "awards",
+					type: "select",
+					hasMany: true,
+					admin: { width: "50%" },
+					options: [
+						{
+							label: "HR",
+							value: "hr",
+						},
+						{
+							label: "SOTD",
+							value: "sotd",
+						},
+						{
+							label: "SOTM",
+							value: "sotm",
+						},
+						{
+							label: "SOTY",
+							value: "soty",
+						},
+					],
+				},
+			],
+		},
+		{
+			name: "services",
+			type: "select",
+			hasMany: true,
+			options: [
+				{
+					label: "DEV",
+					value: "dev",
+				},
+				{
+					label: "DESIGN",
+					value: "design",
+				},
+				{
+					label: "INFRA",
+					value: "infra",
 				},
 			],
 		},

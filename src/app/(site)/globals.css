@@ -1,49 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --background-muted: #171717;
-  --foreground: #f5f5f5;
-  --foreground-muted: #a3a3a3;
+  --background: #ffffff;
+  --background-muted: #f5f5f5;
+  --foreground: #0a0a0a;
+  --foreground-muted: #737373;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --background-muted: #171717;
+    --foreground: #f5f5f5;
+    --foreground-muted: #a3a3a3;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-background-muted: var(--background-muted);
+
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-sans: var(--font-zalando-sans);
+
+  --transition-duration-long: 0.640s;
+  --transition-duration-short: 0.420s;
+  
+  --ease-default: cubic-bezier(0.87, 0, 0.13, 1);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-zalando-sans);
 }
 
-@utility inline-link {
-  position: relative;
+@utility layout-grid {
+  @apply grid grid-cols-12 gap-4 mx-4;
+}
 
-  &:before {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: currentColor;
-    border-radius: 0.25rem;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.640s cubic-bezier(1, 0, 0, 1);
-    will-change: transform;
-  }
-
-  &:hover {
-    &:before {
-      transform-origin: left;
-      transform: scaleX(1);
-    }
-  }
+@utility text-caption {
+  @apply font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none;
 }

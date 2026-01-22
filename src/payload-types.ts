@@ -167,8 +167,13 @@ export interface Media {
  */
 export interface Project {
   id: number;
+  active?: boolean | null;
   name: string;
   url: string;
+  image?: (number | null) | Media;
+  copyright?: string | null;
+  awards?: ('hr' | 'sotd' | 'sotm' | 'soty')[] | null;
+  services?: ('dev' | 'design' | 'infra')[] | null;
   type: 'web' | 'tool' | 'other';
   year: string;
   updatedAt: string;
@@ -297,8 +302,13 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
+  active?: T;
   name?: T;
   url?: T;
+  image?: T;
+  copyright?: T;
+  awards?: T;
+  services?: T;
   type?: T;
   year?: T;
   updatedAt?: T;

@@ -1,7 +1,8 @@
 import type { Metadata, NextPage } from "next";
 
-import { Lenis } from "@/components/layout";
+import { Wrapper } from "@/components/layout/wrapper";
 import { getProjects } from "@/data";
+import { IndexPageClient } from "./page.client";
 
 export const metadata: Metadata = {
 	title: "Benjamin Wagner :: Frontend Developer",
@@ -26,9 +27,9 @@ const IndexPage: NextPage = async () => {
 	const projects = await getProjects();
 
 	return (
-		<Lenis root={true} options={{}}>
-			amk
-		</Lenis>
+		<Wrapper>
+			<IndexPageClient projects={projects} />
+		</Wrapper>
 	);
 };
 
