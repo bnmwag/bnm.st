@@ -15,8 +15,8 @@ interface IWrapperProps extends ComponentProps<"div"> {
 export const Wrapper: FC<IWrapperProps> = ({ lenis, children, className, ...props }) => {
 	return (
 		<>
-			<div className="revealer | pointer-events-none fixed inset-0 z-60 min-h-svh origin-top bg-foreground" />
-			<div className="pointer-events-none fixed inset-0 z-50 flex flex-col justify-between">
+			<div className="revealer | pointer-events-none fixed inset-0 z-60 min-h-svh origin-top bg-foreground" aria-hidden="true" />
+			<div className="pointer-events-none fixed inset-0 z-50 flex flex-col justify-between" aria-hidden="true">
 				{Array.from({ length: 200 }).map((_, index) => (
 					<div key={`tv_line-${index + 1}`} className="h-px w-full bg-foreground/10" />
 				))}

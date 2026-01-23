@@ -99,8 +99,8 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	if (isMobile) {
 		return (
 			<Wrapper lenis={{ options: { infinite: true, syncTouch: true, touchMultiplier: 1 } }}>
-				<div className={cn("", className)} {...props}>
-					<div className="layout-grid h-svh items-center py-52">
+				<div id="main-content" className={cn("", className)} {...props}>
+					<section className="layout-grid h-svh items-center py-52" aria-label="Introduction">
 						<div className="col-span-4 row-start-1 row-end-1">
 							<p className="text-caption">Based in austria,</p>
 							<p className="text-caption">working worldwide.</p>
@@ -110,14 +110,18 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
 							</p>
 						</div>
-					</div>
+					</section>
 					{projects.map((project, index) => (
-						<section key={`${project.id}-${index}`} className="relative flex h-[150vh] items-end">
-							<div className="absolute inset-0">
+						<section
+							key={`${project.id}-${index}`}
+							className="relative flex h-[150vh] items-end"
+							aria-label={`Project: ${project.name}`}
+						>
+							<div className="absolute inset-0" aria-hidden="true">
 								<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" />
 							</div>
 
-							<div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+							<div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" aria-hidden="true" />
 							<ProgressiveBlur className="absolute! inset-x-0 bottom-0 h-1/2" blurIntensity={1} />
 
 							<div className="relative z-10 w-full p-6 pb-12 text-white">
@@ -125,6 +129,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									href={project.url}
 									target="_blank"
 									rel="noopener noreferrer"
+									aria-label={`Visit ${project.name} website`}
 									className="mb-4 inline-block text-[clamp(2em,8vw,4em)] uppercase leading-[.8] tracking-[-.04em]"
 								>
 									{project.name}
@@ -133,25 +138,33 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								<div className="space-y-2">
 									{project.year && (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-white px-1 py-px text-black">YEAR</p>
+											<p className="bg-white px-1 py-px text-black" aria-label="Year">
+												YEAR
+											</p>
 											<p>{project.year}</p>
 										</div>
 									)}
 									{project.copyright && (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-white px-1 py-px text-black">IMG BY</p>
+											<p className="bg-white px-1 py-px text-black" aria-label="Image credit">
+												IMG BY
+											</p>
 											<p>{project.copyright}</p>
 										</div>
 									)}
 									{project.awards?.length ? (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-white px-1 py-px text-black">AWARDS</p>
+											<p className="bg-white px-1 py-px text-black" aria-label="Awards">
+												AWARDS
+											</p>
 											<p>{project.awards.join(", ")}</p>
 										</div>
 									) : null}
 									{project.services?.length ? (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-white px-1 py-px text-black">SERVICES</p>
+											<p className="bg-white px-1 py-px text-black" aria-label="Services">
+												SERVICES
+											</p>
 											<p>{project.services.join(", ")}</p>
 										</div>
 									) : null}
@@ -159,7 +172,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							</div>
 						</section>
 					))}
-					<div className="layout-grid h-svh items-center py-52">
+					<section className="layout-grid h-svh items-center py-52" aria-label="Closing statement">
 						<div className="col-span-4 row-start-1 row-end-1">
 							<p className="text-caption">Based in austria,</p>
 							<p className="text-caption">working worldwide.</p>
@@ -169,7 +182,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
 							</p>
 						</div>
-					</div>
+					</section>
 				</div>
 			</Wrapper>
 		);
@@ -177,7 +190,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 	return (
 		<Wrapper>
-			<section ref={containerRef} className={cn("h-svh", className)} {...props}>
+			<section id="main-content" ref={containerRef} className={cn("h-svh", className)} aria-label="Portfolio projects" {...props}>
 				<motion.div
 					animate={{
 						filter: hoverStack.length > 0 ? "blur(0px)" : "blur(120px)",
@@ -189,6 +202,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 						ease: [0.87, 0, 0.13, 1],
 					}}
 					className="fixed inset-2 overflow-hidden"
+					aria-hidden="true"
 				>
 					<AnimatePresence initial={false}>
 						{hoverStack.map((item, index) => {
@@ -224,7 +238,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 					</AnimatePresence>
 				</motion.div>
 				<div className="layout-grid z-20 h-full py-4 mix-blend-difference ">
-					<div className="links-container col-span-6 flex flex-wrap gap-4 self-end">
+					<nav className="links-container col-span-6 flex flex-wrap gap-4 self-end" aria-label="Project links">
 						{projects.map((project) => (
 							<div key={project.id} className="relative">
 								<Link
@@ -234,6 +248,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									onClick={(e) => handleClick(e, project.id)}
 									onMouseEnter={() => !isTouchDevice && handleEnter(project.id)}
 									onMouseLeave={() => !isTouchDevice && handleLeave()}
+									aria-label={`Visit ${project.name} website`}
 									className={cn(
 										"project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
 										{ "project-link--active": clickedProjectId === project.id && isTouchDevice },
@@ -243,8 +258,8 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								</Link>
 							</div>
 						))}
-					</div>
-					<div className="col-span-2 col-start-8 self-end">
+					</nav>
+					<div className="col-span-2 col-start-8 self-end" aria-live="polite">
 						{isTouchDevice ? (
 							<>
 								<p className="text-caption">Tap to preview</p>
@@ -257,7 +272,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							</>
 						)}
 					</div>
-					<div className="col-span-2 col-start-10 space-y-12 self-end">
+					<aside className="col-span-2 col-start-10 space-y-12 self-end" aria-label="Project details">
 						<div className="flex flex-col justify-center gap-y-12">
 							{projects.map((project) => (
 								<motion.div
@@ -276,28 +291,37 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
 									key={project.id}
 									className="space-y-2"
+									aria-label={`Details for ${project.name}`}
 								>
 									{project.year && (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background">YEAR</p>
+											<p className="bg-foreground px-1 py-px text-background" aria-label="Year">
+												YEAR
+											</p>
 											<p>{project.year}</p>
 										</div>
 									)}
 									{project.copyright && (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background">IMG BY</p>
+											<p className="bg-foreground px-1 py-px text-background" aria-label="Image credit">
+												IMG BY
+											</p>
 											<p>{project.copyright}</p>
 										</div>
 									)}
 									{project.awards?.length ? (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background">AWARDS</p>
+											<p className="bg-foreground px-1 py-px text-background" aria-label="Awards">
+												AWARDS
+											</p>
 											<p>{project.awards.join(", ")}</p>
 										</div>
 									) : null}
 									{project.services?.length ? (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background">SERVICES</p>
+											<p className="bg-foreground px-1 py-px text-background" aria-label="Services">
+												SERVICES
+											</p>
 											<p>{project.services.join(", ")}</p>
 										</div>
 									) : null}
@@ -310,7 +334,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								<p className="text-caption">to show layout grid</p>
 							</div>
 						)}
-					</div>
+					</aside>
 				</div>
 			</section>
 		</Wrapper>

@@ -46,6 +46,7 @@ export const Info: FC = () => {
 	const content = useRef<HTMLDivElement>(null);
 	const scrollWrapper = useRef<HTMLDivElement>(null);
 	const blend = useRef<HTMLDivElement>(null);
+	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	const pathname = usePathname();
 	const router = useTransitionNavigation();
@@ -97,6 +98,11 @@ export const Info: FC = () => {
 				pointerEvents: "auto",
 			});
 
+			// Focus the close button when the panel opens
+			tl.call(() => {
+				closeButtonRef.current?.focus();
+			});
+
 			return () => tl.kill();
 		},
 		{ scope },
@@ -133,21 +139,31 @@ export const Info: FC = () => {
 						handleBack();
 					}
 				}}
+				role="button"
+				tabIndex={0}
+				aria-label="Close info panel"
 				className="pointer-events-none fixed inset-0 z-40 opacity-0 backdrop-blur-3xl"
 			/>
 
-			<div
+			<aside
 				ref={content}
 				data-lenis-prevent
+				aria-modal="true"
+				aria-labelledby="info-heading"
 				className="translate-z-0 pointer-events-none fixed inset-y-2 right-2 z-40 w-[calc(100%-1rem)] max-w-xl overflow-hidden bg-foreground text-background will-change-[clip-path] [clip-path:inset(0_0_100%_0)]"
 			>
 				<div className="absolute inset-x-2 top-2 z-10 flex items-start justify-between mix-blend-difference">
-					<h2 className="-translate-x-1.5 text-[clamp(2em,3.8vw,5em)] text-foreground uppercase leading-[.8] tracking-[-.04em]">
+					<h2
+						id="info-heading"
+						className="-translate-x-1.5 text-[clamp(2em,3.8vw,5em)] text-foreground uppercase leading-[.8] tracking-[-.04em]"
+					>
 						Info
 					</h2>
 					<button
+						ref={closeButtonRef}
 						type="button"
 						onClick={handleBack}
+						aria-label="Close info panel"
 						className="w-fit bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
 					>
 						Back
@@ -207,7 +223,7 @@ export const Info: FC = () => {
 						</div>
 					</div>
 				</div>
-			</div>
+			</aside>
 		</div>
 	);
 };

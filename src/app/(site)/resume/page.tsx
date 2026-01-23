@@ -23,16 +23,16 @@ export const metadata: Metadata = {
 const ResumePage: NextPage = () => {
 	return (
 		<Wrapper>
-			<section className="relative space-y-24 py-[25vh]">
-				<div className="layout-grid">
+			<article id="main-content" className="relative space-y-24 py-[25vh]">
+				<header className="layout-grid">
 					<div className="col-span-2 text-caption md:col-start-3">
 						<h1>Resume</h1>
 					</div>
 					<div className="col-span-full col-start-5 text-caption md:col-span-6">Benjamin Wagner - Frontend Developer</div>
-				</div>
-				<div className="layout-grid">
+				</header>
+				<section className="layout-grid" aria-labelledby="experience-heading">
 					<div className="col-span-2 text-caption md:col-start-3">
-						<h2>Experience</h2>
+						<h2 id="experience-heading">Experience</h2>
 					</div>
 					<div className="col-span-full col-start-5 text-caption md:col-span-6">
 						<div className="space-y-2 pb-4">
@@ -73,10 +73,10 @@ const ResumePage: NextPage = () => {
 							</p>
 						</div>
 					</div>
-				</div>
-				<div className="layout-grid">
+				</section>
+				<section className="layout-grid" aria-labelledby="education-heading">
 					<div className="col-span-2 text-caption md:col-start-3">
-						<h2>Education</h2>
+						<h2 id="education-heading">Education</h2>
 					</div>
 					<div className="col-span-full col-start-5 text-caption md:col-span-6">
 						<div className="space-y-2 pb-4">
@@ -103,10 +103,10 @@ const ResumePage: NextPage = () => {
 							<p className="text-balance text-foreground-muted">General secondary education.</p>
 						</div>
 					</div>
-				</div>
-				<div className="layout-grid">
+				</section>
+				<section className="layout-grid" aria-labelledby="skills-heading">
 					<div className="col-span-2 text-caption md:col-start-3">
-						<h2>Skills</h2>
+						<h2 id="skills-heading">Skills</h2>
 					</div>
 					<div className="col-span-full col-start-5 text-caption md:col-span-6">
 						<ul className="grid gap-4 md:grid-cols-2">
@@ -136,10 +136,10 @@ const ResumePage: NextPage = () => {
 							</li>
 						</ul>
 					</div>
-				</div>
-				<div className="layout-grid">
+				</section>
+				<section className="layout-grid" aria-labelledby="awards-heading">
 					<div className="col-span-2 text-caption md:col-start-3">
-						<h2>Awards</h2>
+						<h2 id="awards-heading">Awards</h2>
 					</div>
 					<div className="col-span-full col-start-5 text-caption md:col-span-6">
 						<div className="space-y-2 pb-4">
@@ -187,8 +187,8 @@ const ResumePage: NextPage = () => {
 							<p className="text-balance text-foreground-muted">Awarded for the website of the choir Hard-Chor.</p>
 						</div>
 					</div>
-				</div>
-				<div className="layout-grid">
+				</section>
+				<section className="layout-grid" aria-label="Download resume">
 					<div className="col-span-2 text-caption md:col-start-3" />
 					<div className="col-span-full col-start-5 text-caption md:col-span-6">
 						<p>
@@ -196,14 +196,15 @@ const ResumePage: NextPage = () => {
 								href="/docs/RESUME-Benjamin_Wagner.pdf"
 								target="_blank"
 								rel="noopener noreferrer"
+								aria-label="Download resume as PDF"
 								className="w-fit bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
 							>
 								Download Resume
 							</a>
 						</p>
 					</div>
-				</div>
-			</section>
+				</section>
+			</article>
 		</Wrapper>
 	);
 };

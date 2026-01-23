@@ -94,6 +94,7 @@ export interface Props {
 	src?: StaticImageData; // for static media
 	videoClassName?: string;
 	style?: React.CSSProperties;
+	decorative?: boolean; // Mark image as decorative (will use empty alt)
 }
 
 const breakpoints = {
@@ -122,7 +123,7 @@ export const Media = forwardRef<HTMLDivElement, Props>(function Media(props, ref
 });
 
 export const VideoMedia: React.FC<Props> = (props) => {
-	const { onClick, resource, videoClassName } = props;
+	const { onClick, resource, videoClassName, alt, decorative = false } = props;
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	// const [showFallback] = useState<boolean>()
@@ -138,12 +139,23 @@ export const VideoMedia: React.FC<Props> = (props) => {
 	}, []);
 
 	if (resource && typeof resource === "object") {
-		const { filename } = resource;
+		const { filename, alt: altFromResource } = resource;
 		const videoSrc = getMediaUrl(`/api/media/file/${filename}`);
+		const videoAlt = decorative ? "" : alt || altFromResource || "Video content";
 
 		return (
 			// biome-ignore lint/a11y/useKeyWithClickEvents: <video> elements don't need to be in a button
-			<video autoPlay className={cn(videoClassName)} controls={false} loop muted onClick={onClick} playsInline ref={videoRef}>
+			<video
+				autoPlay
+				className={cn(videoClassName)}
+				controls={false}
+				loop
+				muted
+				onClick={onClick}
+				playsInline
+				ref={videoRef}
+				aria-label={videoAlt}
+			>
 				<source src={videoSrc} />
 			</video>
 		);
@@ -163,6 +175,7 @@ export const ImageMedia: React.FC<Props> = (props) => {
 		size: sizeFromProps,
 		src: srcFromProps,
 		loading: loadingFromProps,
+		decorative = false,
 	} = props;
 
 	let width: number | undefined;
@@ -197,10 +210,13 @@ export const ImageMedia: React.FC<Props> = (props) => {
 				.map(([, value]) => `(max-width: ${value}px) ${value * 2}w`)
 				.join(", ");
 
+	// Use empty alt for decorative images, otherwise use provided alt or fallback
+	const finalAlt = decorative ? "" : alt || "Project image";
+
 	return (
 		<picture className={cn(pictureClassName)}>
 			<NextImage
-				alt={alt || ""}
+				alt={finalAlt}
 				className={cn(imgClassName)}
 				unoptimized
 				fill={fill}
