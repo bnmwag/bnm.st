@@ -1,10 +1,14 @@
+"use client";
+
 import { Link } from "@/components/layout/link";
+import { useTransitionNavigation } from "@/lib/transitions";
 import cn from "clsx";
 import type { ComponentProps, FC } from "react";
 
 interface INavigationProps extends ComponentProps<"div"> {}
 
 export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
+	const router = useTransitionNavigation();
 	const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
 
 	return (
@@ -52,13 +56,16 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						</li>
 					</ul>
 				</nav>
-				<div className="col-span-4 col-start-9 flex items-start md:col-span-2 md:col-start-12">
-					<Link
-						href={"/info"}
-						className="w-full bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
+				<div className="col-span-4 col-start-9 flex items-start justify-end md:col-span-1 md:col-start-12">
+					<button
+						type="button"
+						onClick={() => {
+							router.push("/info", { withTransition: false });
+						}}
+						className="w-fit bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
 					>
 						Info
-					</Link>
+					</button>
 				</div>
 			</div>
 		</header>

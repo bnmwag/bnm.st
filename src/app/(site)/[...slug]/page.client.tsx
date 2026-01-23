@@ -3,11 +3,13 @@
 import { Media } from "@/components/layout/render-media";
 import { Wrapper } from "@/components/layout/wrapper";
 import { ProgressiveBlur } from "@/components/progressive-blur";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import { Link } from "next-view-transitions";
 import { type ComponentProps, type FC, useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
 
 interface IIndexPageClientProps extends ComponentProps<"div"> {
 	projects: Project[];
@@ -17,26 +19,12 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	const containerRef = useRef<HTMLDivElement>(null);
 	const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const stackCounterRef = useRef(0);
+
 	const [hoverStack, setHoverStack] = useState<Array<{ id: number; key: string }>>([]);
-	const [isMobile, setIsMobile] = useState(false);
-	const [isTouchDevice, setIsTouchDevice] = useState(false);
 	const [clickedProjectId, setClickedProjectId] = useState<number | null>(null);
 
-	useEffect(() => {
-		const checkMobile = () => {
-			setIsMobile(window.innerWidth < 768);
-		};
-
-		const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-		setIsTouchDevice(hasTouch);
-
-		checkMobile();
-		window.addEventListener("resize", checkMobile);
-
-		return () => {
-			window.removeEventListener("resize", checkMobile);
-		};
-	}, []);
+	const isTouchDevice = useTouchDevice();
+	const isMobile = useMediaQuery("(max-width: 767px)");
 
 	const handleEnter = (id: number) => {
 		if (leaveTimeoutRef.current) {
@@ -247,7 +235,10 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									onClick={(e) => handleClick(e, project.id)}
 									onMouseEnter={() => !isTouchDevice && handleEnter(project.id)}
 									onMouseLeave={() => !isTouchDevice && handleLeave()}
-									className="project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100"
+									className={cn(
+										"project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
+										{ "project-link--active": clickedProjectId === project.id && isTouchDevice },
+									)}
 								>
 									{project.name}
 								</Link>

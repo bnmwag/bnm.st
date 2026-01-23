@@ -13,7 +13,7 @@ export default function RootLayout({
 	return (
 		<ViewTransitions>
 			<html lang="en">
-				<body className={`${fonts.sans.variable} antialiased`}>
+				<body className={`${fonts.sans.variable} bg-background text-foreground antialiased`}>
 					{children}
 					<Dev />
 				</body>

@@ -1,19 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --background-muted: #f5f5f5;
-  --foreground: #0a0a0a;
-  --foreground-muted: #737373;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --background-muted: #171717;
-    --foreground: #f5f5f5;
-    --foreground-muted: #a3a3a3;
-  }
+  --background: #000000;
+  --background-muted: #171717;
+  --foreground: #f5f5f5;
+  --foreground-muted: #a3a3a3;
 }
 
 @theme inline {
@@ -43,4 +34,9 @@ body {
 
 @utility text-caption {
   @apply font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none;
+}
+
+.project-link--active:after {
+  transform-origin: left !important;
+  scale: 1 !important;
 }

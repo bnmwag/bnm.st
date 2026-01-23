@@ -28,13 +28,20 @@ export const useRevealer = () => {
 
 	useGSAP(
 		(context) => {
-			if (!isTransitioning) return;
-
 			// make sure elements exist (prevents no-op on cached DOM changes)
-			const revealer = document.querySelector(".revealer");
+			const revealer = document.querySelector(".revealer") as HTMLElement;
 			if (!revealer) return;
 
+			if (!isTransitioning) {
+				// When not transitioning, ensure revealer is hidden
+				gsap.set(revealer, { y: "-100%" });
+				return;
+			}
+
+			// Reset revealer to cover screen, then animate out
 			const tl = gsap.timeline({ defaults: { ease: "expo.inOut" } });
+
+			tl.set(revealer, { y: "0%" });
 
 			tl.to(revealer, {
 				y: "-100%",

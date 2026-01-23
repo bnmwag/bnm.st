@@ -1,6 +1,6 @@
 "use client";
 
-import { Center, Environment, useAnimations, useGLTF } from "@react-three/drei";
+import { Center, Environment, OrbitControls, useAnimations, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 
 import { type FC, useEffect, useRef, useState } from "react";
@@ -13,13 +13,13 @@ export const Human: FC = () => {
 
 	return (
 		<div className="relative h-full w-full">
-			<button
+			{/* <button
 				type="button"
 				onClick={() => setAction((prev) => (prev === "idle-1" ? "walking" : "idle-1"))}
 				className="absolute top-2 left-2 z-10 bg-background px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-foreground uppercase leading-none"
 			>
 				{action === "idle-1" ? "Start walking" : "Stop walking"}
-			</button>
+			</button> */}
 			<Canvas
 				className="h-full w-full"
 				camera={{
@@ -31,6 +31,7 @@ export const Human: FC = () => {
 				<Center disableX>
 					<Model action={action} />
 				</Center>
+				<OrbitControls makeDefault enablePan={false} enableZoom={false} />
 			</Canvas>
 		</div>
 	);

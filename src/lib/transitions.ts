@@ -1,9 +1,4 @@
-import {
-	useGSAP,
-	type ContextFunc,
-	type useGSAPConfig,
-	type useGSAPReturn,
-} from "@gsap/react";
+import { type ContextFunc, useGSAP, type useGSAPConfig, type useGSAPReturn } from "@gsap/react";
 import { useLenis } from "lenis/react";
 import { useTransitionRouter } from "next-view-transitions";
 import { usePathname } from "next/navigation";
@@ -50,10 +45,7 @@ export const useEntryAnimation = (
 
 	return useGSAP((ctx) => {
 		if (isTransitioning || !func) {
-			if (debug)
-				console.log(
-					"[useEntryAnimation] Skipping animation, transition in progress.",
-				);
+			if (debug) console.log("[useEntryAnimation] Skipping animation, transition in progress.");
 			return;
 		}
 		if (typeof func === "function") {
@@ -93,6 +85,12 @@ export const useTransitionNavigation = () => {
 
 		if (withTransition) {
 			startTransition();
+		} else {
+			// When not using transition, ensure revealer is hidden
+			const revealer = document.querySelector(".revealer") as HTMLElement;
+			if (revealer) {
+				revealer.style.transform = "translateY(-100%)";
+			}
 		}
 
 		router.push(url, {
