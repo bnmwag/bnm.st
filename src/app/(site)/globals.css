@@ -40,3 +40,19 @@ body {
   transform-origin: left !important;
   scale: 1 !important;
 }
+
+.prose a {
+  @apply text-foreground underline;
+}
+
+.prose p {
+  @apply mt-4 leading-4;
+}
+
+.prose ul {
+  @apply list-disc space-y-2 my-8;
+}
+
+.prose strong {
+    font-weight: 800;
+}
