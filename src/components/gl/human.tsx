@@ -1,9 +1,9 @@
 "use client";
 
-import { Center, Environment, OrbitControls, useAnimations, useGLTF } from "@react-three/drei";
+import { Environment, OrbitControls, useAnimations, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 
-import { type FC, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useRef } from "react";
 import type * as THREE from "three";
 
 type ActionName = "walking" | "idle-1";
@@ -35,7 +35,7 @@ const Model: FC = () => {
 	const rotationGroup = useRef<THREE.Group>(null);
 
 	// biome-ignore lint/suspicious/noExplicitAny: GLTF types are not yet correct
-	const { nodes, materials, animations } = useGLTF("/human.glb") as any;
+	const { nodes, materials, animations } = useGLTF("/models/human.glb") as any;
 	const { actions } = useAnimations(animations, group);
 
 	useEffect(() => {
@@ -66,4 +66,4 @@ const Model: FC = () => {
 	);
 };
 
-useGLTF.preload("/human.glb");
+useGLTF.preload("/models/human.glb");

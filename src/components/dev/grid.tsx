@@ -1,11 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { type FC, useEffect, useState } from "react";
 
-const Analytics = dynamic(() => import("@vercel/analytics/react").then((m) => m.Analytics), { ssr: false });
-
-export const Dev: FC = () => {
+export const Grid: FC = () => {
 	const [showGrid, setShowGrid] = useState(false);
 
 	useEffect(() => {
@@ -29,7 +26,6 @@ export const Dev: FC = () => {
 					))}
 				</div>
 			)}
-			<Analytics />
 		</>
 	);
 };

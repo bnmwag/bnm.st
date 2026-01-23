@@ -1,23 +1,22 @@
 import type { Metadata, NextPage } from "next";
 
-import { Info } from "@/components/layout/info";
-import { Wrapper } from "@/components/layout/wrapper";
+import { Info } from "@/components/layout";
 import { getProjects } from "@/data";
 import { IndexPageClient } from "./page.client";
 
 export const metadata: Metadata = {
-	title: "Benjamin Wagner :: Frontend Developer",
+	title: "Benjamin Wagner | Frontend Developer",
 	description: "Frontend developer based in Linz, Austria",
 	openGraph: {
 		url: "https://bnm.st/",
-		title: "Benjamin Wagner :: Frontend Developer",
-		description: "Young Frontend Developer living in Linz, Austria.",
+		title: "Benjamin Wagner | Frontend Developer",
+		description: "Frontend developer based in Linz, Austria",
 		images: [
 			{
 				url: "https://bnm.st/og.jpg",
 				width: 800,
 				height: 600,
-				alt: "Benjamin Wagner :: Frontend Developer",
+				alt: "Benjamin Wagner | Frontend Developer",
 				type: "image/jpeg",
 			},
 		],

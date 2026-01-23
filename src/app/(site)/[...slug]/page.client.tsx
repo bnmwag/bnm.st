@@ -1,7 +1,6 @@
 "use client";
 
-import { Media } from "@/components/layout/render-media";
-import { Wrapper } from "@/components/layout/wrapper";
+import { Media, Wrapper } from "@/components/layout";
 import { ProgressiveBlur } from "@/components/progressive-blur";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { Project } from "@/payload-types";

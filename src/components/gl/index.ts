@@ -1,2 +1,2 @@
-export * from "./scene";
-export * from "./shader-plane";
+export * from "./noise";
+export * from "./human";

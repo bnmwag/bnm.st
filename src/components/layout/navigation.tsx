@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/components/layout/link";
+import { Link } from "@/components/layout";
 import { useTransitionNavigation } from "@/lib/transitions";
 import cn from "clsx";
 import type { ComponentProps, FC } from "react";

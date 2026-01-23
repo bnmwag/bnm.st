@@ -2,7 +2,8 @@ import "./globals.css";
 
 import { ViewTransitions } from "next-view-transitions";
 
-import { Dev } from "@/components/dev/dev";
+import { Grid } from "@/components/dev";
+import { Analytics } from "@vercel/analytics/react";
 import { fonts } from "./fonts";
 
 export default function RootLayout({
@@ -15,7 +16,8 @@ export default function RootLayout({
 			<html lang="en">
 				<body className={`${fonts.sans.variable} bg-background text-foreground antialiased`}>
 					{children}
-					<Dev />
+					<Grid />
+					<Analytics />
 				</body>
 			</html>
 		</ViewTransitions>
