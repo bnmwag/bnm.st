@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 	title: "Benjamin Wagner | Frontend Developer",
 	description: "Frontend developer based in Linz, Austria",
 	openGraph: {
-		url: "https://bnm.st/",
+		url: "https://bnm.st",
 		title: "Benjamin Wagner | Frontend Developer",
 		description: "Frontend developer based in Linz, Austria",
 		images: [

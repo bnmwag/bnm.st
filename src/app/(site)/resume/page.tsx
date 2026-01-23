@@ -1,18 +1,19 @@
+import { Wrapper } from "@/components/layout";
 import type { Metadata, NextPage } from "next";
 
 export const metadata: Metadata = {
-	title: "Resume :: Benjamin Wagner",
+	title: "Resume | Benjamin Wagner",
 	description: "Frontend developer based in Linz, Austria",
 	openGraph: {
 		url: "https://bnm.st/resume",
-		title: "Resume :: Benjamin Wagner",
-		description: "Young Frontend Developer living in Linz, Austria.",
+		title: "Resume | Benjamin Wagner",
+		description: "Frontend developer based in Linz, Austria",
 		images: [
 			{
 				url: "https://bnm.st/og.jpg",
 				width: 800,
 				height: 600,
-				alt: "Resume :: Benjamin Wagner",
+				alt: "Resume | Benjamin Wagner",
 				type: "image/jpeg",
 			},
 		],
@@ -21,159 +22,189 @@ export const metadata: Metadata = {
 
 const ResumePage: NextPage = () => {
 	return (
-		<main className="relative z-10 gap-x-5 space-y-24 px-5 pt-[50svh] pb-[15svh]">
-			<div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 ">
-				<div className="mb-8 max-md:text-xl md:col-span-2 xl:col-start-2">
-					<h1>Resume</h1>
-				</div>
-				<div className="space-y-8 md:col-span-5 md:col-start-3 xl:col-start-4">
-					Benjamin Wagner -<br />
-					Fullstack Experience Developer
-				</div>
-			</div>
-			<div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12">
-				<div className="mb-8 max-md:text-xl md:col-span-2 xl:col-start-2">
-					<h2>Experience</h2>
-				</div>
-				<div className="space-y-8 md:col-span-5 md:col-start-3 xl:col-start-4">
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">puka.studio - Puka GmbH, Linz</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">SEP 2025 - PRESENT</p>
-						</div>
-						<p className="text-balance text-foreground-muted">
-							As the Digital Experience Designer in this 2-person company, I handle all aspects of the digital experience like
-							designing, developing, testing, and launching websites, webshops, and apps.
-						</p>
+		<Wrapper>
+			<section className="relative space-y-24 py-[25vh]">
+				<div className="layout-grid">
+					<div className="col-span-2 text-caption md:col-start-3">
+						<h1>Resume</h1>
 					</div>
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">Civilian Service</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">SEP 2024 - JUL 2025</p>
-						</div>
-						<p className="text-balance text-foreground-muted">Had a really nice time there.</p>
-					</div>
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">CIC - Corporate Image Consulting GmbH, Traun</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">MAY 2024 - AUG 2024</p>
-						</div>
-						<p className="text-balance text-foreground-muted">
-							Developed and built websites from scratch using PHP and the company's internal system, customizing and finalizing
-							them according to client requirements. Collaborated closely with designers and project managers to deliver
-							high-quality digital solutions.
-						</p>
-					</div>
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">SPS-Marketing, Linz</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">JUN 2021 - MAR 2024</p>
-						</div>
-						<p className="text-balance text-foreground-muted">
-							Apprenticeship as a Media Specialist - Focus on Web Development, awarded with distinction.
-						</p>
-					</div>
+					<div className="col-span-full col-start-5 text-caption md:col-span-6">Benjamin Wagner - Frontend Developer</div>
 				</div>
-			</div>
-			<div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 ">
-				<div className="mb-8 max-md:text-xl md:col-span-2 xl:col-start-2">
-					<h2>Education</h2>
-				</div>
-				<div className="space-y-8 md:col-span-5 md:col-start-3 xl:col-start-4">
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">Apprenticeship as a Media Specialist - Focus on Web Development</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">JUN 2021 - MAR 2024</p>
-						</div>
-						<p className="text-balance text-foreground-muted">SPS-Marketing, Linz - Graduated with distinction.</p>
+				<div className="layout-grid">
+					<div className="col-span-2 text-caption md:col-start-3">
+						<h2>Experience</h2>
 					</div>
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">Higher Technical Institute (HTL) Perg - Computer Science</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">SEP 2019 - JAN 2021</p>
-						</div>
-						<p className="text-balance text-foreground-muted">
-							Attended for 1.5 years before transitioning into an apprenticeship.
-						</p>
-					</div>
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">New Middle School (NMS) Naarn</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">SEP 2015 - JUN 2019</p>
-						</div>
-						<p className="text-balance text-foreground-muted">General secondary education.</p>
-					</div>
-				</div>
-			</div>
-			<div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12">
-				<div className="mb-8 max-md:text-xl md:col-span-2 xl:col-start-2">
-					<h2>Skills</h2>
-				</div>
-				<div className="space-y-6 md:col-span-5 md:col-start-3 xl:col-start-4">
-					<ul className="grid gap-4 md:grid-cols-2">
-						<li className="relative">
-							<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 h-px w-3 bg-foreground-muted" />
-							Web Technologies
-						</li>
-						<li className="relative">
-							<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 h-px w-3 bg-foreground-muted" />
-							Critical Thinking
-						</li>
-						<li className="relative space-y-2">
-							<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 h-px w-3 bg-foreground-muted" />
-							Problem Solving
-						</li>
-						<li className="relative space-y-2">
-							<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 h-px w-3 bg-foreground-muted" />
-							Teamplayer
-						</li>
-						<li className="relative space-y-2">
-							<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 h-px w-3 bg-foreground-muted" />
-							Perform under pressure
-						</li>
-						<li className="relative space-y-2">
-							<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 h-px w-3 bg-foreground-muted" />
-							Adaptable to new technologies
-						</li>
-					</ul>
-				</div>
-			</div>
-			<div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 ">
-				<div className="mb-8 max-md:text-xl md:col-span-2 xl:col-start-2">
-					<h2>Awards</h2>
-				</div>
-				<div className="space-y-8 md:col-span-5 md:col-start-3 xl:col-start-4">
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p>
-								<a
-									href="https://www.german-brand-award.com/preistraeger/galerie/detail/41107-the-power-of-magna.html"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-balance hover:underline"
-								>
-									GBA Award 2022 - Magna cum laude
-								</a>
+					<div className="col-span-full col-start-5 text-caption md:col-span-6">
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">puka.studio - Puka GmbH, Linz</p>
+								<p className="whitespace-nowrap font-mono md:text-right">SEP 2025 - PRESENT</p>
+							</div>
+							<p className="text-balance text-foreground-muted">
+								As the Digital Experience Designer in this 2-person company, I handle all aspects of the digital experience like
+								designing, developing, testing, and launching websites, webshops, and apps.
 							</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">2022</p>
 						</div>
-						<p className="text-balance text-foreground-muted">
-							Awarded for excellence in the field of media marketing with SPS Marketing.
-						</p>
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">Civilian Service</p>
+								<p className="whitespace-nowrap font-mono md:text-right">SEP 2024 - JUL 2025</p>
+							</div>
+							<p className="text-balance text-foreground-muted">Had a really nice time there.</p>
+						</div>
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">CIC - Corporate Image Consulting GmbH, Traun</p>
+								<p className="whitespace-nowrap font-mono md:text-right">MAY 2024 - AUG 2024</p>
+							</div>
+							<p className="text-balance text-foreground-muted">
+								Developed and built websites from scratch using PHP and the company's internal system, customizing and finalizing
+								them according to client requirements. Collaborated closely with designers and project managers to deliver
+								high-quality digital solutions.
+							</p>
+						</div>
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">SPS-Marketing, Linz</p>
+								<p className="whitespace-nowrap font-mono md:text-right">JUN 2021 - MAR 2024</p>
+							</div>
+							<p className="text-balance text-foreground-muted">
+								Apprenticeship as a Media Specialist - Focus on Web Development, awarded with distinction.
+							</p>
+						</div>
 					</div>
-					<div className="space-y-2 pb-4">
-						<div className="flex justify-between max-md:flex-col md:items-end">
-							<p className="text-balance">Apprenticeship Award for Excellence</p>
-							<p className="whitespace-nowrap font-mono text-xs md:text-right">2024</p>
+				</div>
+				<div className="layout-grid">
+					<div className="col-span-2 text-caption md:col-start-3">
+						<h2>Education</h2>
+					</div>
+					<div className="col-span-full col-start-5 text-caption md:col-span-6">
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">Apprenticeship as a Media Specialist - Focus on Web Development</p>
+								<p className="whitespace-nowrap font-mono md:text-right">JUN 2021 - MAR 2024</p>
+							</div>
+							<p className="text-balance text-foreground-muted">SPS-Marketing, Linz - Graduated with distinction.</p>
 						</div>
-						<p className="text-balance text-foreground-muted">
-							Awarded for outstanding performance and distinction during apprenticeship as a Media Specialist, Focus on Web
-							Development.
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">Higher Technical Institute (HTL) Perg - Computer Science</p>
+								<p className="whitespace-nowrap font-mono md:text-right">SEP 2019 - JAN 2021</p>
+							</div>
+							<p className="text-balance text-foreground-muted">
+								Attended for 1.5 years before transitioning into an apprenticeship.
+							</p>
+						</div>
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">New Middle School (NMS) Naarn</p>
+								<p className="whitespace-nowrap font-mono md:text-right">SEP 2015 - JUN 2019</p>
+							</div>
+							<p className="text-balance text-foreground-muted">General secondary education.</p>
+						</div>
+					</div>
+				</div>
+				<div className="layout-grid">
+					<div className="col-span-2 text-caption md:col-start-3">
+						<h2>Skills</h2>
+					</div>
+					<div className="col-span-full col-start-5 text-caption md:col-span-6">
+						<ul className="grid gap-4 md:grid-cols-2">
+							<li className="relative">
+								<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 size-1.5 bg-foreground" />
+								Web Technologies
+							</li>
+							<li className="relative">
+								<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 size-1.5 bg-foreground" />
+								Critical Thinking
+							</li>
+							<li className="relative space-y-2">
+								<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 size-1.5 bg-foreground" />
+								Problem Solving
+							</li>
+							<li className="relative space-y-2">
+								<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 size-1.5 bg-foreground" />
+								Teamplayer
+							</li>
+							<li className="relative space-y-2">
+								<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 size-1.5 bg-foreground" />
+								Perform under pressure
+							</li>
+							<li className="relative space-y-2">
+								<span className="-left-4 -translate-x-full -translate-y-1/2 absolute top-1/2 size-1.5 bg-foreground" />
+								Adaptable to new technologies
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div className="layout-grid">
+					<div className="col-span-2 text-caption md:col-start-3">
+						<h2>Awards</h2>
+					</div>
+					<div className="col-span-full col-start-5 text-caption md:col-span-6">
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p>
+									<a
+										href="https://www.german-brand-award.com/preistraeger/galerie/detail/41107-the-power-of-magna.html"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-balance hover:underline"
+									>
+										GBA Award 2022 - Magna cum laude
+									</a>
+								</p>
+								<p className="whitespace-nowrap font-mono md:text-right">2022</p>
+							</div>
+							<p className="text-balance text-foreground-muted">
+								Awarded for excellence in the field of media marketing with SPS Marketing.
+							</p>
+						</div>
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">Apprenticeship Award for Excellence</p>
+								<p className="whitespace-nowrap font-mono md:text-right">2024</p>
+							</div>
+							<p className="text-balance text-foreground-muted">
+								Awarded for outstanding performance and distinction during apprenticeship as a Media Specialist, Focus on Web
+								Development.
+							</p>
+						</div>
+						<div className="space-y-2 pb-4">
+							<div className="flex justify-between max-md:flex-col md:items-end">
+								<p className="text-balance">
+									<a
+										href="https://www.awwwards.com/sites/hard-chor"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-balance hover:underline"
+									>
+										Awwwards | Honorable Mention - Hard-Chor
+									</a>
+								</p>
+								<p className="whitespace-nowrap font-mono md:text-right">2026</p>
+							</div>
+							<p className="text-balance text-foreground-muted">Awarded for the website of the choir Hard-Chor.</p>
+						</div>
+					</div>
+				</div>
+				<div className="layout-grid">
+					<div className="col-span-2 text-caption md:col-start-3" />
+					<div className="col-span-full col-start-5 text-caption md:col-span-6">
+						<p>
+							<a
+								href="/docs/RESUME-Benjamin_Wagner.pdf"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="w-fit bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
+							>
+								Download Resume
+							</a>
 						</p>
 					</div>
 				</div>
-			</div>
-		</main>
+			</section>
+		</Wrapper>
 	);
 };
 
