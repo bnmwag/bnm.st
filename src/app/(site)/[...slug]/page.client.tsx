@@ -257,51 +257,59 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							</>
 						)}
 					</div>
-					<div className="col-span-2 col-start-10 space-y-12 self-center">
-						{projects.map((project) => (
-							<motion.div
-								variants={{
-									hidden: {
-										opacity: 0,
-										filter: "blur(12px)",
-									},
-									show: {
-										opacity: 1,
-										filter: "blur(0)",
-									},
-								}}
-								initial="hidden"
-								animate={hoverStack[hoverStack.length - 1]?.id === project.id ? "show" : "hidden"}
-								transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
-								key={project.id}
-								className="space-y-2"
-							>
-								{project.year && (
-									<div className="flex items-center gap-x-2 text-caption">
-										<p className="bg-foreground px-1 py-px text-background">YEAR</p>
-										<p>{project.year}</p>
-									</div>
-								)}
-								{project.copyright && (
-									<div className="flex items-center gap-x-2 text-caption">
-										<p className="bg-foreground px-1 py-px text-background">IMG BY</p>
-										<p>{project.copyright}</p>
-									</div>
-								)}
-								{project.awards?.length ? (
-									<div className="flex items-center gap-x-2 text-caption">
-										<p className="bg-foreground px-1 py-px text-background">AWARDS</p>
-										<p>{project.awards.join(", ")}</p>
-									</div>
-								) : null}
-								{project.services?.length ? (
-									<div className="flex items-center gap-x-2 text-caption">
-										<p className="bg-foreground px-1 py-px text-background">SERVICES</p>
-										<p>{project.services.join(", ")}</p>
-									</div>
-								) : null}
-							</motion.div>
-						))}
+					<div className="col-span-2 col-start-10 space-y-12 self-end">
+						<div className="flex flex-col justify-center gap-y-12">
+							{projects.map((project) => (
+								<motion.div
+									variants={{
+										hidden: {
+											opacity: 0,
+											filter: "blur(12px)",
+										},
+										show: {
+											opacity: 1,
+											filter: "blur(0)",
+										},
+									}}
+									initial="hidden"
+									animate={hoverStack[hoverStack.length - 1]?.id === project.id ? "show" : "hidden"}
+									transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
+									key={project.id}
+									className="space-y-2"
+								>
+									{project.year && (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-foreground px-1 py-px text-background">YEAR</p>
+											<p>{project.year}</p>
+										</div>
+									)}
+									{project.copyright && (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-foreground px-1 py-px text-background">IMG BY</p>
+											<p>{project.copyright}</p>
+										</div>
+									)}
+									{project.awards?.length ? (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-foreground px-1 py-px text-background">AWARDS</p>
+											<p>{project.awards.join(", ")}</p>
+										</div>
+									) : null}
+									{project.services?.length ? (
+										<div className="flex items-center gap-x-2 text-caption">
+											<p className="bg-foreground px-1 py-px text-background">SERVICES</p>
+											<p>{project.services.join(", ")}</p>
+										</div>
+									) : null}
+								</motion.div>
+							))}
+						</div>
+						{!isTouchDevice && (
+							<div className="col-span-8 col-start-10 self-end">
+								<p className="text-caption">press shift + G</p>
+								<p className="text-caption">to show layout grid</p>
+							</div>
+						)}
 					</div>
 				</div>
 			</section>
