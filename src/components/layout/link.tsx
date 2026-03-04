@@ -1,8 +1,9 @@
 "use client";
 
-import { useTransitionNavigation } from "@/lib/transitions";
+// import { useTransitionNavigation } from "@/lib/transitions";
 import cn from "clsx";
 import NextLink, { type LinkProps } from "next/link";
+import { useRouter } from "next/navigation";
 import type { FC } from "react";
 
 interface ILinkProps extends LinkProps {
@@ -15,7 +16,7 @@ interface ILinkProps extends LinkProps {
 }
 
 export const Link: FC<ILinkProps> = ({ className, withTransition = true, target, rel, ...props }) => {
-	const router = useTransitionNavigation();
+	const router = useRouter();
 
 	const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
 		// Allow default behavior for external links or when meta/ctrl key is pressed
@@ -24,14 +25,14 @@ export const Link: FC<ILinkProps> = ({ className, withTransition = true, target,
 		}
 
 		e.preventDefault();
-		router.push(props.href as string, { withTransition });
+		router.push(props.href as string);
 	};
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
 		// Ensure Enter key works properly
 		if (e.key === "Enter" && !e.metaKey && !e.ctrlKey && target !== "_blank") {
 			e.preventDefault();
-			router.push(props.href as string, { withTransition });
+			router.push(props.href as string);
 		}
 	};
 

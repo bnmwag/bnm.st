@@ -1,6 +1,6 @@
 import type { Metadata, NextPage } from "next";
 
-import { Info } from "@/components/layout";
+import { Info } from "@/components/layout/info";
 import { getProjects } from "@/data";
 import { IndexPageClient } from "./page.client";
 
