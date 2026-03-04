@@ -9,13 +9,20 @@ async function loadFont() {
 	return res.arrayBuffer();
 }
 
-interface OgImageProps {
-	title: string;
-	subtitle?: string;
-	label?: string;
-}
+const pad = 56;
 
-export async function buildOgImage({ title, subtitle, label = "FREELANCE FRONTEND DEVELOPER" }: OgImageProps) {
+const caption = {
+	fontSize: 11,
+	fontWeight: 700,
+	letterSpacing: "0.1em",
+	textTransform: "uppercase" as const,
+	color: "#000",
+	opacity: 0.35,
+	lineHeight: 1.4,
+};
+
+// ── Home OG: small role top-left, big name bottom-left ────────────────────────
+export async function buildHomeOgImage() {
 	const fontData = await loadFont();
 
 	return new ImageResponse(
@@ -23,119 +30,105 @@ export async function buildOgImage({ title, subtitle, label = "FREELANCE FRONTEN
 			style={{
 				width: "100%",
 				height: "100%",
-				background: "#000",
+				background: "#fff",
+				backgroundImage:
+					"radial-gradient(rgba(0,0,0,0.10) 1px, transparent 1px)",
+				backgroundSize: "3px 3px",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
-				padding: "48px 56px",
+				padding: pad,
 				fontFamily: "ZalandoSans",
-				color: "#fff",
 				position: "relative",
 				overflow: "hidden",
 			}}
 		>
-			{/* Scanlines */}
-			<div
-				style={{
-					position: "absolute",
-					inset: 0,
-					backgroundImage:
-						"repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(255,255,255,0.035) 3px, rgba(255,255,255,0.035) 4px)",
-					pointerEvents: "none",
-				}}
-			/>
+			{/* Top-left: role */}
+			<span style={{ ...caption }}>
+				Freelance Creative Developer
+			</span>
 
-			{/* Top bar */}
-			<div
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "flex-start",
-					width: "100%",
-				}}
-			>
+			{/* Bottom-left: name in two lines */}
+			<div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
 				<span
 					style={{
-						fontSize: 13,
-						fontWeight: 700,
-						letterSpacing: "0.08em",
-						textTransform: "uppercase",
-						opacity: 0.9,
-					}}
-				>
-					BNM.ST
-				</span>
-				<span
-					style={{
-						fontSize: 13,
-						fontWeight: 700,
-						letterSpacing: "0.08em",
-						textTransform: "uppercase",
-						opacity: 0.4,
-					}}
-				>
-					{label}
-				</span>
-			</div>
-
-			{/* Main title */}
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "column",
-					gap: 0,
-					flex: 1,
-					justifyContent: "center",
-					paddingTop: 16,
-				}}
-			>
-				<span
-					style={{
-						fontSize: title.length > 20 ? 88 : 104,
+						fontSize: 118,
 						fontWeight: 700,
 						letterSpacing: "-0.04em",
 						textTransform: "uppercase",
 						lineHeight: 0.85,
-						color: "#fff",
+						color: "#000",
 					}}
 				>
-					{title}
+					Benjamin
 				</span>
+				<span
+					style={{
+						fontSize: 118,
+						fontWeight: 700,
+						letterSpacing: "-0.04em",
+						textTransform: "uppercase",
+						lineHeight: 0.85,
+						color: "#000",
+					}}
+				>
+					Wagner
+				</span>
+			</div>
+		</div>,
+		{
+			...OG_SIZE,
+			fonts: [{ name: "ZalandoSans", data: fontData, weight: 700, style: "normal" }],
+		},
+	);
+}
+
+// ── Sub-page OG: small breadcrumb top-left, big page title bottom-left ────────
+interface SubPageOgProps {
+	title: string;
+	titleSize?: number;
+}
+
+export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgProps) {
+	const fontData = await loadFont();
+
+	return new ImageResponse(
+		<div
+			style={{
+				width: "100%",
+				height: "100%",
+				background: "#fff",
+				backgroundImage:
+					"radial-gradient(rgba(0,0,0,0.10) 1px, transparent 1px)",
+				backgroundSize: "3px 3px",
+				display: "flex",
+				flexDirection: "column",
+				justifyContent: "space-between",
+				padding: pad,
+				fontFamily: "ZalandoSans",
+				position: "relative",
+				overflow: "hidden",
+			}}
+		>
+			{/* Top-left: breadcrumb */}
+			<div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+				<span style={{ ...caption }}>Benjamin Wagner</span>
+				<span style={{ ...caption }}>Freelance Frontend Developer</span>
 			</div>
 
-			{/* Bottom bar */}
-			<div
+			{/* Bottom-left: page title */}
+			<span
 				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "flex-end",
-					width: "100%",
+					fontSize: titleSize,
+					fontWeight: 700,
+					letterSpacing: "-0.04em",
+					textTransform: "uppercase",
+					lineHeight: 0.85,
+					color: "#000",
 				}}
 			>
-				<span
-					style={{
-						fontSize: 13,
-						fontWeight: 700,
-						letterSpacing: "0.06em",
-						textTransform: "uppercase",
-						opacity: 0.4,
-						maxWidth: 600,
-					}}
-				>
-					{subtitle ?? "Based in Austria · Working worldwide"}
-				</span>
-				<span
-					style={{
-						fontSize: 13,
-						fontWeight: 700,
-						letterSpacing: "0.08em",
-						textTransform: "uppercase",
-						opacity: 0.25,
-					}}
-				>
-					BENJAMIN WAGNER
-				</span>
-			</div>
+				{title}
+			</span>
 		</div>,
 		{
 			...OG_SIZE,
