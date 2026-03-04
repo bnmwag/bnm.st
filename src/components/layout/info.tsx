@@ -1,11 +1,11 @@
 "use client";
 
-import { useEntryAnimation, useTransitionNavigation } from "@/lib/transitions";
+import { ScrambleText } from "@/components/scramble-text";
 import { gsap } from "gsap";
 import Lenis from "lenis";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { type FC, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { type FC, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Human } from "../gl/human";
 
 const services = [
@@ -29,6 +29,23 @@ const services = [
 	},
 ];
 
+const InfoLink: FC<{ label: string; value: string; href: string }> = ({ label, value, href }) => {
+	return (
+		<div className="col-span-6 grid grid-cols-6 items-baseline">
+			<p className="col-span-2 text-caption opacity-50">{label}</p>
+			<a
+				href={href}
+				target="_blank"
+				rel="noreferrer"
+				className="group relative col-span-4 inline-flex w-fit overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+			>
+				<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+				<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">{value}</ScrambleText>
+			</a>
+		</div>
+	);
+};
+
 const links = [
 	{
 		label: "Email",
@@ -42,17 +59,20 @@ const links = [
 export const Info: FC = () => {
 	const since = Math.floor((Date.now() - new Date("2021-06-01").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
 
-	const scope = useRef<HTMLDivElement>(null);
 	const content = useRef<HTMLDivElement>(null);
 	const scrollWrapper = useRef<HTMLDivElement>(null);
 	const blend = useRef<HTMLDivElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+	const router = useRouter();
 	const pathname = usePathname();
-	const router = useTransitionNavigation();
+	const [mounted, setMounted] = useState(false);
 
+	useEffect(() => setMounted(true), []);
+
+	// ─── Lenis scroll inside panel ────────────────────────────────────────────
 	useEffect(() => {
-		if (!scrollWrapper.current || pathname !== "/info") return;
+		if (!scrollWrapper.current || pathname !== "/info" || !mounted) return;
 
 		const lenis = new Lenis({
 			wrapper: scrollWrapper.current,
@@ -69,67 +89,42 @@ export const Info: FC = () => {
 			lenis.raf(time);
 			rafId = requestAnimationFrame(raf);
 		}
-
 		rafId = requestAnimationFrame(raf);
 
 		return () => {
 			cancelAnimationFrame(rafId);
 			lenis.destroy();
 		};
-	}, [pathname]);
+	}, [pathname, mounted]);
 
-	useEntryAnimation(
-		() => {
-			if (pathname !== "/info") return;
+	// ─── Open animation ───────────────────────────────────────────────────────
+	useEffect(() => {
+		if (pathname !== "/info" || !mounted) return;
 
-			const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+		const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+		tl.to(blend.current, { opacity: 1, duration: 1 });
+		tl.to(content.current, { clipPath: "inset(0 0 0% 0)", duration: 1.5 });
+		tl.set([content.current, blend.current], { pointerEvents: "auto" });
+		tl.call(() => closeButtonRef.current?.focus());
 
-			tl.to(blend.current, {
-				opacity: 1,
-				duration: 1,
-			});
+		return () => { tl.kill(); };
+	}, [pathname, mounted]);
 
-			tl.to(content.current, {
-				clipPath: "inset(0 0 0% 0)",
-				duration: 1.5,
-			});
-
-			tl.set([content.current, blend.current], {
-				pointerEvents: "auto",
-			});
-
-			// Focus the close button when the panel opens
-			tl.call(() => {
-				closeButtonRef.current?.focus();
-			});
-
-			return () => tl.kill();
-		},
-		{ scope },
-	);
-
+	// ─── Close ────────────────────────────────────────────────────────────────
 	const handleBack = () => {
 		const tl = gsap.timeline({
 			defaults: { ease: "expo.inOut" },
-			onComplete: () => {
-				router.push("/", { withTransition: false });
-			},
+			onComplete: () => router.back(),
 		});
-
-		tl.to(content.current, {
-			clipPath: "inset(100% 0 0 0)",
-			duration: 0.9,
-		});
-
+		tl.to(content.current, { clipPath: "inset(100% 0 0 0)", duration: 0.9 });
 		tl.to(blend.current, { opacity: 0, duration: 0.7 }, "-=0.4");
-
-		tl.set([content.current, blend.current], {
-			pointerEvents: "none",
-		});
+		tl.set([content.current, blend.current], { pointerEvents: "none" });
 	};
 
-	return (
-		<div ref={scope}>
+	if (!mounted) return null;
+
+	return createPortal(
+		<div>
 			<div
 				ref={blend}
 				onClick={handleBack}
@@ -164,9 +159,10 @@ export const Info: FC = () => {
 						type="button"
 						onClick={handleBack}
 						aria-label="Close info panel"
-						className="w-fit bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
+						className="group relative overflow-hidden bg-foreground px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
-						Back
+						<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+						<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Back</ScrambleText>
 					</button>
 				</div>
 				<div ref={scrollWrapper} className="h-full overflow-y-auto">
@@ -206,24 +202,14 @@ export const Info: FC = () => {
 
 							<div className="grid grid-cols-6 gap-y-6">
 								{links.map((link) => (
-									<div key={link.label} className="col-span-6 grid grid-cols-6 items-baseline">
-										<p className="col-span-2 text-caption opacity-50">{link.label}</p>
-
-										<Link
-											href={link.href}
-											target="_blank"
-											rel="noreferrer"
-											className="-translate-x-1.75 hover:translate-0 relative col-span-4 inline-flex h-3 w-fit items-center text-caption transition-transform duration-short ease-default before:aspect-square before:h-1.75 before:rotate-90 before:scale-0 before:bg-background before:transition-all before:duration-short before:ease-default after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:bg-background after:transition-transform after:duration-short after:ease-default hover:after:origin-left hover:after:scale-x-100 hover:before:mr-2 hover:before:rotate-0 hover:before:scale-100"
-										>
-											{link.value}
-										</Link>
-									</div>
+									<InfoLink key={link.label} {...link} />
 								))}
 							</div>
 						</div>
 					</div>
 				</div>
 			</aside>
-		</div>
+		</div>,
+		document.body,
 	);
 };

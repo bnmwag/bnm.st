@@ -1,18 +1,21 @@
 "use client";
 
 import { Link } from "@/components/layout";
-import { useTransitionNavigation } from "@/lib/transitions";
+import { ScrambleText } from "@/components/scramble-text";
 import cn from "clsx";
+import { motion } from "motion/react";
+import { usePathname, useRouter } from "next/navigation";
 import type { ComponentProps, FC } from "react";
 
 interface INavigationProps extends ComponentProps<"div"> {}
 
 export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
-	const router = useTransitionNavigation();
+	const router = useRouter();
+	const pathname = usePathname();
 	const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
 
 	return (
-		<header className={cn("fixed inset-x-0 top-0 z-40 pt-4 mix-blend-difference", className)} {...props}>
+		<header className={cn("fixed inset-x-0 top-0 z-40 pt-4 text-background mix-blend-difference", className)} {...props}>
 			<div className="layout-grid">
 				<div className="col-span-4 flex items-start md:col-span-2">
 					<Link href={"/"} className="inline-block text-caption" aria-label="Home - Benjamin Wagner">
@@ -30,44 +33,63 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 				</div>
 				<nav className="col-span-2 md:col-start-10" aria-label="Main navigation">
 					<ul className="space-y-2">
-						<li className="block h-fit text-[clamp(.625rem,.5vw,.75rem)] leading-none ">
+						<li className="block h-fit leading-none">
 							<Link
 								href="/resume"
-								className="-translate-x-1.75 hover:translate-0 relative inline-flex h-3 w-fit items-center text-caption transition-transform duration-short ease-default before:aspect-square before:h-1.75 before:rotate-90 before:scale-0 before:bg-foreground before:transition-all before:duration-short before:ease-default after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:bg-foreground after:transition-transform after:duration-short after:ease-default hover:after:origin-left hover:after:scale-x-100 hover:before:mr-2 hover:before:rotate-0 hover:before:scale-100"
+								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
-								Resume
+								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Resume</ScrambleText>
 							</Link>
 						</li>
-						<li className="block h-fit text-[clamp(.625rem,.5vw,.75rem)] leading-none ">
+						<li className="block h-fit leading-none">
 							<Link
 								href="/imprint"
-								className="-translate-x-1.75 hover:translate-0 relative inline-flex h-3 w-fit items-center text-caption transition-transform duration-short ease-default before:aspect-square before:h-1.75 before:rotate-90 before:scale-0 before:bg-foreground before:transition-all before:duration-short before:ease-default after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:bg-foreground after:transition-transform after:duration-short after:ease-default hover:after:origin-left hover:after:scale-x-100 hover:before:mr-2 hover:before:rotate-0 hover:before:scale-100"
+								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
-								Imprint
+								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Imprint</ScrambleText>
 							</Link>
 						</li>
-						<li className="block h-fit text-[clamp(.625rem,.5vw,.75rem)] leading-none ">
+						<li className="block h-fit leading-none">
 							<Link
 								href="/privacy"
-								className="-translate-x-1.75 hover:translate-0 relative inline-flex h-3 w-fit items-center text-caption transition-transform duration-short ease-default before:aspect-square before:h-1.75 before:rotate-90 before:scale-0 before:bg-foreground before:transition-all before:duration-short before:ease-default after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:bg-foreground after:transition-transform after:duration-short after:ease-default hover:after:origin-left hover:after:scale-x-100 hover:before:mr-2 hover:before:rotate-0 hover:before:scale-100"
+								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
-								Privacy
+								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Privacy</ScrambleText>
+							</Link>
+						</li>
+						<li className="block h-fit leading-none">
+							<Link
+								href="/contact"
+								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+							>
+								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Contact</ScrambleText>
 							</Link>
 						</li>
 					</ul>
 				</nav>
-				<div className="col-span-4 col-start-9 flex items-start justify-end md:col-span-1 md:col-start-12">
+				<motion.div
+					className="col-span-4 col-start-9 flex items-start justify-end md:col-span-1 md:col-start-12"
+					animate={{
+						opacity: pathname === "/" || pathname === "/info" ? 1 : 0,
+						filter: pathname === "/" || pathname === "/info" ? "blur(0px)" : "blur(12px)",
+						pointerEvents: pathname === "/" || pathname === "/info" ? "auto" : "none",
+					}}
+					transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
+				>
 					<button
 						type="button"
-						onClick={() => {
-							router.push("/info", { withTransition: false });
-						}}
+						onClick={() => router.push("/info")}
 						aria-label="Open info panel"
-						className="w-fit bg-foreground px-2 py-0.5 text-left font-medium text-[clamp(.625rem,.5vw,.75rem)] text-background uppercase leading-none"
+						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
-						Info
+						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+						<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">Info</ScrambleText>
 					</button>
-				</div>
+				</motion.div>
 			</div>
 		</header>
 	);
