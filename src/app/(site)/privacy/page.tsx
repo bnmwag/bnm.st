@@ -2,21 +2,15 @@ import { Wrapper } from "@/components/layout";
 import type { Metadata, NextPage } from "next";
 
 export const metadata: Metadata = {
-	title: "Imprint :: Benjamin Wagner",
-	description: "Frontend developer based in Linz, Austria",
+	title: "Privacy Policy",
+	description: "Privacy policy for bnm.st — how your data is handled when you visit or contact Benjamin Wagner.",
+	alternates: { canonical: "https://bnm.st/privacy" },
+	robots: { index: false, follow: false },
 	openGraph: {
-		url: "https://bnm.st/resume",
-		title: " Imprint :: Benjamin Wagner",
-		description: "Young Frontend Developer living in Linz, Austria.",
-		images: [
-			{
-				url: "https://bnm.st/og.jpg",
-				width: 800,
-				height: 600,
-				alt: "Imprint :: Benjamin Wagner",
-				type: "image/jpeg",
-			},
-		],
+		url: "https://bnm.st/privacy",
+		title: "Privacy Policy — Benjamin Wagner",
+		description: "Privacy policy for bnm.st.",
+		images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Privacy Policy — Benjamin Wagner", type: "image/jpeg" }],
 	},
 };
 

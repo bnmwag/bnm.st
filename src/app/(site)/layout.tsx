@@ -1,5 +1,50 @@
 import "./globals.css";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	metadataBase: new URL("https://bnm.st"),
+	title: {
+		default: "Benjamin Wagner — Freelance Frontend Developer",
+		template: "%s — Benjamin Wagner",
+	},
+	description:
+		"Freelance frontend & creative developer based in Austria. Building design-driven React & Next.js interfaces, WebGL experiences, and polished digital products for clients worldwide.",
+	keywords: [
+		"freelance frontend developer",
+		"creative developer",
+		"React developer",
+		"Next.js developer",
+		"WebGL developer",
+		"UI engineer",
+		"Figma to code",
+		"interactive web design",
+		"scroll animations",
+		"Three.js",
+		"Austria",
+		"Benjamin Wagner",
+	],
+	authors: [{ name: "Benjamin Wagner", url: "https://bnm.st" }],
+	creator: "Benjamin Wagner",
+	openGraph: {
+		type: "website",
+		locale: "en_US",
+		url: "https://bnm.st",
+		siteName: "Benjamin Wagner",
+		images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Benjamin Wagner — Freelance Frontend Developer" }],
+	},
+	twitter: {
+		card: "summary_large_image",
+		creator: "@bnmwag",
+		site: "@bnmwag",
+	},
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+	},
+};
+
 import { Grid } from "@/components/dev";
 import Noise from "@/components/gl/noise";
 import { Navigation } from "@/components/layout/navigation";
