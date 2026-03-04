@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --background-muted: #171717;
-  --foreground: #f5f5f5;
-  --foreground-muted: #a3a3a3;
+  --background: #fff;
+  --background-muted: #a3a3a3;
+  --foreground: #000;
+  --foreground-muted: #171717;
 }
 
 @theme inline {
@@ -23,9 +23,15 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-zalando-sans);
+}
+
+::selection {
+  @apply bg-background text-foreground;
+}
+
+a, button {
+  @apply cursor-pointer;
 }
 
 @utility layout-grid {
