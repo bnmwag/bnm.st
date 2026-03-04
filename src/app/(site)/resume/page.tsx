@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 		title: "Resume — Benjamin Wagner",
 		description:
 			"4+ years of experience across freelance and agency work — specialising in React, Next.js, WebGL, and creative frontend development.",
-		images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Resume — Benjamin Wagner", type: "image/jpeg" }],
 	},
 };
 

@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 		title: "Benjamin Wagner — Freelance Frontend Developer",
 		description:
 			"Freelance frontend & creative developer based in Austria. I build design-driven React & Next.js interfaces, WebGL experiences, and polished digital products for clients worldwide.",
-		images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Benjamin Wagner — Freelance Frontend Developer", type: "image/jpeg" }],
 	},
 };
 
