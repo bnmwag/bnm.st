@@ -6,7 +6,7 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { type ComponentProps, type FC, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -237,7 +237,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 						})}
 					</AnimatePresence>
 				</motion.div>
-				<div className="layout-grid z-20 h-full py-4 mix-blend-difference ">
+				<div className="layout-grid z-20 h-full py-4 text-background mix-blend-difference ">
 					<nav className="links-container col-span-6 flex flex-wrap gap-4 self-end" aria-label="Project links">
 						{projects.map((project) => (
 							<div key={project.id} className="relative">
@@ -250,7 +250,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									onMouseLeave={() => !isTouchDevice && handleLeave()}
 									aria-label={`Visit ${project.name} website`}
 									className={cn(
-										"project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-foreground after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
+										"project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-background after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
 										{ "project-link--active": clickedProjectId === project.id && isTouchDevice },
 									)}
 								>
@@ -295,7 +295,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 								>
 									{project.year && (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background" aria-label="Year">
+											<p className="bg-background px-1 py-px text-foreground" aria-label="Year">
 												YEAR
 											</p>
 											<p>{project.year}</p>
@@ -303,7 +303,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									)}
 									{project.copyright && (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background" aria-label="Image credit">
+											<p className="bg-background px-1 py-px text-foreground" aria-label="Image credit">
 												IMG BY
 											</p>
 											<p>{project.copyright}</p>
@@ -311,7 +311,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									)}
 									{project.awards?.length ? (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background" aria-label="Awards">
+											<p className="bg-background px-1 py-px text-foreground" aria-label="Awards">
 												AWARDS
 											</p>
 											<p>{project.awards.join(", ")}</p>
@@ -319,7 +319,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									) : null}
 									{project.services?.length ? (
 										<div className="flex items-center gap-x-2 text-caption">
-											<p className="bg-foreground px-1 py-px text-background" aria-label="Services">
+											<p className="bg-background px-1 py-px text-foreground" aria-label="Services">
 												SERVICES
 											</p>
 											<p>{project.services.join(", ")}</p>
