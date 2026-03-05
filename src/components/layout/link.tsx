@@ -1,6 +1,5 @@
 "use client";
 
-// import { useTransitionNavigation } from "@/lib/transitions";
 import cn from "clsx";
 import NextLink, { type LinkProps } from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,13 +8,12 @@ import type { FC } from "react";
 interface ILinkProps extends LinkProps {
 	className?: string;
 	children: React.ReactNode;
-	withTransition?: boolean;
 	"aria-label"?: string;
 	target?: string;
 	rel?: string;
 }
 
-export const Link: FC<ILinkProps> = ({ className, withTransition = true, target, rel, ...props }) => {
+export const Link: FC<ILinkProps> = ({ className, target, rel, ...props }) => {
 	const router = useRouter();
 
 	const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
