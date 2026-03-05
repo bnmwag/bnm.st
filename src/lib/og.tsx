@@ -18,6 +18,90 @@ async function loadFonts() {
 	return { bold, medium, light };
 }
 
+// ── Minimal pure-JS PNG encoder (works on Edge + Node, no deps) ───────────────
+const CRC_TABLE = (() => {
+	const t = new Uint32Array(256);
+	for (let n = 0; n < 256; n++) {
+		let c = n;
+		for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+		t[n] = c >>> 0;
+	}
+	return t;
+})();
+
+function crc32(buf: Buffer): number {
+	let c = 0xffffffff;
+	for (const b of buf) c = CRC_TABLE[(c ^ b) & 0xff] ^ (c >>> 8);
+	return (c ^ 0xffffffff) >>> 0;
+}
+
+function pngChunk(type: string, data: Buffer): Buffer {
+	const t = Buffer.from(type, "ascii");
+	const lenBuf = Buffer.alloc(4);
+	lenBuf.writeUInt32BE(data.length);
+	const crcBuf = Buffer.alloc(4);
+	crcBuf.writeUInt32BE(crc32(Buffer.concat([t, data])));
+	return Buffer.concat([lenBuf, t, data, crcBuf]);
+}
+
+function adler32(data: Buffer): number {
+	let s1 = 1;
+	let s2 = 0;
+	for (const b of data) {
+		s1 = (s1 + b) % 65521;
+		s2 = (s2 + s1) % 65521;
+	}
+	return ((s2 << 16) | s1) >>> 0;
+}
+
+// zlib wrapper using a stored (no-compression) deflate block — no zlib import needed
+function zlibStore(data: Buffer): Buffer {
+	const blockHeader = Buffer.alloc(5);
+	blockHeader[0] = 0x01; // BFINAL=1, BTYPE=00 (stored)
+	blockHeader.writeUInt16LE(data.length, 1);
+	blockHeader.writeUInt16LE((~data.length) & 0xffff, 3);
+	const checksum = Buffer.alloc(4);
+	checksum.writeUInt32BE(adler32(data));
+	// zlib header: CMF=0x78, FLG=0x01 → (0x78*256+0x01) % 31 === 0 ✓
+	return Buffer.concat([Buffer.from([0x78, 0x01]), blockHeader, data, checksum]);
+}
+
+function buildNoisePng(w: number, h: number, alpha: number): string {
+	const raw = Buffer.alloc(h * (1 + w * 4));
+	let off = 0;
+	for (let y = 0; y < h; y++) {
+		raw[off++] = 0; // PNG filter: None
+		for (let x = 0; x < w; x++) {
+			const v = (Math.random() * 256) | 0;
+			raw[off++] = v;
+			raw[off++] = v;
+			raw[off++] = v;
+			raw[off++] = alpha;
+		}
+	}
+	const ihdr = Buffer.alloc(13);
+	ihdr.writeUInt32BE(w, 0);
+	ihdr.writeUInt32BE(h, 4);
+	ihdr[8] = 8; // bit depth
+	ihdr[9] = 6; // colour type: RGBA
+	const png = Buffer.concat([
+		Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), // PNG signature
+		pngChunk("IHDR", ihdr),
+		pngChunk("IDAT", zlibStore(raw)),
+		pngChunk("IEND", Buffer.alloc(0)),
+	]);
+	return `data:image/png;base64,${png.toString("base64")}`;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SCANLINES: React.CSSProperties = {
+	position: "absolute",
+	inset: 0,
+	display: "flex",
+	backgroundImage:
+		"repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.04) 1px, rgba(0,0,0,0.04) 2px)",
+};
+
 const pad = 20;
 
 const caption: React.CSSProperties = {
@@ -31,6 +115,7 @@ const caption: React.CSSProperties = {
 // ── Home OG: small role top-left, big name bottom-left ────────────────────────
 export async function buildHomeOgImage() {
 	const { bold, medium, light } = await loadFonts();
+	const noise = buildNoisePng(64, 64, 25);
 
 	return new ImageResponse(
 		<div
@@ -39,30 +124,50 @@ export async function buildHomeOgImage() {
 				height: "100%",
 				background: "#fff",
 				display: "flex",
-				flexDirection: "column",
-				justifyContent: "space-between",
-				padding: pad,
-				fontFamily: "ZalandoSans",
 				position: "relative",
 				overflow: "hidden",
 			}}
 		>
-			{/* Top-left: role */}
-			<span style={{ ...caption }}>Freelance Creative Developer</span>
-
-			{/* Bottom-left: full name on one line */}
-			<span
+			{/* noise grain overlay */}
+			<div
 				style={{
-					fontSize: 76,
-					fontWeight: 300,
-					letterSpacing: "-0.04em",
-					textTransform: "uppercase",
-					lineHeight: 1,
-					color: "#000",
+					position: "absolute",
+					inset: 0,
+					display: "flex",
+					backgroundImage: `url(${noise})`,
+					backgroundRepeat: "repeat",
+					backgroundSize: "64px 64px",
+				}}
+			/>
+			{/* scanlines overlay */}
+			<div style={SCANLINES} />
+
+			{/* content */}
+			<div
+				style={{
+					position: "absolute",
+					inset: 0,
+					display: "flex",
+					flexDirection: "column",
+					justifyContent: "space-between",
+					padding: pad,
+					fontFamily: "ZalandoSans",
 				}}
 			>
-				Benjamin Wagner
-			</span>
+				<span style={{ ...caption }}>Freelance Creative Developer</span>
+				<span
+					style={{
+						fontSize: 76,
+						fontWeight: 300,
+						letterSpacing: "-0.04em",
+						textTransform: "uppercase",
+						lineHeight: 1,
+						color: "#000",
+					}}
+				>
+					Benjamin Wagner
+				</span>
+			</div>
 		</div>,
 		{
 			...OG_SIZE,
@@ -83,6 +188,7 @@ interface SubPageOgProps {
 
 export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgProps) {
 	const { bold, medium, light } = await loadFonts();
+	const noise = buildNoisePng(64, 64, 25);
 
 	return new ImageResponse(
 		<div
@@ -91,30 +197,50 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 				height: "100%",
 				background: "#fff",
 				display: "flex",
-				flexDirection: "column",
-				justifyContent: "space-between",
-				padding: pad,
-				fontFamily: "ZalandoSans",
 				position: "relative",
 				overflow: "hidden",
 			}}
 		>
-			{/* Top-left: breadcrumb */}
-			<span style={{ ...caption }}>Benjamin Wagner - Freelance Frontend Developer</span>
-
-			{/* Bottom-left: page title */}
-			<span
+			{/* noise grain overlay */}
+			<div
 				style={{
-					fontSize: titleSize,
-					fontWeight: 300,
-					letterSpacing: "-0.04em",
-					textTransform: "uppercase",
-					lineHeight: 0.85,
-					color: "#000",
+					position: "absolute",
+					inset: 0,
+					display: "flex",
+					backgroundImage: `url(${noise})`,
+					backgroundRepeat: "repeat",
+					backgroundSize: "64px 64px",
+				}}
+			/>
+			{/* scanlines overlay */}
+			<div style={SCANLINES} />
+
+			{/* content */}
+			<div
+				style={{
+					position: "absolute",
+					inset: 0,
+					display: "flex",
+					flexDirection: "column",
+					justifyContent: "space-between",
+					padding: pad,
+					fontFamily: "ZalandoSans",
 				}}
 			>
-				{title}
-			</span>
+				<span style={{ ...caption }}>Benjamin Wagner - Freelance Frontend Developer</span>
+				<span
+					style={{
+						fontSize: titleSize,
+						fontWeight: 300,
+						letterSpacing: "-0.04em",
+						textTransform: "uppercase",
+						lineHeight: 0.85,
+						color: "#000",
+					}}
+				>
+					{title}
+				</span>
+			</div>
 		</div>,
 		{
 			...OG_SIZE,
