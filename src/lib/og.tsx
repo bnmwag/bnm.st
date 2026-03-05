@@ -135,7 +135,7 @@ export async function buildHomeOgImage() {
 					display: "flex",
 					backgroundImage: `url(${noise})`,
 					backgroundRepeat: "repeat",
-					backgroundSize: "128px 128px",
+					backgroundSize: "64px 64px",
 				}}
 			/>
 			{/* scanlines */}
@@ -212,7 +212,7 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 					display: "flex",
 					backgroundImage: `url(${noise})`,
 					backgroundRepeat: "repeat",
-					backgroundSize: "128px 128px",
+					backgroundSize: "64px 64px",
 				}}
 			/>
 			{/* scanlines */}
