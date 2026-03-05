@@ -1,4 +1,5 @@
 export * from "./info";
+export * from "./preloader";
 export * from "./link";
 export * from "./lenis";
 export * from "./navigation";

@@ -48,6 +48,7 @@ export const metadata: Metadata = {
 import { Grid } from "@/components/dev";
 import Noise from "@/components/gl/noise";
 import { Navigation } from "@/components/layout/navigation";
+import { Preloader } from "@/components/layout/preloader";
 import { PageTransition } from "@/features/page-transitions/components/page-transitions";
 import { TransitionProvider } from "@/features/page-transitions/context/page-transition.context";
 import { Analytics } from "@vercel/analytics/react";
@@ -77,6 +78,7 @@ export default function RootLayout({
 						</main>
 					</PageTransition>
 				</TransitionProvider>
+				<Preloader />
 				<Grid />
 				<Analytics />
 			</body>
