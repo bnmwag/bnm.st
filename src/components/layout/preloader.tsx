@@ -92,40 +92,43 @@ export const Preloader = () => {
 
 	// Render a static cover before hydration so the first paint is never a flash of content
 	if (!mounted) {
-		return <div className="fixed inset-0 z-[200] bg-foreground" />;
+		return <div className="fixed inset-x-0 top-0 h-[100lvh] z-[200] bg-foreground" />;
 	}
 
 	if (!visible) return null;
 
 	return createPortal(
+		// 100lvh = large viewport height (no browser bars) — extends behind Safari's bottom bar when bars are visible
 		<div
 			ref={overlayRef}
-			className="fixed inset-0 z-[200] flex flex-col justify-between bg-foreground p-4"
+			className="fixed inset-x-0 top-0 h-[100lvh] z-[200] bg-foreground"
 			style={{ clipPath: "inset(0 0 0% 0)" }}
 		>
-			<span ref={captionRef} className="text-caption uppercase text-background/50">
-				Freelance Creative Developer
-			</span>
+			<div className="flex h-svh flex-col justify-between p-4">
+				<span ref={captionRef} className="text-caption uppercase text-background/50">
+					Freelance Creative Developer
+				</span>
 
-			<div
-				className="text-[clamp(3rem,7vw,9rem)] uppercase leading-[.85] tracking-[-0.04em] text-background"
-				aria-label={NAME}
-			>
-				{WORDS.map((word, i) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: static word list
-					<span key={i}>
-						<span
-							ref={(el) => {
-								wordRefs.current[i] = el;
-							}}
-							className="inline-block"
-							aria-hidden="true"
-						>
-							{word}
+				<div
+					className="text-[clamp(3rem,7vw,9rem)] uppercase leading-[.85] tracking-[-0.04em] text-background"
+					aria-label={NAME}
+				>
+					{WORDS.map((word, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: static word list
+						<span key={i}>
+							<span
+								ref={(el) => {
+									wordRefs.current[i] = el;
+								}}
+								className="inline-block"
+								aria-hidden="true"
+							>
+								{word}
+							</span>
+							{i < WORDS.length - 1 && <span className="inline-block">&nbsp;</span>}
 						</span>
-						{i < WORDS.length - 1 && <span className="inline-block">&nbsp;</span>}
-					</span>
-				))}
+					))}
+				</div>
 			</div>
 		</div>,
 		document.body,

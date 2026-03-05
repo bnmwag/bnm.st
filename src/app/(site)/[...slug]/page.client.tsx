@@ -240,17 +240,6 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							</div>
 						</section>
 					))}
-					<section className="layout-grid h-svh items-center py-52" aria-label="Closing statement">
-						<div className="col-span-4 row-start-1 row-end-1">
-							<p className="text-caption">Based in austria,</p>
-							<p className="text-caption">working worldwide.</p>
-						</div>
-						<div className="col-span-6 col-start-6 row-start-2 row-end-2">
-							<p className="text-balance text-caption">
-								{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
-							</p>
-						</div>
-					</section>
 				</div>
 			</Wrapper>
 		);

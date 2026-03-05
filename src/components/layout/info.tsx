@@ -99,6 +99,19 @@ export const Info: FC = () => {
 		};
 	}, [mounted]);
 
+	// ─── Body scroll lock ─────────────────────────────────────────────────────
+	useEffect(() => {
+		if (!mounted) return;
+		if (pathname === "/info") {
+			document.body.style.overflow = "hidden";
+		} else {
+			document.body.style.overflow = "";
+		}
+		return () => {
+			document.body.style.overflow = "";
+		};
+	}, [mounted, pathname]);
+
 	// ─── Open / close driven by pathname ─────────────────────────────────────
 	// Using pathname (not just mounted) handles component reuse from Next.js
 	// router cache — the instance stays alive across visits so we can't rely
@@ -171,7 +184,7 @@ export const Info: FC = () => {
 				role="button"
 				tabIndex={0}
 				aria-label="Close info panel"
-				className="pointer-events-none fixed inset-x-0 top-0 -bottom-28 z-30 opacity-0 backdrop-blur-3xl"
+				className="max-md:-bottom-64 pointer-events-none fixed inset-0 z-30 opacity-0 backdrop-blur-3xl"
 			/>
 
 			<aside

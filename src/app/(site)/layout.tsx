@@ -1,6 +1,12 @@
 import "./globals.css";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+
+export const viewport: Viewport = {
+	viewportFit: "cover",
+	colorScheme: "light",
+	themeColor: "#fff",
+};
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://bnm.st"),
@@ -67,13 +73,12 @@ export default function RootLayout({
 				<TransitionProvider>
 					<PageTransition>
 						<Navigation />
-						<div
-							className="pointer-events-none fixed inset-0 z-300 flex flex-col justify-between mix-blend-difference"
-							aria-hidden="true"
-						>
-							{Array.from({ length: 200 }).map((_, index) => (
-								<div key={`tv_line-${index + 1}`} className="h-px w-full bg-white/10" />
-							))}
+						<div className="-bottom-64 -top-64 pointer-events-none fixed inset-x-0 z-300 mix-blend-difference" aria-hidden="true">
+							<div className="pointer-events-none absolute top-0 left-0 hidden h-full w-full flex-col justify-between md:flex">
+								{Array.from({ length: 200 }).map((_, index) => (
+									<div key={`tv_line-${index + 1}`} className="h-px w-full bg-white/10" />
+								))}
+							</div>
 							<Noise patternAlpha={25} />
 						</div>
 						<main className="page-content min-h-svh w-full bg-white antialiased">

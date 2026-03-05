@@ -43,7 +43,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	};
 
 	return (
-		<header className={cn("fixed inset-x-0 top-0 z-40 pt-4 text-background mix-blend-difference", className)} {...props}>
+		<header className={cn("fixed inset-x-0 top-0 z-40 pt-8 text-background mix-blend-difference md:pt-4", className)} {...props}>
 			<div className="layout-grid">
 				<div className="col-span-4 flex items-start md:col-span-2">
 					<Link href={"/"} onClick={haptic} className="inline-block text-caption" aria-label="Home - Benjamin Wagner">
