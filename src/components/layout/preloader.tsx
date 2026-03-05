@@ -19,25 +19,31 @@ export const Preloader = () => {
 	useEffect(() => {
 		if (!mounted || !overlayRef.current || !nameRef.current || !captionRef.current) return;
 
-		const split = new SplitText(nameRef.current, { type: "chars" });
+		const split = new SplitText(nameRef.current, {
+			type: "lines,chars",
+			aria: "none",
+			mask: "lines",
+			linesClass: "perspective-distant",
+		});
 
-		gsap.set(split.chars, { y: "110%", force3D: true });
+		gsap.set(split.chars, { y: "100%", rotateX: 60, force3D: true });
 		gsap.set(captionRef.current, { opacity: 0, y: 6 });
 
 		const tl = gsap.timeline({ onComplete: () => setVisible(false) });
 
-		// name chars slide up
+		// name chars flip up with 3D rotateX
 		tl.to(split.chars, {
+			rotateX: 0,
 			y: 0,
-			duration: 0.9,
-			stagger: 0.03,
-			delay: 1,
+			duration: 2.1,
+			stagger: 0.035,
+			delay: 0.4,
 			ease: "expo.out",
 			force3D: true,
 		});
 
 		// caption fades in
-		tl.to(captionRef.current, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "<0.15");
+		tl.to(captionRef.current, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "<0.2");
 
 		// hold
 		tl.addLabel("exit", "+=0.5");
@@ -66,10 +72,8 @@ export const Preloader = () => {
 				Freelance Creative Developer
 			</span>
 
-			<div className="overflow-hidden">
-				<div ref={nameRef} className="uppercase leading-[.85] tracking-[-0.04em] text-background text-[clamp(3rem,7vw,9rem)]">
-					Benjamin Wagner
-				</div>
+			<div ref={nameRef} className="uppercase leading-[.85] tracking-[-0.04em] text-background text-[clamp(3rem,7vw,9rem)]">
+				Benjamin Wagner
 			</div>
 		</div>,
 		document.body,
