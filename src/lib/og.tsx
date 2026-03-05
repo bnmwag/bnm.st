@@ -135,7 +135,7 @@ export async function buildHomeOgImage() {
 					display: "flex",
 					backgroundImage: `url(${noise})`,
 					backgroundRepeat: "repeat",
-					backgroundSize: "64px 64px",
+					backgroundSize: "200px 200px",
 				}}
 			/>
 			{/* scanlines */}
@@ -148,7 +148,7 @@ export async function buildHomeOgImage() {
 					bottom: 0,
 					display: "flex",
 					backgroundImage:
-						"repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.035) 1px, rgba(0,0,0,0.035) 2px)",
+						"repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
 				}}
 			/>
 
@@ -212,7 +212,7 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 					display: "flex",
 					backgroundImage: `url(${noise})`,
 					backgroundRepeat: "repeat",
-					backgroundSize: "64px 64px",
+					backgroundSize: "200px 200px",
 				}}
 			/>
 			{/* scanlines */}
@@ -225,7 +225,7 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 					bottom: 0,
 					display: "flex",
 					backgroundImage:
-						"repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.035) 1px, rgba(0,0,0,0.035) 2px)",
+						"repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
 				}}
 			/>
 
