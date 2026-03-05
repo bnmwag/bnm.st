@@ -1,6 +1,5 @@
 import type { Metadata, NextPage } from "next";
 
-import { Info } from "@/components/layout/info";
 import { getProjects } from "@/data";
 import { IndexPageClient } from "./page.client";
 
@@ -45,7 +44,6 @@ const IndexPage: NextPage = async () => {
 		<>
 			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 			<IndexPageClient projects={projects} />
-			<Info />
 		</>
 	);
 };

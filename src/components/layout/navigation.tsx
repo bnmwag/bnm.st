@@ -2,10 +2,10 @@
 
 import { Link } from "@/components/layout";
 import { ScrambleText } from "@/components/scramble-text";
+import { useScramble } from "@/hooks/use-scramble";
 import cn from "clsx";
-import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
-import type { ComponentProps, FC } from "react";
+import { type ComponentProps, type FC, useEffect, useRef } from "react";
 
 interface INavigationProps extends ComponentProps<"div"> {}
 
@@ -13,6 +13,27 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+
+	const isInfoOpen = pathname === "/info";
+	const label = isInfoOpen ? "Back" : "Info";
+	const { display: labelDisplay, scramble: labelScramble, reset: labelReset } = useScramble(label);
+	const prevLabelRef = useRef(label);
+
+	// Scramble text whenever the label changes (Info ↔ Back)
+	useEffect(() => {
+		if (prevLabelRef.current !== label) {
+			prevLabelRef.current = label;
+			labelScramble();
+		}
+	}, [label, labelScramble]);
+
+	const handleInfoClick = () => {
+		if (isInfoOpen) {
+			window.dispatchEvent(new CustomEvent("info:close"));
+		} else {
+			router.push("/info");
+		}
+	};
 
 	return (
 		<header className={cn("fixed inset-x-0 top-0 z-40 pt-4 text-background mix-blend-difference", className)} {...props}>
@@ -69,27 +90,24 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					</ul>
 				</nav>
 				<div className="col-span-4 col-start-9 flex items-start justify-end gap-x-4 md:col-span-2 md:col-start-11">
-					<motion.div
-						className="flex"
-						animate={{
-							opacity: pathname === "/" || pathname === "/info" ? 1 : 0,
-							filter: pathname === "/" || pathname === "/info" ? "blur(0px)" : "blur(12px)",
-							pointerEvents: pathname === "/" || pathname === "/info" ? "auto" : "none",
-						}}
-						transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
+					<button
+						type="button"
+						onClick={handleInfoClick}
+						onMouseEnter={labelScramble}
+						onMouseLeave={labelReset}
+						aria-label={isInfoOpen ? "Close info panel" : "Open info panel"}
+						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
-						<button
-							type="button"
-							onClick={() => router.push("/info")}
-							aria-label="Open info panel"
-							className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+						{/* Invisible copy reserves the width of the longer word */}
+						<span className="invisible" aria-hidden="true">Back</span>
+						<span
+							className="absolute inset-0 flex items-center justify-center text-foreground transition-colors duration-short ease-default group-hover:text-background"
+							aria-label={label}
 						>
-							<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-							<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">
-								Info
-							</ScrambleText>
-						</button>
-					</motion.div>
+							{labelDisplay}
+						</span>
+					</button>
 					<Link
 						href="/contact"
 						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"

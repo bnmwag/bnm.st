@@ -1,12 +1,12 @@
 "use client";
 
-import { ScrambleText } from "@/components/scramble-text";
 import { gsap } from "gsap";
 import Lenis from "lenis";
 import { usePathname, useRouter } from "next/navigation";
 import { type FC, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Human } from "../gl/human";
+import { ScrambleText } from "../scramble-text";
 
 const services = [
 	{
@@ -40,7 +40,9 @@ const InfoLink: FC<{ label: string; value: string; href: string }> = ({ label, v
 				className="group relative col-span-4 inline-flex w-fit overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 			>
 				<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-				<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">{value}</ScrambleText>
+				<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
+					{value}
+				</ScrambleText>
 			</a>
 		</div>
 	);
@@ -62,17 +64,17 @@ export const Info: FC = () => {
 	const content = useRef<HTMLDivElement>(null);
 	const scrollWrapper = useRef<HTMLDivElement>(null);
 	const blend = useRef<HTMLDivElement>(null);
-	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	const router = useRouter();
 	const pathname = usePathname();
+	const isAnimatingOut = useRef(false);
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => setMounted(true), []);
 
 	// ─── Lenis scroll inside panel ────────────────────────────────────────────
 	useEffect(() => {
-		if (!scrollWrapper.current || pathname !== "/info" || !mounted) return;
+		if (!scrollWrapper.current || !mounted) return;
 
 		const lenis = new Lenis({
 			wrapper: scrollWrapper.current,
@@ -95,23 +97,44 @@ export const Info: FC = () => {
 			cancelAnimationFrame(rafId);
 			lenis.destroy();
 		};
-	}, [pathname, mounted]);
+	}, [mounted]);
 
-	// ─── Open animation ───────────────────────────────────────────────────────
+	// ─── Open / close driven by pathname ─────────────────────────────────────
+	// Using pathname (not just mounted) handles component reuse from Next.js
+	// router cache — the instance stays alive across visits so we can't rely
+	// on mount firing twice.
 	useEffect(() => {
-		if (pathname !== "/info" || !mounted) return;
+		if (!mounted) return;
 
-		const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
-		tl.to(blend.current, { opacity: 1, duration: 1 });
-		tl.to(content.current, { clipPath: "inset(0 0 0% 0)", duration: 1.5 });
-		tl.set([content.current, blend.current], { pointerEvents: "auto" });
-		tl.call(() => closeButtonRef.current?.focus());
+		if (pathname === "/info") {
+			// Opening — reset guard and ensure element starts from closed state
+			// (GSAP may have left inline styles from a previous close animation).
+			isAnimatingOut.current = false;
+			gsap.set(content.current, { clipPath: "inset(0 0 100% 0)", pointerEvents: "none" });
+			gsap.set(blend.current, { opacity: 0, pointerEvents: "none" });
 
-		return () => { tl.kill(); };
-	}, [pathname, mounted]);
+			const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+			tl.to(blend.current, { opacity: 1, duration: 1 });
+			tl.to(content.current, { clipPath: "inset(0 0 0% 0)", duration: 1.5 });
+			tl.set([content.current, blend.current], { pointerEvents: "auto" });
+			return () => { tl.kill(); };
+		}
 
-	// ─── Close ────────────────────────────────────────────────────────────────
+		// Forward navigation away from /info — animate out without router.back()
+		if (!isAnimatingOut.current) {
+			isAnimatingOut.current = true;
+			const tl = gsap.timeline({ defaults: { ease: "expo.inOut" } });
+			tl.to(content.current, { clipPath: "inset(100% 0 0 0)", duration: 0.9 });
+			tl.to(blend.current, { opacity: 0, duration: 0.7 }, "-=0.4");
+			tl.set([content.current, blend.current], { pointerEvents: "none" });
+			return () => { tl.kill(); };
+		}
+	}, [mounted, pathname]);
+
+	// ─── Close (nav button / backdrop) ───────────────────────────────────────
 	const handleBack = () => {
+		if (isAnimatingOut.current) return;
+		isAnimatingOut.current = true;
 		const tl = gsap.timeline({
 			defaults: { ease: "expo.inOut" },
 			onComplete: () => router.back(),
@@ -121,10 +144,17 @@ export const Info: FC = () => {
 		tl.set([content.current, blend.current], { pointerEvents: "none" });
 	};
 
+	// ─── Close via nav button custom event ───────────────────────────────────
+	useEffect(() => {
+		window.addEventListener("info:close", handleBack);
+		return () => window.removeEventListener("info:close", handleBack);
+	});
+
 	if (!mounted) return null;
 
 	return createPortal(
 		<div>
+			{/* Backdrop — z-30 sits below nav (z-40) */}
 			<div
 				ref={blend}
 				onClick={handleBack}
@@ -137,7 +167,7 @@ export const Info: FC = () => {
 				role="button"
 				tabIndex={0}
 				aria-label="Close info panel"
-				className="pointer-events-none fixed inset-0 z-40 opacity-0 backdrop-blur-3xl"
+				className="pointer-events-none fixed inset-0 z-30 opacity-0 backdrop-blur-3xl"
 			/>
 
 			<aside
@@ -145,25 +175,15 @@ export const Info: FC = () => {
 				data-lenis-prevent
 				aria-modal="true"
 				aria-labelledby="info-heading"
-				className="translate-z-0 pointer-events-none fixed inset-y-2 right-2 z-40 w-[calc(100%-1rem)] max-w-xl overflow-hidden bg-foreground text-background will-change-[clip-path] [clip-path:inset(0_0_100%_0)]"
+				className="translate-z-0 pointer-events-none fixed inset-y-2 right-2 z-30 w-[calc(100%-1rem)] max-w-xl overflow-hidden bg-foreground text-background will-change-[clip-path] [clip-path:inset(0_0_100%_0)]"
 			>
-				<div className="absolute inset-x-2 top-2 z-10 flex items-start justify-between mix-blend-difference">
+				<div className="absolute inset-x-2 top-2 z-10 mix-blend-difference">
 					<h2
 						id="info-heading"
 						className="-translate-x-1.5 text-[clamp(2em,3.8vw,5em)] text-foreground uppercase leading-[.8] tracking-[-.04em]"
 					>
 						Info
 					</h2>
-					<button
-						ref={closeButtonRef}
-						type="button"
-						onClick={handleBack}
-						aria-label="Close info panel"
-						className="group relative overflow-hidden bg-foreground px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
-					>
-						<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-						<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Back</ScrambleText>
-					</button>
 				</div>
 				<div ref={scrollWrapper} className="h-full overflow-y-auto">
 					<div data-lenis-content className="space-y-48 px-2 py-48">
