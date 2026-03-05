@@ -45,9 +45,11 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 	// ghost (z-index:1) from the very first frame — no flash possible.
 	useLayoutEffect(() => {
 		if (pathname === "/info") return;
-		// Coming back from /info — the page was already visible underneath,
-		// no transition needed so don't hide the wrapper.
-		if (prevPathnameRef.current === "/info") return;
+		// Coming back from /info via router.back() — the page was already visible
+		// underneath, no transition needed so don't hide the wrapper.
+		// Forward navigation FROM /info (activeTransitionRef set) falls through
+		// so the new page is hidden correctly before its entry animation.
+		if (prevPathnameRef.current === "/info" && !activeTransitionRef.current) return;
 
 		const content = document.querySelector<HTMLElement>(".page-content");
 		if (!content) return;
@@ -71,6 +73,11 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		const prevPathname = prevPathnameRef.current;
 		prevPathnameRef.current = pathname;
 
+		// Capture and immediately clear the active transition so a stale value
+		// from a previous link-click never bleeds into router.back() from /info.
+		const activeTransition = activeTransitionRef.current;
+		activeTransitionRef.current = null;
+
 		const content = document.querySelector<HTMLElement>(".page-content");
 		if (!content) return;
 
@@ -85,9 +92,10 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 			return;
 		}
 
-		// Coming back from /info — page was already visible, just ensure wrapper
-		// is visible and skip all transition/entry animations.
-		if (prevPathname === "/info") {
+		// Coming back from /info via router.back() — page was already visible,
+		// skip transition. Forward nav FROM /info has activeTransition set,
+		// so it falls through and runs the normal entry animation.
+		if (prevPathname === "/info" && !activeTransition) {
 			const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
 			if (wrapper) gsap.set(wrapper, { opacity: 1 });
 			return;
@@ -96,8 +104,8 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		const entryTl = gsap.timeline();
 
 		// Transition clip/slide only runs on real navigations, not initial load.
-		if (activeTransitionRef.current) {
-			activeTransitionRef.current.entry(entryTl, content);
+		if (activeTransition) {
+			activeTransition.entry(entryTl, content);
 		}
 
 		let cancelled = false;
@@ -142,7 +150,7 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		// signal before revealing the page — so content animates in as the
 		// overlay wipes away. On internal navigation the preloader is already
 		// done, so onPreloaderReady fires the callback synchronously.
-		if (!activeTransitionRef.current) {
+		if (!activeTransition) {
 			onPreloaderReady(runPageAnimation);
 		} else {
 			runPageAnimation();
