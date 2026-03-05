@@ -5,100 +5,33 @@ import { gsap } from "@/lib/gsap";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-const LINES = ["Born 2005.", "Based in Austria.", "Obsessed with details.", "Builds for the web.", "Currently available."];
-
-const MIN_DURATION = 800; // ms — never flash by on fast connections
-const HOLD_AFTER_DONE = 300; // ms hold at 100% before exit wipe
+const NAME = "BENJAMIN WAGNER";
 
 export const Preloader = () => {
 	const overlayRef = useRef<HTMLDivElement>(null);
-
-	// Three digit slot refs: [hundreds, tens, ones]
-	const digitRefs = useRef<(HTMLSpanElement | null)[]>([null, null, null]);
-	const prevDigitsRef = useRef(["0", "0", "0"]);
-
-	// Line refs for 3D flip-in animation
-	const lineRefs = useRef<(HTMLSpanElement | null)[]>([]);
-	lineRefs.current = [];
+	const captionRef = useRef<HTMLSpanElement>(null);
+	const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
 	const [mounted, setMounted] = useState(false);
 	const [visible, setVisible] = useState(true);
-	const [displayCount, setDisplayCount] = useState(0);
-	const [visibleLines, setVisibleLines] = useState(0); // how many lines are shown (0–5)
 
 	const { notifyPreloaderDone } = useTransition();
 
 	useEffect(() => setMounted(true), []);
 
-	// ── Digit slide animation whenever displayCount changes ───────────────────
 	useEffect(() => {
-		const curr = String(displayCount).padStart(3, "0").split("");
-		const prev = prevDigitsRef.current;
-
-		curr.forEach((digit, i) => {
-			if (digit !== prev[i]) {
-				const el = digitRefs.current[i];
-				if (el) {
-					gsap.fromTo(el, { y: "100%" }, { y: 0, duration: 0.14, ease: "power3.out", force3D: true });
-				}
-			}
-		});
-
-		prevDigitsRef.current = curr;
-	}, [displayCount]);
-
-	// ── Line flip-in when a new line becomes visible ──────────────────────────
-	useEffect(() => {
-		if (visibleLines === 0) return;
-		const el = lineRefs.current[visibleLines - 1];
-		if (!el) return;
-		gsap.fromTo(
-			el,
-			{ y: "100%", rotateX: 80, transformPerspective: 300, force3D: true },
-			{ y: 0, rotateX: 0, duration: 0.7, ease: "expo.out", force3D: true },
-		);
-	}, [visibleLines]);
-
-	// ── Core preload logic ────────────────────────────────────────────────────
-	useEffect(() => {
-		if (!mounted || !overlayRef.current) return;
+		if (!mounted || !overlayRef.current || !captionRef.current) return;
 
 		const tweens: gsap.core.Tween[] = [];
-		const startTime = Date.now();
-		let cancelled = false;
+		const chars = charRefs.current.filter((el): el is HTMLSpanElement => el !== null);
 
-		// Proxy object GSAP will animate — avoids manual RAF loop
-		const proxy = { val: 0 };
+		// transformPerspective bakes perspective into each element's own transform matrix —
+		// CSS `perspective` on the overflow wrapper would be flattened by the stacking context.
+		gsap.set(chars, { y: "100%", rotateX: 80, transformPerspective: 300, force3D: true });
+		gsap.set(captionRef.current, { opacity: 0, y: 8 });
 
-		const setProgress = (target: number) => {
-			gsap.killTweensOf(proxy);
-			// Animate proxy toward new target; onUpdate drives React state
-			tweens.push(
-				gsap.to(proxy, {
-					val: target,
-					duration: 0.6,
-					ease: "power2.out",
-					onUpdate: () => {
-						if (cancelled) return;
-						const rounded = Math.min(100, Math.floor(proxy.val));
-						setDisplayCount(rounded);
-						// Reveal lines at 0%, 20%, 40%, 60%, 80% thresholds
-						setVisibleLines(Math.min(LINES.length, Math.floor(rounded / 20) + 1));
-					},
-				}),
-			);
-		};
-
-		// Start animating from 0
-		setProgress(0);
-
-		const exit = () => {
-			if (cancelled) return;
-			// Snap to exactly 100, hold, then wipe
-			setDisplayCount(100);
-			setVisibleLines(LINES.length);
-			setTimeout(() => {
-				if (cancelled) return;
+		const tl = gsap.timeline({
+			onComplete: () => {
 				notifyPreloaderDone();
 				if (overlayRef.current) {
 					tweens.push(
@@ -110,124 +43,57 @@ export const Preloader = () => {
 						}),
 					);
 				}
-			}, HOLD_AFTER_DONE);
-		};
+			},
+		});
 
-		const finish = () => {
-			if (cancelled) return;
-			const elapsed = Date.now() - startTime;
-			const remaining = Math.max(0, MIN_DURATION - elapsed);
-			// Animate to 100 over remaining time, then exit
-			gsap.killTweensOf(proxy);
-			tweens.push(
-				gsap.to(proxy, {
-					val: 100,
-					duration: Math.max(0.3, remaining / 1000),
-					ease: "power2.inOut",
-					onUpdate: () => {
-						if (cancelled) return;
-						const rounded = Math.min(100, Math.floor(proxy.val));
-						setDisplayCount(rounded);
-						setVisibleLines(Math.min(LINES.length, Math.floor(rounded / 20) + 1));
-					},
-					onComplete: () => {
-						setTimeout(exit, 80);
-					},
-				}),
-			);
-		};
-
-		// Query all images that are not yet loaded
-		const images = Array.from(document.querySelectorAll<HTMLImageElement>("img")).filter(
-			(img) => !img.complete || !img.naturalWidth,
-		);
-
-		if (images.length === 0) {
-			// Nothing to load — animate counter over MIN_DURATION then exit
-			finish();
-			return () => {
-				cancelled = true;
-				for (const tw of tweens) tw.kill();
-			};
-		}
-
-		let loadedCount = 0;
-
-		const onLoad = () => {
-			if (cancelled) return;
-			loadedCount++;
-			const pct = (loadedCount / images.length) * 100;
-			setProgress(pct);
-			if (loadedCount >= images.length) finish();
-		};
-
-		for (const img of images) {
-			img.addEventListener("load", onLoad, { once: true });
-			img.addEventListener("error", onLoad, { once: true });
-		}
+		tl.to(chars, { y: 0, rotateX: 0, duration: 1.2, stagger: 0.04, ease: "expo.out", force3D: true })
+			.to(captionRef.current, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "<0.2")
+			.to({}, { duration: 0.5 }); // hold before exit
 
 		return () => {
-			cancelled = true;
+			tl.kill();
 			for (const tw of tweens) tw.kill();
-			for (const img of images) {
-				img.removeEventListener("load", onLoad);
-				img.removeEventListener("error", onLoad);
-			}
 		};
 	}, [mounted, notifyPreloaderDone]);
 
-	if (!mounted || !visible) return null;
+	// Render a static cover before hydration so the first paint is never a flash of content
+	if (!mounted) {
+		return <div className="fixed inset-0 z-[200] bg-foreground" />;
+	}
 
-	const digits = String(displayCount).padStart(3, "0").split("");
+	if (!visible) return null;
 
 	return createPortal(
 		<div
 			ref={overlayRef}
-			className="fixed inset-0 z-200 flex flex-col justify-between bg-foreground p-4"
+			className="fixed inset-0 z-[200] flex flex-col justify-between bg-foreground p-4"
 			style={{ clipPath: "inset(0 0 0% 0)" }}
 		>
-			{/* ── Terminal lines ── */}
-			<div className="flex flex-col gap-y-1 pt-8">
-				{LINES.slice(0, visibleLines).map((line, i) => (
-					<div key={line} className="overflow-hidden">
-						<span
-							ref={(el) => {
-								lineRefs.current[i] = el;
-							}}
-							className={`block text-caption ${i === visibleLines - 1 ? "text-background" : "text-background/30"}`}
-						>
-							{line}
-						</span>
-					</div>
-				))}
-			</div>
+			<span ref={captionRef} className="text-caption uppercase text-background/50">
+				Freelance Creative Developer
+			</span>
 
-			{/* ── Counter + name ── */}
-			<div>
-				<div
-					className="flex items-end gap-x-[0.05em] leading-none"
-					aria-label={`Loading ${displayCount} percent`}
-					aria-live="polite"
-				>
-					{digits.map((digit, i) => (
-						<div key={`digit-${i * 1}`} className="overflow-hidden" style={{ lineHeight: 0.85 }}>
+			<div
+				className="text-[clamp(3rem,7vw,9rem)] uppercase leading-[.85] tracking-[-0.04em] text-background"
+				aria-label={NAME}
+			>
+				{NAME.split("").map((char, i) =>
+					char === " " ? (
+						<span key={i} className="inline-block">&nbsp;</span>
+					) : (
+						<span key={i} style={{ overflow: "hidden", display: "inline-block" }}>
 							<span
 								ref={(el) => {
-									digitRefs.current[i] = el;
+									charRefs.current[i] = el;
 								}}
-								className="block font-medium text-background tabular-nums"
-								style={{ fontSize: "clamp(5rem,10vw,13rem)" }}
+								className="inline-block"
 								aria-hidden="true"
 							>
-								{digit}
+								{char}
 							</span>
-						</div>
-					))}
-					<span className="mb-[0.1em] ml-[0.15em] text-background/50 text-caption" aria-hidden="true">
-						%
-					</span>
-				</div>
-				<p className="mt-3 text-background/50 text-caption">Benjamin Wagner</p>
+						</span>
+					),
+				)}
 			</div>
 		</div>,
 		document.body,

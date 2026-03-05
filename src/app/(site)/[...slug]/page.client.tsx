@@ -28,6 +28,17 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	const isMobile = useMediaQuery("(max-width: 767px)");
 	const { setEntryAnimations } = useTransition();
 
+	// Preload all project hover images in the background so they're in cache on first hover
+	useEffect(() => {
+		projects.forEach((project) => {
+			const img = project.image;
+			if (img && typeof img === "object" && img.url) {
+				const el = new window.Image();
+				el.src = img.url;
+			}
+		});
+	}, [projects]);
+
 	useEffect(() => {
 		setEntryAnimations(() => {
 			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
