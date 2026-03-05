@@ -4,7 +4,7 @@ import { Media, Wrapper } from "@/components/layout";
 import { ProgressiveBlur } from "@/components/progressive-blur";
 import { useTransition } from "@/features/page-transitions/context/page-transition.context";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { SplitText, gsap } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
@@ -33,23 +33,29 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
 			if (!links?.length) return;
 
-			// type:"lines" keeps the link DOM intact (no inline-block char spans)
-			// so the ::after hover bar height is unaffected
-			const splits = Array.from(links).map(
-				(el) => new SplitText(el, { type: "lines", mask: "lines", linesClass: "perspective-distant" }),
-			);
+			// Wrap each link in a temporary overflow-hidden clip — never touch the
+			// link's own DOM so the ::after hover bar is never affected.
+			const wrappers = Array.from(links).map((link) => {
+				const wrap = document.createElement("div");
+				wrap.style.cssText = "overflow:hidden;perspective:36rem;";
+				link.parentElement!.insertBefore(wrap, link);
+				wrap.appendChild(link);
+				return wrap;
+			});
 
-			const lines = splits.flatMap((s) => Array.from(s.lines) as HTMLElement[]);
-			gsap.set(lines, { y: "100%", rotateX: 50, force3D: true });
+			gsap.set(Array.from(links), { y: "100%", rotateX: 50, force3D: true });
 
 			const tl = gsap.timeline({
 				onComplete: () => {
-					gsap.set(lines, { clearProps: "all" });
-					for (const s of splits) s.revert();
+					gsap.set(Array.from(links), { clearProps: "all" });
+					for (const wrap of wrappers) {
+						wrap.parentElement!.insertBefore(wrap.firstElementChild!, wrap);
+						wrap.remove();
+					}
 				},
 			});
 
-			tl.to(lines, { rotateX: 0, y: 0, duration: 1.2, stagger: 0.07, ease: "expo.out", force3D: true });
+			tl.to(Array.from(links), { rotateX: 0, y: 0, duration: 1.2, stagger: 0.07, ease: "expo.out", force3D: true });
 		});
 	}, [setEntryAnimations]);
 
