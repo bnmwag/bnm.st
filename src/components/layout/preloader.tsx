@@ -10,6 +10,7 @@ const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const SCRAMBLE_INTERVAL = 60;   // ms between random ticks
 const LOCK_STAGGER = 40;        // ms between each char locking
 const HOLD_AFTER_LOCK = 400;    // ms hold before exit wipe starts
+const SCRAMBLE_DURATION = 1200; // ms of scramble before chars start locking
 
 function randomChar() {
   return POOL[Math.floor(Math.random() * POOL.length)];
@@ -30,6 +31,8 @@ export const Preloader = () => {
 
   const { notifyPreloaderDone } = useTransition();
 
+  charRefs.current = [];
+
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
@@ -37,6 +40,7 @@ export const Preloader = () => {
 
     const lockedUpTo = { current: -1 };
     const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const tweens: gsap.core.Tween[] = [];
 
     // ── Scramble interval — randomises every unlocked char ──────────────────
     const interval = setInterval(() => {
@@ -50,13 +54,15 @@ export const Preloader = () => {
 
     // ── Caption fade-in ──────────────────────────────────────────────────────
     gsap.set(captionRef.current, { opacity: 0, y: 6 });
-    gsap.to(captionRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      delay: 0.4,
-      ease: "power2.out",
-    });
+    tweens.push(
+      gsap.to(captionRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        delay: 0.4,
+        ease: "power2.out",
+      }),
+    );
 
     // ── Lock chars left → right ──────────────────────────────────────────────
     const lockable = NAME.split("").reduce<number[]>((acc, c, i) => {
@@ -79,10 +85,12 @@ export const Preloader = () => {
           // Physical pop on the span
           const el = charRefs.current[charIndex];
           if (el) {
-            gsap.fromTo(
-              el,
-              { y: 16 },
-              { y: 0, duration: 0.28, ease: "expo.out", force3D: true },
+            tweens.push(
+              gsap.fromTo(
+                el,
+                { y: 16 },
+                { y: 0, duration: 0.28, ease: "expo.out", force3D: true },
+              ),
             );
           }
 
@@ -91,19 +99,21 @@ export const Preloader = () => {
             const exitT = setTimeout(() => {
               notifyPreloaderDone();
               if (overlayRef.current) {
-                gsap.to(overlayRef.current, {
-                  clipPath: "inset(0 0 100% 0)",
-                  duration: 1.2,
-                  ease: "expo.inOut",
-                  onComplete: () => setVisible(false),
-                });
+                tweens.push(
+                  gsap.to(overlayRef.current, {
+                    clipPath: "inset(0 0 100% 0)",
+                    duration: 1.2,
+                    ease: "expo.inOut",
+                    onComplete: () => setVisible(false),
+                  }),
+                );
               }
             }, HOLD_AFTER_LOCK);
             timeouts.push(exitT);
           }
         },
         // Start locking after ~1.2s of scramble
-        1200 + order * LOCK_STAGGER,
+        SCRAMBLE_DURATION + order * LOCK_STAGGER,
       );
       timeouts.push(t);
     });
@@ -111,8 +121,9 @@ export const Preloader = () => {
     return () => {
       clearInterval(interval);
       for (const t of timeouts) clearTimeout(t);
+      for (const tw of tweens) tw.kill();
     };
-  }, [mounted]);
+  }, [mounted, notifyPreloaderDone]);
 
   if (!mounted || !visible) return null;
 
