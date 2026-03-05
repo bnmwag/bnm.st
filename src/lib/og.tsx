@@ -59,7 +59,7 @@ function zlibStore(data: Buffer): Buffer {
 	const blockHeader = Buffer.alloc(5);
 	blockHeader[0] = 0x01; // BFINAL=1, BTYPE=00 (stored)
 	blockHeader.writeUInt16LE(data.length, 1);
-	blockHeader.writeUInt16LE((~data.length) & 0xffff, 3);
+	blockHeader.writeUInt16LE(~data.length & 0xffff, 3);
 	const checksum = Buffer.alloc(4);
 	checksum.writeUInt32BE(adler32(data));
 	// CMF=0x78, FLG=0x01 → (0x78*256+0x01) % 31 === 0 ✓
@@ -94,7 +94,7 @@ function buildNoisePng(w: number, h: number, alpha: number): string {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-const pad = 40;
+const pad = 20;
 
 const caption: React.CSSProperties = {
 	fontSize: 11,
@@ -135,7 +135,7 @@ export async function buildHomeOgImage() {
 					display: "flex",
 					backgroundImage: `url(${noise})`,
 					backgroundRepeat: "repeat",
-					backgroundSize: "200px 200px",
+					backgroundSize: "128px 128px",
 				}}
 			/>
 			{/* scanlines */}
@@ -148,7 +148,7 @@ export async function buildHomeOgImage() {
 					bottom: 0,
 					display: "flex",
 					backgroundImage:
-						"repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
+						"repeating-linear-gradient(0deg, transparent 0px, transparent 5px, rgba(0,0,0,0.07) 5px, rgba(0,0,0,0.07) 6px)",
 				}}
 			/>
 
@@ -212,7 +212,7 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 					display: "flex",
 					backgroundImage: `url(${noise})`,
 					backgroundRepeat: "repeat",
-					backgroundSize: "200px 200px",
+					backgroundSize: "128px 128px",
 				}}
 			/>
 			{/* scanlines */}
@@ -225,7 +225,7 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 					bottom: 0,
 					display: "flex",
 					backgroundImage:
-						"repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
+						"repeating-linear-gradient(0deg, transparent 0px, transparent 5px, rgba(0,0,0,0.07) 5px, rgba(0,0,0,0.07) 6px)",
 				}}
 			/>
 
