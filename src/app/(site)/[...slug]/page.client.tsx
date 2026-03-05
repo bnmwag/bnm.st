@@ -80,11 +80,11 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 			// Each link: bar wipes in from left, then wipes out to the right revealing the text
 			linkArr.forEach((link, i) => {
 				const bar = bars[i];
-				const offset = i * 0.08;
-				tl.to(bar, { scaleX: 1, duration: 0.38, ease: "expo.in" }, offset);
-				tl.set(link, { opacity: 1 }, offset + 0.38);
-				tl.set(bar, { transformOrigin: "right center" }, offset + 0.38);
-				tl.to(bar, { scaleX: 0, duration: 0.48, ease: "expo.out" }, offset + 0.38);
+				const offset = i * 0.05;
+				tl.to(bar, { scaleX: 1, duration: 0.55, ease: "expo.in" }, offset);
+				tl.set(link, { opacity: 1 }, offset + 0.55);
+				tl.set(bar, { transformOrigin: "right center" }, offset + 0.55);
+				tl.to(bar, { scaleX: 0, duration: 0.65, ease: "expo.out" }, offset + 0.55);
 			});
 		});
 	}, [setEntryAnimations]);

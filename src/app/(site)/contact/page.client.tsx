@@ -68,20 +68,29 @@ export const ContactPageClient: FC = () => {
 				(el) => el.offsetHeight > 0,
 			);
 
-			const lineWrappers = titleLines.map((line) => {
-				const wrap = document.createElement("div");
-				wrap.style.cssText = "overflow:hidden;";
-				line.parentElement!.insertBefore(wrap, line);
-				wrap.appendChild(line);
-				return wrap;
+			gsap.set(titleLines, { opacity: 0 });
+
+			// Fixed bars outside any stacking context so they render as solid black
+			const titleBars = titleLines.map((line) => {
+				const rect = line.getBoundingClientRect();
+				const bar = document.createElement("div");
+				Object.assign(bar.style, {
+					position: "fixed",
+					top: `${rect.top}px`,
+					left: `${rect.left}px`,
+					width: `${rect.width}px`,
+					height: `${rect.height}px`,
+					background: "var(--foreground)",
+					transformOrigin: "left center",
+					transform: "scaleX(0)",
+					pointerEvents: "none",
+					zIndex: "50",
+				});
+				document.body.appendChild(bar);
+				return bar;
 			});
 
-			gsap.set(titleLines, { y: "100%", rotateX: 80, transformPerspective: 300, force3D: true });
-
 			// ── Form row blend overlays ──────────────────────────────────────────
-			// Blends are appended to the container (not the rows) and positioned
-			// via getBoundingClientRect. This keeps them out of the row's child
-			// list so removing them can never shift the row's layout.
 			const fieldRows = Array.from(container.querySelectorAll<HTMLElement>("[data-field-row]"));
 			const containerRect = container.getBoundingClientRect();
 
@@ -111,16 +120,20 @@ export const ContactPageClient: FC = () => {
 			// ── Master timeline ──────────────────────────────────────────────────
 			const masterTl = gsap.timeline({
 				onComplete: () => {
-					gsap.set(titleLines, { clearProps: "all" });
-					for (const wrap of lineWrappers) {
-						wrap.parentElement!.insertBefore(wrap.firstElementChild!, wrap);
-						wrap.remove();
-					}
+					for (const bar of titleBars) bar.remove();
+					gsap.set(titleLines, { clearProps: "opacity" });
 				},
 			});
 
-			// Title lines flip in
-			masterTl.to(titleLines, { y: 0, rotateX: 0, duration: 1.0, stagger: 0.1, ease: "expo.out", force3D: true }, 0);
+			// Title lines: bar wipes in from left → line revealed → bar exits right
+			titleLines.forEach((line, i) => {
+				const bar = titleBars[i];
+				const offset = i * 0.1;
+				masterTl.to(bar, { scaleX: 1, duration: 0.55, ease: "expo.in" }, offset);
+				masterTl.set(line, { opacity: 1 }, offset + 0.55);
+				masterTl.set(bar, { transformOrigin: "right center" }, offset + 0.55);
+				masterTl.to(bar, { scaleX: 0, duration: 0.65, ease: "expo.out" }, offset + 0.55);
+			});
 
 			// Form rows: white wipes up (turns black), then black wipes up (reveals field).
 			blendData.forEach(({ blend, white, black }, i) => {
