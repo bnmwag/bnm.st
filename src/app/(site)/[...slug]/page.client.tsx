@@ -37,13 +37,13 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 			// link's own DOM so the ::after hover bar is never affected.
 			const wrappers = Array.from(links).map((link) => {
 				const wrap = document.createElement("div");
-				wrap.style.cssText = "overflow:hidden;perspective:36rem;";
+				wrap.style.cssText = "overflow:hidden;";
 				link.parentElement!.insertBefore(wrap, link);
 				wrap.appendChild(link);
 				return wrap;
 			});
 
-			gsap.set(Array.from(links), { y: "100%", rotateX: 50, force3D: true });
+			gsap.set(Array.from(links), { y: "100%", rotateX: 80, transformPerspective: 300, force3D: true });
 
 			const tl = gsap.timeline({
 				onComplete: () => {
@@ -284,7 +284,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									onMouseLeave={() => !isTouchDevice && handleLeave()}
 									aria-label={`Visit ${project.name} website`}
 									className={cn(
-										"project-link | after:-left-2 after:-right-2 relative text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:top-1.5 after:bottom-1.5 after:origin-right after:scale-x-0 after:bg-background after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
+										"project-link | after:-left-2 after:-right-2 after:-top-1.5 after:-bottom-1.5 relative inline-flex text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:origin-right after:scale-x-0 after:bg-background after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
 										{ "project-link--active": clickedProjectId === project.id && isTouchDevice },
 									)}
 								>

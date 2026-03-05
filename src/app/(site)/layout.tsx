@@ -65,9 +65,12 @@ export default function RootLayout({
 				<TransitionProvider>
 					<PageTransition>
 						<Navigation />
-						<div className="pointer-events-none fixed inset-0 z-50 flex flex-col justify-between" aria-hidden="true">
+						<div
+							className="pointer-events-none fixed inset-0 z-300 flex flex-col justify-between mix-blend-difference"
+							aria-hidden="true"
+						>
 							{Array.from({ length: 200 }).map((_, index) => (
-								<div key={`tv_line-${index + 1}`} className="h-px w-full bg-foreground/10" />
+								<div key={`tv_line-${index + 1}`} className="h-px w-full bg-white/10" />
 							))}
 							<Noise patternAlpha={25} />
 						</div>

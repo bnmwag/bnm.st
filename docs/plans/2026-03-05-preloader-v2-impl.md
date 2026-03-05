@@ -1,3 +1,23 @@
+# Preloader v2 Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Replace the current preloader with a real asset-loading preloader: bold 3-digit counter (0→100), personal terminal-style lines appearing at 20% intervals, digit-column slide animation, and the same exit wipe.
+
+**Architecture:** Single component rewrite. Real image preloading via DOM query + load events. GSAP animates digit slots on change and line entries. A GSAP proxy tween drives the smooth display counter toward the real load progress value. Minimum 800ms display time prevents flashing on fast connections.
+
+**Tech Stack:** React, GSAP, Next.js portal, Tailwind
+
+---
+
+### Task 1: Rewrite `preloader.tsx`
+
+**Files:**
+- Modify: `src/components/layout/preloader.tsx`
+
+Replace the entire file with the following:
+
+```tsx
 "use client";
 
 import { useTransition } from "@/features/page-transitions/context/page-transition.context";
@@ -246,3 +266,24 @@ export const Preloader = () => {
 		document.body,
 	);
 };
+```
+
+**Step 2: Check for TypeScript errors**
+
+Run `mcp__ide__getDiagnostics` on the file. Fix any errors before committing.
+
+**Step 3: Verify behaviour in browser**
+
+- Hard-reload — counter should increment from 000 toward 100 tracking real image loads
+- Terminal lines appear at ~0%, 20%, 40%, 60%, 80% load progress
+- Each line flips in with 3D rotation
+- Digit slots slide up when their value changes
+- Exit wipes upward at 100%
+- Page entry animation still fires correctly
+
+**Step 4: Commit**
+
+```bash
+git add src/components/layout/preloader.tsx
+git commit -m "feat: preloader v2 — real preload counter + terminal lines"
+```

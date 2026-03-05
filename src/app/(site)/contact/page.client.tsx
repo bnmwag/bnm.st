@@ -2,9 +2,11 @@
 
 import { Wrapper } from "@/components/layout";
 import { ScrambleText } from "@/components/scramble-text";
+import { useTransition } from "@/features/page-transitions/context/page-transition.context";
+import { gsap } from "@/lib/gsap";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
-import { type FC, useActionState, useRef, useState } from "react";
+import { type FC, useActionState, useEffect, useRef, useState } from "react";
 import { type ContactState, submitContact } from "./actions";
 
 const TYPES = ["Freelance", "Collaboration", "Just saying hi"] as const;
@@ -39,6 +41,7 @@ const ErrorMessage: FC<{ message?: string }> = ({ message }) => (
 export const ContactPageClient: FC = () => {
 	const [state, action, isPending] = useActionState(submitContact, INITIAL_STATE);
 	const mountedAtRef = useRef(Date.now());
+	const containerRef = useRef<HTMLElement>(null);
 
 	const [type, setType] = useState("");
 	const [timeline, setTimeline] = useState("");
@@ -52,6 +55,84 @@ export const ContactPageClient: FC = () => {
 	const emailScope = useRef<HTMLDivElement>(null);
 	const messageScope = useRef<HTMLDivElement>(null);
 
+	const { setEntryAnimations } = useTransition();
+
+	useEffect(() => {
+		setEntryAnimations(() => {
+			if (!containerRef.current) return;
+			const container = containerRef.current;
+
+			// ── Title lines ─────────────────────────────────────────────────────
+			// Filter to only visible lines (desktop vs mobile, one set is display:none)
+			const titleLines = Array.from(container.querySelectorAll<HTMLElement>(".title-line-inner")).filter(
+				(el) => el.offsetHeight > 0,
+			);
+
+			const lineWrappers = titleLines.map((line) => {
+				const wrap = document.createElement("div");
+				wrap.style.cssText = "overflow:hidden;";
+				line.parentElement!.insertBefore(wrap, line);
+				wrap.appendChild(line);
+				return wrap;
+			});
+
+			gsap.set(titleLines, { y: "100%", rotateX: 80, transformPerspective: 300, force3D: true });
+
+			// ── Form row blend overlays ──────────────────────────────────────────
+			// Blends are appended to the container (not the rows) and positioned
+			// via getBoundingClientRect. This keeps them out of the row's child
+			// list so removing them can never shift the row's layout.
+			const fieldRows = Array.from(container.querySelectorAll<HTMLElement>("[data-field-row]"));
+			const containerRect = container.getBoundingClientRect();
+
+			const blendData = fieldRows.map((row) => {
+				const rect = row.getBoundingClientRect();
+				const top = rect.top - containerRect.top;
+				const left = rect.left - containerRect.left;
+
+				const blend = document.createElement("div");
+				blend.style.cssText = `position:absolute;top:${top}px;left:${left}px;width:${rect.width}px;height:${rect.height}px;z-index:10;pointer-events:none;`;
+
+				const black = document.createElement("div");
+				black.style.cssText = "position:absolute;inset:0;background:#000;";
+
+				const white = document.createElement("div");
+				white.style.cssText = "position:absolute;inset:0;background:#fff;mix-blend-mode:difference;";
+
+				blend.appendChild(black);
+				blend.appendChild(white);
+				container.appendChild(blend);
+
+				gsap.set([black, white], { clipPath: "inset(0% 0% 0% 0%)" });
+
+				return { blend, black, white };
+			});
+
+			// ── Master timeline ──────────────────────────────────────────────────
+			const masterTl = gsap.timeline({
+				onComplete: () => {
+					gsap.set(titleLines, { clearProps: "all" });
+					for (const wrap of lineWrappers) {
+						wrap.parentElement!.insertBefore(wrap.firstElementChild!, wrap);
+						wrap.remove();
+					}
+				},
+			});
+
+			// Title lines flip in
+			masterTl.to(titleLines, { y: 0, rotateX: 0, duration: 1.0, stagger: 0.1, ease: "expo.out", force3D: true }, 0);
+
+			// Form rows: white wipes up (turns black), then black wipes up (reveals field).
+			blendData.forEach(({ blend, white, black }, i) => {
+				const rowTl = gsap.timeline({ onComplete: () => blend.remove() });
+				rowTl
+					.to(white, { clipPath: "inset(0% 0% 100% 0%)", duration: 1.2, ease: "expo.inOut" })
+					.to(black, { clipPath: "inset(0% 0% 100% 0%)", duration: 1.2, ease: "expo.inOut" }, "<0.3");
+				masterTl.add(rowTl, 0.15 + i * 0.1);
+			});
+		});
+	}, [setEntryAnimations]);
+
 	const validate = (fd: FormData): typeof errors => {
 		const errs: typeof errors = {};
 		const name = String(fd.get("name") ?? "").trim();
@@ -62,7 +143,11 @@ export const ContactPageClient: FC = () => {
 		if (!email) errs.email = "Email is required.";
 		else if (!validateEmail(email)) errs.email = "Please enter a valid email address.";
 		if (currentWebsite) {
-			try { new URL(currentWebsite); } catch { errs.current_website = "Please enter a valid URL."; }
+			try {
+				new URL(currentWebsite);
+			} catch {
+				errs.current_website = "Please enter a valid URL.";
+			}
 		}
 		if (!message) errs.message = "Tell me more about your project.";
 		return errs;
@@ -83,16 +168,19 @@ export const ContactPageClient: FC = () => {
 
 	return (
 		<Wrapper>
-			<article id="main-content" className="min-h-svh pt-[25vh] pb-4">
+			<article id="main-content" ref={containerRef} className="relative min-h-svh pt-[25vh] pb-4">
 				{/* ── Left: headline — fixed bottom-left on desktop ── */}
 				<div className="fixed bottom-4 left-4 z-10 space-y-6 max-md:hidden">
 					<p className="max-w-xs text-caption text-foreground/50">
 						Available for freelance work, collaborations, and interesting experiments.
 					</p>
 					<h1 className="text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">
-						Let&apos;s build
-						<br />
-						something.
+						<span className="block overflow-hidden">
+							<span className="title-line-inner inline-block">Let&apos;s build</span>
+						</span>
+						<span className="block overflow-hidden">
+							<span className="title-line-inner inline-block">something.</span>
+						</span>
 					</h1>
 				</div>
 
@@ -103,9 +191,12 @@ export const ContactPageClient: FC = () => {
 							Available for freelance work, collaborations, and interesting experiments.
 						</p>
 						<h1 className="text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">
-							Let&apos;s build
-							<br />
-							something.
+							<span className="block overflow-hidden">
+								<span className="title-line-inner inline-block">Let&apos;s build</span>
+							</span>
+							<span className="block overflow-hidden">
+								<span className="title-line-inner inline-block">something.</span>
+							</span>
 						</h1>
 					</div>
 
@@ -140,7 +231,7 @@ export const ContactPageClient: FC = () => {
 									className="space-y-10"
 									noValidate
 								>
-									{/* Honeypot — hidden from humans, bots fill it */}
+									{/* Honeypot */}
 									<input
 										name="website"
 										type="text"
@@ -149,17 +240,13 @@ export const ContactPageClient: FC = () => {
 										autoComplete="off"
 										className="absolute -left-[9999px] h-0 w-0 opacity-0"
 									/>
-
-									{/* Time gate */}
 									<input type="hidden" name="_mountedAt" defaultValue={String(mountedAtRef.current)} />
-
-									{/* Hidden pill values */}
 									<input type="hidden" name="type" value={type} />
 									<input type="hidden" name="timeline" value={timeline} />
 									<input type="hidden" name="budget" value={budget} />
 
 									{/* Name + Email */}
-									<div className="grid grid-cols-2 gap-6">
+									<div data-field-row className="grid grid-cols-2 gap-6">
 										<div ref={nameScope} className="space-y-3">
 											<label
 												htmlFor="name"
@@ -206,8 +293,8 @@ export const ContactPageClient: FC = () => {
 										</div>
 									</div>
 
-									{/* Company + Website (optional) */}
-									<div className="grid grid-cols-2 gap-6">
+									{/* Company + Website */}
+									<div data-field-row className="grid grid-cols-2 gap-6">
 										<div className="space-y-3">
 											<label htmlFor="company" className="text-caption">
 												Company <span className="opacity-40">(optional)</span>
@@ -223,7 +310,10 @@ export const ContactPageClient: FC = () => {
 										<div className="space-y-3">
 											<label
 												htmlFor="current_website"
-												className={cn("text-caption transition-colors duration-short", errors.current_website ? "text-rose-600" : "")}
+												className={cn(
+													"text-caption transition-colors duration-short",
+													errors.current_website ? "text-rose-600" : "",
+												)}
 											>
 												Current website <span className={errors.current_website ? "opacity-100" : "opacity-40"}>(optional)</span>
 											</label>
@@ -246,7 +336,7 @@ export const ContactPageClient: FC = () => {
 									</div>
 
 									{/* Type */}
-									<div className="space-y-3">
+									<div data-field-row className="space-y-3">
 										<p className="text-caption">Type</p>
 										<div className="flex flex-wrap gap-2">
 											{TYPES.map((t) => (
@@ -268,7 +358,7 @@ export const ContactPageClient: FC = () => {
 									</div>
 
 									{/* Timeline */}
-									<div className="space-y-3">
+									<div data-field-row className="space-y-3">
 										<p className="text-caption">Timeline</p>
 										<div className="flex flex-wrap gap-2">
 											{TIMELINES.map((t) => (
@@ -290,7 +380,7 @@ export const ContactPageClient: FC = () => {
 									</div>
 
 									{/* Budget */}
-									<div className="space-y-3">
+									<div data-field-row className="space-y-3">
 										<p className="text-caption">Budget</p>
 										<div className="flex flex-wrap gap-2">
 											{BUDGETS.map((b) => (
@@ -312,7 +402,7 @@ export const ContactPageClient: FC = () => {
 									</div>
 
 									{/* Message */}
-									<div ref={messageScope} className="space-y-3">
+									<div data-field-row ref={messageScope} className="space-y-3">
 										<label
 											htmlFor="message"
 											className={cn("text-caption transition-colors duration-short", errors.message ? "text-rose-600" : "")}
@@ -357,16 +447,18 @@ export const ContactPageClient: FC = () => {
 									</AnimatePresence>
 
 									{/* Submit */}
-									<button
-										type="submit"
-										disabled={isPending || !type || !timeline || !budget}
-										className="group relative overflow-hidden bg-foreground px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none disabled:cursor-not-allowed disabled:opacity-40"
-									>
-										<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100 group-disabled:hidden" />
-										<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
-											{isPending ? "Sending..." : "Send it"}
-										</ScrambleText>
-									</button>
+									<div data-field-row className="flex w-fit">
+										<button
+											type="submit"
+											disabled={isPending || !type || !timeline || !budget}
+											className="group relative bg-foreground px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none disabled:cursor-not-allowed disabled:opacity-40"
+										>
+											<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100 group-disabled:hidden" />
+											<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
+												{isPending ? "Sending..." : "Send it"}
+											</ScrambleText>
+										</button>
+									</div>
 								</motion.form>
 							)}
 						</AnimatePresence>
