@@ -2,28 +2,35 @@ import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
-async function loadFont() {
-	const res = await fetch(
-		"https://fonts.gstatic.com/s/zalandosans/v2/FwZ67-Asy1Em_lq_aK3hpr-RrktWHD54lnesO2lsVvrnhgw8zPbXoT_cODkT.ttf",
-	);
-	return res.arrayBuffer();
+const FONT_700_URL =
+	"https://fonts.gstatic.com/s/zalandosans/v2/FwZ67-Asy1Em_lq_aK3hpr-RrktWHD54lnesO2lsVvrnhgw8zPbXoT_cODkT.ttf";
+const FONT_300_URL =
+	"https://fonts.gstatic.com/s/zalandosans/v2/FwZ67-Asy1Em_lq_aK3hpr-RrktWHD54lnesO2lsVvrnhgw8zPbXoT9lPzkT.ttf";
+const FONT_500_URL =
+	"https://fonts.gstatic.com/s/zalandosans/v2/FwZ67-Asy1Em_lq_aK3hpr-RrktWHD54lnesO2lsVvrnhgw8zPbXoT8JPzkT.ttf";
+
+async function loadFonts() {
+	const [bold, medium, light] = await Promise.all([
+		fetch(FONT_700_URL).then((r) => r.arrayBuffer()),
+		fetch(FONT_500_URL).then((r) => r.arrayBuffer()),
+		fetch(FONT_300_URL).then((r) => r.arrayBuffer()),
+	]);
+	return { bold, medium, light };
 }
 
-const pad = 56;
+const pad = 20;
 
-const caption = {
-	fontSize: 11,
-	fontWeight: 700,
-	letterSpacing: "0.1em",
-	textTransform: "uppercase" as const,
+const caption: React.CSSProperties = {
+	fontWeight: 500,
+	fontFamily: "ZalandoSans",
+	textTransform: "uppercase",
 	color: "#000",
-	opacity: 0.35,
-	lineHeight: 1.4,
+	lineHeight: 1,
 };
 
 // ── Home OG: small role top-left, big name bottom-left ────────────────────────
 export async function buildHomeOgImage() {
-	const fontData = await loadFont();
+	const { bold, medium, light } = await loadFonts();
 
 	return new ImageResponse(
 		<div
@@ -31,9 +38,6 @@ export async function buildHomeOgImage() {
 				width: "100%",
 				height: "100%",
 				background: "#fff",
-				backgroundImage:
-					"radial-gradient(rgba(0,0,0,0.10) 1px, transparent 1px)",
-				backgroundSize: "3px 3px",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
@@ -44,53 +48,41 @@ export async function buildHomeOgImage() {
 			}}
 		>
 			{/* Top-left: role */}
-			<span style={{ ...caption }}>
-				Freelance Creative Developer
-			</span>
+			<span style={{ ...caption }}>Freelance Creative Developer</span>
 
-			{/* Bottom-left: name in two lines */}
-			<div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-				<span
-					style={{
-						fontSize: 118,
-						fontWeight: 700,
-						letterSpacing: "-0.04em",
-						textTransform: "uppercase",
-						lineHeight: 0.85,
-						color: "#000",
-					}}
-				>
-					Benjamin
-				</span>
-				<span
-					style={{
-						fontSize: 118,
-						fontWeight: 700,
-						letterSpacing: "-0.04em",
-						textTransform: "uppercase",
-						lineHeight: 0.85,
-						color: "#000",
-					}}
-				>
-					Wagner
-				</span>
-			</div>
+			{/* Bottom-left: full name on one line */}
+			<span
+				style={{
+					fontSize: 76,
+					fontWeight: 300,
+					letterSpacing: "-0.04em",
+					textTransform: "uppercase",
+					lineHeight: 1,
+					color: "#000",
+				}}
+			>
+				Benjamin Wagner
+			</span>
 		</div>,
 		{
 			...OG_SIZE,
-			fonts: [{ name: "ZalandoSans", data: fontData, weight: 700, style: "normal" }],
+			fonts: [
+				{ name: "ZalandoSans", data: bold, weight: 700, style: "normal" },
+				{ name: "ZalandoSans", data: medium, weight: 500, style: "normal" },
+				{ name: "ZalandoSans", data: light, weight: 300, style: "normal" },
+			],
 		},
 	);
 }
 
-// ── Sub-page OG: small breadcrumb top-left, big page title bottom-left ────────
+// ── Sub-page OG: small breadcrumb top-left, big page title bottom-left ─────────
 interface SubPageOgProps {
 	title: string;
 	titleSize?: number;
 }
 
 export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgProps) {
-	const fontData = await loadFont();
+	const { bold, medium, light } = await loadFonts();
 
 	return new ImageResponse(
 		<div
@@ -98,9 +90,6 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 				width: "100%",
 				height: "100%",
 				background: "#fff",
-				backgroundImage:
-					"radial-gradient(rgba(0,0,0,0.10) 1px, transparent 1px)",
-				backgroundSize: "3px 3px",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
@@ -111,16 +100,13 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 			}}
 		>
 			{/* Top-left: breadcrumb */}
-			<div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-				<span style={{ ...caption }}>Benjamin Wagner</span>
-				<span style={{ ...caption }}>Freelance Frontend Developer</span>
-			</div>
+			<span style={{ ...caption }}>Benjamin Wagner - Freelance Frontend Developer</span>
 
 			{/* Bottom-left: page title */}
 			<span
 				style={{
 					fontSize: titleSize,
-					fontWeight: 700,
+					fontWeight: 300,
 					letterSpacing: "-0.04em",
 					textTransform: "uppercase",
 					lineHeight: 0.85,
@@ -132,7 +118,11 @@ export async function buildSubPageOgImage({ title, titleSize = 140 }: SubPageOgP
 		</div>,
 		{
 			...OG_SIZE,
-			fonts: [{ name: "ZalandoSans", data: fontData, weight: 700, style: "normal" }],
+			fonts: [
+				{ name: "ZalandoSans", data: bold, weight: 700, style: "normal" },
+				{ name: "ZalandoSans", data: medium, weight: 500, style: "normal" },
+				{ name: "ZalandoSans", data: light, weight: 300, style: "normal" },
+			],
 		},
 	);
 }
