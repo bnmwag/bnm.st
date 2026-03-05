@@ -44,29 +44,48 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
 			if (!links?.length) return;
 
-			// Wrap each link in a temporary overflow-hidden clip — never touch the
-			// link's own DOM so the ::after hover bar is never affected.
-			const wrappers = Array.from(links).map((link) => {
-				const wrap = document.createElement("div");
-				wrap.style.cssText = "overflow:hidden;";
-				link.parentElement!.insertBefore(wrap, link);
-				wrap.appendChild(link);
-				return wrap;
-			});
+			const linkArr = Array.from(links);
 
-			gsap.set(Array.from(links), { y: "100%", rotateX: 80, transformPerspective: 300, force3D: true });
+			// Hide links — bars will reveal them as they wipe out
+			gsap.set(linkArr, { opacity: 0 });
+
+			// Inject fixed-position bars directly into <body> so they are outside
+			// the mix-blend-difference container and render as solid black bars.
+			const bars = linkArr.map((link) => {
+				const rect = link.getBoundingClientRect();
+				const bar = document.createElement("div");
+				Object.assign(bar.style, {
+					position: "fixed",
+					top: `${rect.top}px`,
+					left: `${rect.left}px`,
+					width: `${rect.width}px`,
+					height: `${rect.height}px`,
+					background: "var(--foreground)",
+					transformOrigin: "left center",
+					transform: "scaleX(0)",
+					pointerEvents: "none",
+					zIndex: "50",
+				});
+				document.body.appendChild(bar);
+				return bar;
+			});
 
 			const tl = gsap.timeline({
 				onComplete: () => {
-					gsap.set(Array.from(links), { clearProps: "all" });
-					for (const wrap of wrappers) {
-						wrap.parentElement!.insertBefore(wrap.firstElementChild!, wrap);
-						wrap.remove();
-					}
+					for (const bar of bars) bar.remove();
+					gsap.set(linkArr, { clearProps: "opacity" });
 				},
 			});
 
-			tl.to(Array.from(links), { rotateX: 0, y: 0, duration: 1.2, stagger: 0.07, ease: "expo.out", force3D: true });
+			// Each link: bar wipes in from left, then wipes out to the right revealing the text
+			linkArr.forEach((link, i) => {
+				const bar = bars[i];
+				const offset = i * 0.08;
+				tl.to(bar, { scaleX: 1, duration: 0.38, ease: "expo.in" }, offset);
+				tl.set(link, { opacity: 1 }, offset + 0.38);
+				tl.set(bar, { transformOrigin: "right center" }, offset + 0.38);
+				tl.to(bar, { scaleX: 0, duration: 0.48, ease: "expo.out" }, offset + 0.38);
+			});
 		});
 	}, [setEntryAnimations]);
 
