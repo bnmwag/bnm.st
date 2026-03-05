@@ -5,13 +5,7 @@ import { gsap } from "@/lib/gsap";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-const LINES = [
-	"Born 2005.",
-	"Based in Austria.",
-	"Obsessed with details.",
-	"Builds for the web.",
-	"Currently available.",
-];
+const LINES = ["Born 2005.", "Based in Austria.", "Obsessed with details.", "Builds for the web.", "Currently available."];
 
 const MIN_DURATION = 800; // ms — never flash by on fast connections
 const HOLD_AFTER_DONE = 300; // ms hold at 100% before exit wipe
@@ -45,11 +39,7 @@ export const Preloader = () => {
 			if (digit !== prev[i]) {
 				const el = digitRefs.current[i];
 				if (el) {
-					gsap.fromTo(
-						el,
-						{ y: "100%" },
-						{ y: 0, duration: 0.14, ease: "power3.out", force3D: true },
-					);
+					gsap.fromTo(el, { y: "100%" }, { y: 0, duration: 0.14, ease: "power3.out", force3D: true });
 				}
 			}
 		});
@@ -140,7 +130,9 @@ export const Preloader = () => {
 						setDisplayCount(rounded);
 						setVisibleLines(Math.min(LINES.length, Math.floor(rounded / 20) + 1));
 					},
-					onComplete: () => setTimeout(exit, 80),
+					onComplete: () => {
+						setTimeout(exit, 80);
+					},
 				}),
 			);
 		};
@@ -191,7 +183,7 @@ export const Preloader = () => {
 	return createPortal(
 		<div
 			ref={overlayRef}
-			className="fixed inset-0 z-200 flex flex-col justify-between p-4 bg-foreground"
+			className="fixed inset-0 z-200 flex flex-col justify-between bg-foreground p-4"
 			style={{ clipPath: "inset(0 0 0% 0)" }}
 		>
 			{/* ── Terminal lines ── */}
@@ -202,9 +194,7 @@ export const Preloader = () => {
 							ref={(el) => {
 								lineRefs.current[i] = el;
 							}}
-							className={`block text-caption ${
-								i === visibleLines - 1 ? "text-background" : "text-background/30"
-							}`}
+							className={`block text-caption ${i === visibleLines - 1 ? "text-background" : "text-background/30"}`}
 						>
 							{line}
 						</span>
@@ -220,12 +210,12 @@ export const Preloader = () => {
 					aria-live="polite"
 				>
 					{digits.map((digit, i) => (
-						<div key={i} className="overflow-hidden" style={{ lineHeight: 0.85 }}>
+						<div key={`digit-${i * 1}`} className="overflow-hidden" style={{ lineHeight: 0.85 }}>
 							<span
 								ref={(el) => {
 									digitRefs.current[i] = el;
 								}}
-								className="block text-background font-medium tabular-nums"
+								className="block font-medium text-background tabular-nums"
 								style={{ fontSize: "clamp(5rem,10vw,13rem)" }}
 								aria-hidden="true"
 							>
@@ -233,14 +223,11 @@ export const Preloader = () => {
 							</span>
 						</div>
 					))}
-					<span
-						className="text-caption text-background/50 mb-[0.1em] ml-[0.15em]"
-						aria-hidden="true"
-					>
+					<span className="mb-[0.1em] ml-[0.15em] text-background/50 text-caption" aria-hidden="true">
 						%
 					</span>
 				</div>
-				<p className="text-caption text-background/50 mt-3">Benjamin Wagner</p>
+				<p className="mt-3 text-background/50 text-caption">Benjamin Wagner</p>
 			</div>
 		</div>,
 		document.body,
