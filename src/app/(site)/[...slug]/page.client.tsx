@@ -166,7 +166,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 	if (isMobile) {
 		return (
-			<Wrapper lenis={{ options: { infinite: true, syncTouch: true, touchMultiplier: 1 } }}>
+			<Wrapper>
 				<div id="main-content" className={cn("", className)} {...props}>
 					<section className="layout-grid h-svh items-center py-52" aria-label="Introduction">
 						<div className="col-span-4 row-start-1 row-end-1">

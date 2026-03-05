@@ -181,7 +181,7 @@ export const ContactPageClient: FC = () => {
 
 	return (
 		<Wrapper>
-			<article id="main-content" ref={containerRef} className="relative min-h-svh pt-[25vh] pb-4">
+			<article id="main-content" ref={containerRef} className="relative min-h-svh pt-[25vh] pb-[25vh] md:pb-4">
 				{/* ── Left: headline — fixed bottom-left on desktop ── */}
 				<div className="fixed bottom-4 left-4 z-10 space-y-6 max-md:hidden">
 					<p className="max-w-xs text-caption text-foreground/50">
