@@ -33,18 +33,23 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
 			if (!links?.length) return;
 
+			// type:"lines" keeps the link DOM intact (no inline-block char spans)
+			// so the ::after hover bar height is unaffected
 			const splits = Array.from(links).map(
-				(el) => new SplitText(el, { type: "lines,chars", aria: "none", mask: "lines", linesClass: "perspective-distant" }),
+				(el) => new SplitText(el, { type: "lines", mask: "lines", linesClass: "perspective-distant" }),
 			);
 
-			const chars = splits.flatMap((s) => s.chars as HTMLElement[]);
-			gsap.set(chars, { y: "100%", rotateX: 60, force3D: true });
+			const lines = splits.flatMap((s) => Array.from(s.lines) as HTMLElement[]);
+			gsap.set(lines, { y: "100%", rotateX: 50, force3D: true });
 
 			const tl = gsap.timeline({
-				onComplete: () => { for (const s of splits) s.revert(); },
+				onComplete: () => {
+					gsap.set(lines, { clearProps: "all" });
+					for (const s of splits) s.revert();
+				},
 			});
 
-			tl.to(chars, { rotateX: 0, y: 0, duration: 2.1, stagger: 0.035, ease: "expo.out", force3D: true });
+			tl.to(lines, { rotateX: 0, y: 0, duration: 1.2, stagger: 0.07, ease: "expo.out", force3D: true });
 		});
 	}, [setEntryAnimations]);
 

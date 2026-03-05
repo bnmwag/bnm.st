@@ -35,9 +35,9 @@ export const Preloader = () => {
 		tl.to(split.chars, {
 			rotateX: 0,
 			y: 0,
-			duration: 2.1,
-			stagger: 0.035,
-			delay: 0.4,
+			duration: 1.4,
+			stagger: 0.025,
+			delay: 0.3,
 			ease: "expo.out",
 			force3D: true,
 		});
