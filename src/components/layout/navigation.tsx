@@ -31,65 +31,75 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
 					</p>
 				</div>
-				<nav className="col-span-2 md:col-start-10" aria-label="Main navigation">
+				<nav className="col-span-2 md:col-start-8" aria-label="Main navigation">
 					<ul className="space-y-2">
-						<li className="block h-fit leading-none">
+						<li className="flex h-fit leading-none">
 							<Link
 								href="/resume"
 								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
 								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Resume</ScrambleText>
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
+									Resume
+								</ScrambleText>
 							</Link>
 						</li>
-						<li className="block h-fit leading-none">
+						<li className="flex h-fit leading-none">
 							<Link
 								href="/imprint"
 								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
 								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Imprint</ScrambleText>
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
+									Imprint
+								</ScrambleText>
 							</Link>
 						</li>
-						<li className="block h-fit leading-none">
+						<li className="flex h-fit leading-none">
 							<Link
 								href="/privacy"
 								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
 								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Privacy</ScrambleText>
-							</Link>
-						</li>
-						<li className="block h-fit leading-none">
-							<Link
-								href="/contact"
-								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
-							>
-								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">Contact</ScrambleText>
+								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
+									Privacy
+								</ScrambleText>
 							</Link>
 						</li>
 					</ul>
 				</nav>
-				<motion.div
-					className="col-span-4 col-start-9 flex items-start justify-end md:col-span-1 md:col-start-12"
-					animate={{
-						opacity: pathname === "/" || pathname === "/info" ? 1 : 0,
-						filter: pathname === "/" || pathname === "/info" ? "blur(0px)" : "blur(12px)",
-						pointerEvents: pathname === "/" || pathname === "/info" ? "auto" : "none",
-					}}
-					transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
-				>
-					<button
-						type="button"
-						onClick={() => router.push("/info")}
-						aria-label="Open info panel"
+				<div className="col-span-4 col-start-9 flex items-start justify-end gap-x-4 md:col-span-2 md:col-start-11">
+					<motion.div
+						className="flex"
+						animate={{
+							opacity: pathname === "/" || pathname === "/info" ? 1 : 0,
+							filter: pathname === "/" || pathname === "/info" ? "blur(0px)" : "blur(12px)",
+							pointerEvents: pathname === "/" || pathname === "/info" ? "auto" : "none",
+						}}
+						transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
+					>
+						<button
+							type="button"
+							onClick={() => router.push("/info")}
+							aria-label="Open info panel"
+							className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+						>
+							<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+							<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">
+								Info
+							</ScrambleText>
+						</button>
+					</motion.div>
+					<Link
+						href="/contact"
 						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-						<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">Info</ScrambleText>
-					</button>
-				</motion.div>
+						<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">
+							Contact
+						</ScrambleText>
+					</Link>
+				</div>
 			</div>
 		</header>
 	);
