@@ -6,6 +6,8 @@ import { useScramble } from "@/hooks/use-scramble";
 import cn from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { type ComponentProps, type FC, useEffect, useRef } from "react";
+import { defaultPatterns } from "web-haptics";
+import { useWebHaptics } from "web-haptics/react";
 
 interface INavigationProps extends ComponentProps<"div"> {}
 
@@ -19,6 +21,8 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	const { display: labelDisplay, scramble: labelScramble, reset: labelReset } = useScramble(label);
 	const prevLabelRef = useRef(label);
 
+	const { trigger } = useWebHaptics({ debug: true });
+
 	// Scramble text whenever the label changes (Info ↔ Back)
 	useEffect(() => {
 		if (prevLabelRef.current !== label) {
@@ -27,7 +31,10 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 		}
 	}, [label, labelScramble]);
 
+	const haptic = () => trigger(defaultPatterns.soft);
+
 	const handleInfoClick = () => {
+		haptic();
 		if (isInfoOpen) {
 			window.dispatchEvent(new CustomEvent("info:close"));
 		} else {
@@ -39,7 +46,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 		<header className={cn("fixed inset-x-0 top-0 z-40 pt-4 text-background mix-blend-difference", className)} {...props}>
 			<div className="layout-grid">
 				<div className="col-span-4 flex items-start md:col-span-2">
-					<Link href={"/"} className="inline-block text-caption" aria-label="Home - Benjamin Wagner">
+					<Link href={"/"} onClick={haptic} className="inline-block text-caption" aria-label="Home - Benjamin Wagner">
 						Benjamin Wagner
 					</Link>
 				</div>
@@ -57,6 +64,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						<li className="flex h-fit leading-none">
 							<Link
 								href="/resume"
+								onClick={haptic}
 								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
 								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
@@ -68,6 +76,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						<li className="flex h-fit leading-none">
 							<Link
 								href="/imprint"
+								onClick={haptic}
 								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
 								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
@@ -79,6 +88,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						<li className="flex h-fit leading-none">
 							<Link
 								href="/privacy"
+								onClick={haptic}
 								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 							>
 								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
@@ -100,7 +110,9 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
 						{/* Invisible copy reserves the width of the longer word */}
-						<span className="invisible" aria-hidden="true">Back</span>
+						<span className="invisible" aria-hidden="true">
+							Back
+						</span>
 						<span
 							className="absolute inset-0 flex items-center justify-center text-foreground transition-colors duration-short ease-default group-hover:text-background"
 							aria-label={label}
@@ -110,6 +122,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					</button>
 					<Link
 						href="/contact"
+						onClick={haptic}
 						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />

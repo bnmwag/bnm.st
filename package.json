@@ -40,6 +40,7 @@
 		"tempus": "1.0.0-dev.17",
 		"three": "^0.177.0",
 		"usehooks-ts": "^3.1.1",
+		"web-haptics": "^0.0.6",
 		"zustand": "^5.0.11"
 	},
 	"devDependencies": {

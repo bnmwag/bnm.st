@@ -11,6 +11,8 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { type ComponentProps, type FC, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import { defaultPatterns } from "web-haptics";
+import { useWebHaptics } from "web-haptics/react";
 
 interface IIndexPageClientProps extends ComponentProps<"div"> {
 	projects: Project[];
@@ -26,6 +28,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 	const isTouchDevice = useTouchDevice();
 	const isMobile = useMediaQuery("(max-width: 767px)");
+	const { trigger } = useWebHaptics();
 	const { setEntryAnimations } = useTransition();
 
 	// Preload all project hover images in the background so they're in cache on first hover
@@ -128,6 +131,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, projectId: number) => {
 		if (isTouchDevice) {
+			trigger(defaultPatterns.soft);
 			if (clickedProjectId === projectId) {
 				return;
 			}
