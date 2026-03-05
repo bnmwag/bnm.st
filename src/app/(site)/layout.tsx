@@ -77,8 +77,8 @@ export default function RootLayout({
 							</div>
 						</main>
 					</PageTransition>
+					<Preloader />
 				</TransitionProvider>
-				<Preloader />
 				<Grid />
 				<Analytics />
 			</body>

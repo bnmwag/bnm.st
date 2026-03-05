@@ -2,7 +2,9 @@
 
 import { Media, Wrapper } from "@/components/layout";
 import { ProgressiveBlur } from "@/components/progressive-blur";
+import { useTransition } from "@/features/page-transitions/context/page-transition.context";
 import { useTouchDevice } from "@/hooks/use-touch-device";
+import { gsap } from "@/lib/gsap";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
@@ -24,6 +26,19 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 	const isTouchDevice = useTouchDevice();
 	const isMobile = useMediaQuery("(max-width: 767px)");
+	const { setEntryAnimations } = useTransition();
+
+	useEffect(() => {
+		setEntryAnimations(() => {
+			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
+			if (!links?.length) return;
+			gsap.fromTo(
+				Array.from(links),
+				{ y: 48, opacity: 0 },
+				{ y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "expo.out" },
+			);
+		});
+	}, [setEntryAnimations]);
 
 	const handleEnter = (id: number) => {
 		if (leaveTimeoutRef.current) {

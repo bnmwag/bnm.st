@@ -28,7 +28,7 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const isTransitioning = useRef(false);
-	const { getEntryAnimations } = useTransition();
+	const { getEntryAnimations, onPreloaderReady } = useTransition();
 
 	// activeTransitionRef is set in the click handler before router.push.
 	// Both useLayoutEffect and useEffect use it to detect a real navigation
@@ -100,39 +100,56 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 			activeTransitionRef.current.entry(entryTl, content);
 		}
 
-		const fn = getEntryAnimations();
-		const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
+		let cancelled = false;
 
-		if (fn) {
-			if (fn.length > 0) {
-				// TimelineAnimationFn: fn runs synchronously, adding tweens to pageTl.
-				// Reveal wrapper after fn so any initial-state sets in fn fire first.
-				const pageTl = gsap.timeline();
-				(fn as TimelineAnimationFn)(pageTl);
-				entryTl.add(pageTl, `<${PAGE_ANIM_DELAY}`);
-				if (wrapper)
-					entryTl.call(() => {
-						gsap.set(wrapper, { opacity: 1 });
-					});
-			} else {
-				// FreeAnimationFn: fn runs inside a GSAP call on the first tick.
-				// Reveal wrapper after fn so SplitText chars are at y:100% before
-				// wrapper becomes visible — prevents a flash of unsplit text.
-				entryTl.call(
-					() => {
-						(fn as () => void)();
-						if (wrapper) gsap.set(wrapper, { opacity: 1 });
-					},
-					[],
-					`<${PAGE_ANIM_DELAY}`,
-				);
+		const runPageAnimation = () => {
+			if (cancelled) return;
+
+			const fn = getEntryAnimations();
+			const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
+
+			if (fn) {
+				if (fn.length > 0) {
+					// TimelineAnimationFn: fn runs synchronously, adding tweens to pageTl.
+					// Reveal wrapper after fn so any initial-state sets in fn fire first.
+					const pageTl = gsap.timeline();
+					(fn as TimelineAnimationFn)(pageTl);
+					entryTl.add(pageTl, `<${PAGE_ANIM_DELAY}`);
+					if (wrapper)
+						entryTl.call(() => {
+							gsap.set(wrapper, { opacity: 1 });
+						});
+				} else {
+					// FreeAnimationFn: fn runs inside a GSAP call on the first tick.
+					// Reveal wrapper after fn so SplitText chars are at y:100% before
+					// wrapper becomes visible — prevents a flash of unsplit text.
+					entryTl.call(
+						() => {
+							(fn as () => void)();
+							if (wrapper) gsap.set(wrapper, { opacity: 1 });
+						},
+						[],
+						`<${PAGE_ANIM_DELAY}`,
+					);
+				}
+			} else if (wrapper) {
+				// No page animation registered — just reveal the wrapper.
+				gsap.set(wrapper, { opacity: 1 });
 			}
-		} else if (wrapper) {
-			// No page animation registered — just reveal the wrapper.
-			gsap.set(wrapper, { opacity: 1 });
+		};
+
+		// On initial hard load (no active transition): wait for the preloader to
+		// signal before revealing the page — so content animates in as the
+		// overlay wipes away. On internal navigation the preloader is already
+		// done, so onPreloaderReady fires the callback synchronously.
+		if (!activeTransitionRef.current) {
+			onPreloaderReady(runPageAnimation);
+		} else {
+			runPageAnimation();
 		}
 
 		return () => {
+			cancelled = true;
 			entryTl.kill();
 		};
 	}, [pathname]);
