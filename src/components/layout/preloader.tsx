@@ -6,11 +6,12 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 const NAME = "BENJAMIN WAGNER";
+const WORDS = NAME.split(" ");
 
 export const Preloader = () => {
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const captionRef = useRef<HTMLSpanElement>(null);
-	const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+	const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
 	const [mounted, setMounted] = useState(false);
 	const [visible, setVisible] = useState(true);
@@ -23,35 +24,68 @@ export const Preloader = () => {
 		if (!mounted || !overlayRef.current || !captionRef.current) return;
 
 		const tweens: gsap.core.Tween[] = [];
-		const chars = charRefs.current.filter((el): el is HTMLSpanElement => el !== null);
+		const words = wordRefs.current.filter((el): el is HTMLSpanElement => el !== null);
 
-		// transformPerspective bakes perspective into each element's own transform matrix —
-		// CSS `perspective` on the overflow wrapper would be flattened by the stacking context.
-		gsap.set(chars, { y: "100%", rotateX: 80, transformPerspective: 300, force3D: true });
-		gsap.set(captionRef.current, { opacity: 0, y: 8 });
+		gsap.set(words, { opacity: 0 });
+		gsap.set(captionRef.current, { opacity: 0 });
 
-		const tl = gsap.timeline({
-			onComplete: () => {
-				notifyPreloaderDone();
-				if (overlayRef.current) {
-					tweens.push(
-						gsap.to(overlayRef.current, {
-							clipPath: "inset(0 0 100% 0)",
-							duration: 1.2,
-							ease: "expo.inOut",
-							onComplete: () => setVisible(false),
-						}),
-					);
-				}
-			},
+		// White bars on dark background — fixed so they sit outside the overlay stacking context
+		const bars = words.map((wordEl) => {
+			const rect = wordEl.getBoundingClientRect();
+			const bar = document.createElement("div");
+			Object.assign(bar.style, {
+				position: "fixed",
+				top: `${rect.top}px`,
+				left: `${rect.left}px`,
+				width: `${rect.width}px`,
+				height: `${rect.height}px`,
+				background: "var(--background)",
+				transformOrigin: "left center",
+				transform: "scaleX(0)",
+				pointerEvents: "none",
+				zIndex: "201",
+			});
+			document.body.appendChild(bar);
+			return bar;
 		});
 
-		tl.to(chars, { y: 0, rotateX: 0, duration: 1.2, stagger: 0.04, ease: "expo.out", force3D: true })
-			.to(captionRef.current, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "<0.2")
-			.to({}, { duration: 0.5 }); // hold before exit
+		const tl = gsap.timeline();
+
+		// Bar wipes in from left → text revealed → bar exits right, staggered per word
+		words.forEach((word, i) => {
+			const bar = bars[i];
+			const offset = i * 0.12;
+			tl.to(bar, { scaleX: 1, duration: 0.55, ease: "expo.in" }, offset);
+			tl.set(word, { opacity: 1 }, offset + 0.55);
+			tl.set(bar, { transformOrigin: "right center" }, offset + 0.55);
+			tl.to(bar, { scaleX: 0, duration: 0.65, ease: "expo.out" }, offset + 0.55);
+		});
+
+		// Caption fades in after the reveal
+		tl.to(captionRef.current, { opacity: 0.5, duration: 0.5, ease: "power2.out" }, "-=0.3");
+
+		// Hold
+		tl.to({}, { duration: 0.5 });
+
+		// Exit
+		tl.add(() => {
+			for (const bar of bars) bar.remove();
+			notifyPreloaderDone();
+			if (overlayRef.current) {
+				tweens.push(
+					gsap.to(overlayRef.current, {
+						clipPath: "inset(0 0 100% 0)",
+						duration: 1.2,
+						ease: "expo.inOut",
+						onComplete: () => setVisible(false),
+					}),
+				);
+			}
+		});
 
 		return () => {
 			tl.kill();
+			for (const bar of bars) bar.remove();
 			for (const tw of tweens) tw.kill();
 		};
 	}, [mounted, notifyPreloaderDone]);
@@ -77,23 +111,21 @@ export const Preloader = () => {
 				className="text-[clamp(3rem,7vw,9rem)] uppercase leading-[.85] tracking-[-0.04em] text-background"
 				aria-label={NAME}
 			>
-				{NAME.split("").map((char, i) =>
-					char === " " ? (
-						<span key={i} className="inline-block">&nbsp;</span>
-					) : (
-						<span key={i} style={{ overflow: "hidden", display: "inline-block" }}>
-							<span
-								ref={(el) => {
-									charRefs.current[i] = el;
-								}}
-								className="inline-block"
-								aria-hidden="true"
-							>
-								{char}
-							</span>
+				{WORDS.map((word, i) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: static word list
+					<span key={i}>
+						<span
+							ref={(el) => {
+								wordRefs.current[i] = el;
+							}}
+							className="inline-block"
+							aria-hidden="true"
+						>
+							{word}
 						</span>
-					),
-				)}
+						{i < WORDS.length - 1 && <span className="inline-block">&nbsp;</span>}
+					</span>
+				))}
 			</div>
 		</div>,
 		document.body,
