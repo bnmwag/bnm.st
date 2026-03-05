@@ -1,81 +1,147 @@
 "use client";
 
 import { useTransition } from "@/features/page-transitions/context/page-transition.context";
-import { SplitText, gsap } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+const NAME = "BENJAMIN WAGNER";
+const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const SCRAMBLE_INTERVAL = 60;   // ms between random ticks
+const LOCK_STAGGER = 40;        // ms between each char locking
+const HOLD_AFTER_LOCK = 400;    // ms hold before exit wipe starts
+
+function randomChar() {
+  return POOL[Math.floor(Math.random() * POOL.length)];
+}
+
 export const Preloader = () => {
-	const overlayRef = useRef<HTMLDivElement>(null);
-	const nameRef = useRef<HTMLDivElement>(null);
-	const captionRef = useRef<HTMLSpanElement>(null);
-	const [mounted, setMounted] = useState(false);
-	const [visible, setVisible] = useState(true);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const captionRef = useRef<HTMLSpanElement>(null);
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-	const { notifyPreloaderDone } = useTransition();
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(true);
 
-	useEffect(() => setMounted(true), []);
+  // Displayed chars — start fully scrambled (spaces preserved)
+  const [chars, setChars] = useState<string[]>(() =>
+    NAME.split("").map((c) => (c === " " ? " " : randomChar())),
+  );
 
-	useEffect(() => {
-		if (!mounted || !overlayRef.current || !nameRef.current || !captionRef.current) return;
+  const { notifyPreloaderDone } = useTransition();
 
-		const split = new SplitText(nameRef.current, {
-			type: "lines,chars",
-			aria: "none",
-			mask: "lines",
-			linesClass: "perspective-distant",
-		});
+  useEffect(() => setMounted(true), []);
 
-		gsap.set(split.chars, { y: "100%", rotateX: 60, force3D: true });
-		gsap.set(captionRef.current, { opacity: 0, y: 6 });
+  useEffect(() => {
+    if (!mounted || !overlayRef.current || !captionRef.current) return;
 
-		const tl = gsap.timeline({ onComplete: () => setVisible(false) });
+    const lockedUpTo = { current: -1 };
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
-		// name chars flip up with 3D rotateX
-		tl.to(split.chars, {
-			rotateX: 0,
-			y: 0,
-			duration: 1.4,
-			stagger: 0.025,
-			delay: 0.3,
-			ease: "expo.out",
-			force3D: true,
-		});
+    // ── Scramble interval — randomises every unlocked char ──────────────────
+    const interval = setInterval(() => {
+      setChars((prev) =>
+        prev.map((c, i) => {
+          if (c === " " || i <= lockedUpTo.current) return c;
+          return randomChar();
+        }),
+      );
+    }, SCRAMBLE_INTERVAL);
 
-		// caption fades in
-		tl.to(captionRef.current, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "<0.2");
+    // ── Caption fade-in ──────────────────────────────────────────────────────
+    gsap.set(captionRef.current, { opacity: 0, y: 6 });
+    gsap.to(captionRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      delay: 0.4,
+      ease: "power2.out",
+    });
 
-		// hold
-		tl.addLabel("exit", "+=0.5");
+    // ── Lock chars left → right ──────────────────────────────────────────────
+    const lockable = NAME.split("").reduce<number[]>((acc, c, i) => {
+      if (c !== " ") acc.push(i);
+      return acc;
+    }, []);
 
-		// notify at wipe start — page entry animation runs simultaneously
-		tl.call(notifyPreloaderDone, [], "exit");
+    lockable.forEach((charIndex, order) => {
+      const t = setTimeout(
+        () => {
+          lockedUpTo.current = charIndex;
 
-		// wipe overlay upward
-		tl.to(overlayRef.current, { clipPath: "inset(0 0 100% 0)", duration: 1.2, ease: "expo.inOut" }, "exit");
+          // Snap char to correct value
+          setChars((prev) => {
+            const next = [...prev];
+            next[charIndex] = NAME[charIndex];
+            return next;
+          });
 
-		return () => {
-			tl.kill();
-			split.revert();
-		};
-	}, [mounted]);
+          // Physical pop on the span
+          const el = charRefs.current[charIndex];
+          if (el) {
+            gsap.fromTo(
+              el,
+              { y: 16 },
+              { y: 0, duration: 0.28, ease: "expo.out", force3D: true },
+            );
+          }
 
-	if (!mounted || !visible) return null;
+          // After the last char locks, hold then exit
+          if (order === lockable.length - 1) {
+            const exitT = setTimeout(() => {
+              notifyPreloaderDone();
+              if (overlayRef.current) {
+                gsap.to(overlayRef.current, {
+                  clipPath: "inset(0 0 100% 0)",
+                  duration: 1.2,
+                  ease: "expo.inOut",
+                  onComplete: () => setVisible(false),
+                });
+              }
+            }, HOLD_AFTER_LOCK);
+            timeouts.push(exitT);
+          }
+        },
+        // Start locking after ~1.2s of scramble
+        1200 + order * LOCK_STAGGER,
+      );
+      timeouts.push(t);
+    });
 
-	return createPortal(
-		<div
-			ref={overlayRef}
-			className="fixed inset-0 z-200 flex flex-col justify-between p-4 bg-foreground"
-			style={{ clipPath: "inset(0 0 0% 0)" }}
-		>
-			<span ref={captionRef} className="text-caption uppercase text-background/50 opacity-0">
-				Freelance Creative Developer
-			</span>
+    return () => {
+      clearInterval(interval);
+      for (const t of timeouts) clearTimeout(t);
+    };
+  }, [mounted]);
 
-			<div ref={nameRef} className="uppercase leading-[.85] tracking-[-0.04em] text-background text-[clamp(3rem,7vw,9rem)]">
-				Benjamin Wagner
-			</div>
-		</div>,
-		document.body,
-	);
+  if (!mounted || !visible) return null;
+
+  return createPortal(
+    <div
+      ref={overlayRef}
+      className="fixed inset-0 z-200 flex flex-col justify-between p-4 bg-foreground"
+      style={{ clipPath: "inset(0 0 0% 0)" }}
+    >
+      <span ref={captionRef} className="text-caption uppercase text-background/50">
+        Freelance Creative Developer
+      </span>
+
+      <div
+        className="uppercase leading-[.85] tracking-[-0.04em] text-background text-[clamp(3rem,7vw,9rem)]"
+        aria-label={NAME}
+      >
+        {chars.map((c, i) => (
+          <span
+            key={i}
+            ref={(el) => { charRefs.current[i] = el; }}
+            className="inline-block"
+            aria-hidden="true"
+          >
+            {c}
+          </span>
+        ))}
+      </div>
+    </div>,
+    document.body,
+  );
 };
