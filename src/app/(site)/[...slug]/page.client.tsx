@@ -4,7 +4,7 @@ import { Media, Wrapper } from "@/components/layout";
 import { ProgressiveBlur } from "@/components/progressive-blur";
 import { useTransition } from "@/features/page-transitions/context/page-transition.context";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { gsap } from "@/lib/gsap";
+import { SplitText, gsap } from "@/lib/gsap";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
@@ -32,11 +32,19 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 		setEntryAnimations(() => {
 			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
 			if (!links?.length) return;
-			gsap.fromTo(
-				Array.from(links),
-				{ y: 48, opacity: 0 },
-				{ y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "expo.out" },
+
+			const splits = Array.from(links).map(
+				(el) => new SplitText(el, { type: "lines,chars", aria: "none", mask: "lines", linesClass: "perspective-distant" }),
 			);
+
+			const chars = splits.flatMap((s) => s.chars as HTMLElement[]);
+			gsap.set(chars, { y: "100%", rotateX: 60, force3D: true });
+
+			const tl = gsap.timeline({
+				onComplete: () => { for (const s of splits) s.revert(); },
+			});
+
+			tl.to(chars, { rotateX: 0, y: 0, duration: 2.1, stagger: 0.035, ease: "expo.out", force3D: true });
 		});
 	}, [setEntryAnimations]);
 
