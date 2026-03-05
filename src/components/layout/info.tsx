@@ -117,7 +117,9 @@ export const Info: FC = () => {
 			tl.to(blend.current, { opacity: 1, duration: 1 });
 			tl.to(content.current, { clipPath: "inset(0 0 0% 0)", duration: 1.5 });
 			tl.set([content.current, blend.current], { pointerEvents: "auto" });
-			return () => { tl.kill(); };
+			return () => {
+				tl.kill();
+			};
 		}
 
 		// Forward navigation away from /info — animate out without router.back()
@@ -127,7 +129,9 @@ export const Info: FC = () => {
 			tl.to(content.current, { clipPath: "inset(100% 0 0 0)", duration: 0.9 });
 			tl.to(blend.current, { opacity: 0, duration: 0.7 }, "-=0.4");
 			tl.set([content.current, blend.current], { pointerEvents: "none" });
-			return () => { tl.kill(); };
+			return () => {
+				tl.kill();
+			};
 		}
 	}, [mounted, pathname]);
 
@@ -167,7 +171,7 @@ export const Info: FC = () => {
 				role="button"
 				tabIndex={0}
 				aria-label="Close info panel"
-				className="pointer-events-none fixed inset-0 z-30 opacity-0 backdrop-blur-3xl"
+				className="pointer-events-none fixed inset-x-0 top-0 -bottom-28 z-30 opacity-0 backdrop-blur-3xl"
 			/>
 
 			<aside
