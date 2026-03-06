@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const CHARS = "▙▚▞akiedzek▝▀▖▜▛▟▙▚▞▝▀▖akiedzek";
 const FRAMES_PER_CHAR = 4;
 const TARGET_DURATION = 600; // ms — fixed total, so all words take the same time
 
