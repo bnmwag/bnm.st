@@ -42,6 +42,12 @@ a, button {
   @apply font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none;
 }
 
+@utility motion-reduce-hidden {
+  @media (prefers-reduced-motion: reduce) {
+    display: none !important;
+  }
+}
+
 .project-link--active:after {
   transform-origin: left !important;
   scale: 1 !important;
@@ -61,4 +67,40 @@ a, button {
 
 .prose strong {
     font-weight: 800;
+}
+
+/* Skip link — visually hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  transition: top 0.1s;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Reduced motion — kill all CSS transitions and animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
