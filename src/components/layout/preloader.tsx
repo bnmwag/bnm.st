@@ -23,6 +23,13 @@ export const Preloader = () => {
 	useEffect(() => {
 		if (!mounted || !overlayRef.current || !captionRef.current) return;
 
+		// Skip animation entirely for reduced motion users
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			notifyPreloaderDone();
+			setVisible(false);
+			return;
+		}
+
 		const tweens: gsap.core.Tween[] = [];
 		const words = wordRefs.current.filter((el): el is HTMLSpanElement => el !== null);
 
