@@ -5,7 +5,7 @@ import "lenis/dist/lenis.css";
 import type { LenisRef, LenisProps as ReactLenisProps } from "lenis/react";
 import { ReactLenis } from "lenis/react";
 import Snap from "lenis/snap";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTempus } from "tempus/react";
 
 interface SnapConfig {
@@ -26,6 +26,16 @@ interface LenisProps extends Omit<ReactLenisProps, "ref"> {
 export function Lenis({ root, options, children, snap: snapConfig }: LenisProps) {
 	const lenisRef = useRef<LenisRef>(null);
 	const snapRef = useRef<Snap | null>(null);
+
+	const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+	useEffect(() => {
+		const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+		setPrefersReducedMotion(mq.matches);
+		const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+		mq.addEventListener("change", handler);
+		return () => mq.removeEventListener("change", handler);
+	}, []);
 
 	useEffect(() => {
 		if (!snapConfig?.enabled) return;
@@ -78,7 +88,7 @@ export function Lenis({ root, options, children, snap: snapConfig }: LenisProps)
 			root={root}
 			options={{
 				...options,
-				lerp: options?.lerp ?? 0.125,
+				lerp: prefersReducedMotion ? 1 : (options?.lerp ?? 0.125),
 				autoRaf: false,
 				anchors: true,
 				prevent: (node: Element | null) => node?.nodeName === "VERCEL-LIVE-FEEDBACK" || node?.id === "theatrejs-studio-root",
