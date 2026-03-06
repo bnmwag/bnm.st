@@ -275,15 +275,15 @@ export const Info: FC = () => {
 					</h2>
 				</div>
 				<div ref={scrollWrapper} className="h-full overflow-y-auto">
-					<div data-lenis-content className="space-y-48 px-2 pb-48 pt-2">
-						<div className="h-[calc(100svh-32px)] flex flex-col justify-end gap-y-12">
+					<div data-lenis-content className="space-y-48 px-2 pt-2 pb-48">
+						<div className="flex h-[calc(100svh-32px)] flex-col justify-end gap-y-12">
 							<div className="space-y-4">
 								<h3 className="text-[clamp(1.5em,2.4vw,2.5em)] uppercase leading-[.9] tracking-[-0.04em]">
 									Hey — I&apos;m Benjamin.
 								</h3>
 								<p className="text-caption leading-normal opacity-60">
-									Frontend developer and creative builder based in Austria. I care about the craft — the kind of work where
-									the interaction feels right, the layout breathes, and nothing is there without a reason.
+									Frontend developer and creative builder based in Austria. I care about the craft — the kind of work where the
+									interaction feels right, the layout breathes, and nothing is there without a reason.
 								</p>
 							</div>
 							<div className="aspect-3/4 w-full border">
