@@ -55,11 +55,11 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						<ScrambleText className="transition-colors duration-short ease-default">Benjamin Wagner</ScrambleText>
 					</Link>
 				</div>
-				<div className="col-span-2 max-md:hidden" aria-label="Location">
+				<div className="col-span-2 max-md:hidden">
 					<p className="text-caption">Based in austria,</p>
 					<p className="text-caption">working worldwide.</p>
 				</div>
-				<div className="col-span-3 max-md:hidden" aria-label="About">
+				<div className="col-span-3 max-md:hidden">
 					<p className="text-balance text-caption">
 						{age}/yo frontend developer focused on crafting polished, high-quality digital experiences.
 					</p>
