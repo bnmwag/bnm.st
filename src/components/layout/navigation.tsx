@@ -2,6 +2,7 @@
 
 import { Link } from "@/components/layout";
 import { ScrambleText } from "@/components/scramble-text";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useScramble } from "@/hooks/use-scramble";
 import cn from "clsx";
 import { usePathname, useRouter } from "next/navigation";
@@ -20,6 +21,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	const label = isInfoOpen ? "Back" : "Info";
 	const { display: labelDisplay, scramble: labelScramble, reset: labelReset } = useScramble(label);
 	const prevLabelRef = useRef(label);
+	const reducedMotion = useReducedMotion();
 
 	const { trigger } = useWebHaptics({ debug: true });
 
@@ -27,7 +29,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	useEffect(() => {
 		if (prevLabelRef.current !== label) {
 			prevLabelRef.current = label;
-			labelScramble();
+			if (!reducedMotion) labelScramble();
 		}
 	}, [label, labelScramble]);
 
@@ -108,8 +110,8 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					<button
 						type="button"
 						onClick={handleInfoClick}
-						onMouseEnter={labelScramble}
-						onMouseLeave={labelReset}
+						onMouseEnter={reducedMotion ? undefined : labelScramble}
+						onMouseLeave={reducedMotion ? undefined : labelReset}
 						aria-label={isInfoOpen ? "Close info panel" : "Open info panel"}
 						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>

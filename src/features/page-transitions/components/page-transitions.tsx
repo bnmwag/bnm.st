@@ -106,7 +106,7 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		const entryTl = gsap.timeline();
 
 		// Transition clip/slide only runs on real navigations, not initial load.
-		if (activeTransition) {
+		if (activeTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 			activeTransition.entry(entryTl, content);
 		}
 
