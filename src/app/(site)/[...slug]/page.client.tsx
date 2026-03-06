@@ -7,7 +7,7 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import { gsap } from "@/lib/gsap";
 import type { Project } from "@/payload-types";
 import cn from "clsx";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { type ComponentProps, type FC, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -30,6 +30,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	const isMobile = useMediaQuery("(max-width: 767px)");
 	const { trigger } = useWebHaptics();
 	const { setEntryAnimations } = useTransition();
+	const shouldReduceMotion = useReducedMotion();
 
 	// Preload all project hover images in the background so they're in cache on first hover
 	useEffect(() => {
@@ -44,6 +45,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 	useEffect(() => {
 		setEntryAnimations(() => {
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 			const links = containerRef.current?.querySelectorAll<HTMLElement>(".project-link");
 			if (!links?.length) return;
 
@@ -280,10 +282,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 						opacity: hoverStack.length > 0 ? 1 : 0,
 						pointerEvents: hoverStack.length > 0 ? "auto" : "none",
 					}}
-					transition={{
-						duration: 0.64,
-						ease: [0.87, 0, 0.13, 1],
-					}}
+					transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
 					className="fixed inset-2 overflow-hidden"
 					aria-hidden="true"
 				>
@@ -309,10 +308,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									exit={{
 										opacity: 0,
 									}}
-									transition={{
-										duration: 0.64,
-										ease: [0.87, 0, 0.13, 1],
-									}}
+									transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
 								>
 									<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" />
 								</motion.div>

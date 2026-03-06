@@ -5,7 +5,7 @@ import { ScrambleText } from "@/components/scramble-text";
 import { useTransition } from "@/features/page-transitions/context/page-transition.context";
 import { gsap } from "@/lib/gsap";
 import cn from "clsx";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type FC, useActionState, useEffect, useRef, useState } from "react";
 import { type ContactState, submitContact } from "./actions";
 
@@ -22,21 +22,24 @@ function validateEmail(value: string) {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-const ErrorMessage: FC<{ message?: string }> = ({ message }) => (
-	<AnimatePresence>
-		{message && (
-			<motion.span
-				initial={{ opacity: 0, y: -4, height: 0 }}
-				animate={{ opacity: 1, y: 0, height: "auto" }}
-				exit={{ opacity: 0, y: -4, height: 0 }}
-				transition={{ duration: 0.2, ease: "easeOut" }}
-				className="mt-1.5 block overflow-hidden text-caption text-rose-600"
-			>
-				{message}
-			</motion.span>
-		)}
-	</AnimatePresence>
-);
+const ErrorMessage: FC<{ message?: string }> = ({ message }) => {
+	const shouldReduceMotion = useReducedMotion();
+	return (
+		<AnimatePresence>
+			{message && (
+				<motion.span
+					initial={shouldReduceMotion ? {} : { opacity: 0, y: -4, height: 0 }}
+					animate={{ opacity: 1, y: 0, height: "auto" }}
+					exit={shouldReduceMotion ? {} : { opacity: 0, y: -4, height: 0 }}
+					transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
+					className="mt-1.5 block overflow-hidden text-caption text-rose-600"
+				>
+					{message}
+				</motion.span>
+			)}
+		</AnimatePresence>
+	);
+};
 
 export const ContactPageClient: FC = () => {
 	const [state, action, isPending] = useActionState(submitContact, INITIAL_STATE);
@@ -55,10 +58,13 @@ export const ContactPageClient: FC = () => {
 	const emailScope = useRef<HTMLDivElement>(null);
 	const messageScope = useRef<HTMLDivElement>(null);
 
+	const shouldReduceMotion = useReducedMotion();
+
 	const { setEntryAnimations } = useTransition();
 
 	useEffect(() => {
 		setEntryAnimations(() => {
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 			if (!containerRef.current) return;
 			const container = containerRef.current;
 
@@ -221,7 +227,7 @@ export const ContactPageClient: FC = () => {
 									key="success"
 									initial={{ opacity: 0, filter: "blur(12px)" }}
 									animate={{ opacity: 1, filter: "blur(0px)" }}
-									transition={{ duration: 0.8, ease: [0.87, 0, 0.13, 1] }}
+									transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.8, ease: [0.87, 0, 0.13, 1] }}
 									className="space-y-6"
 								>
 									<p className="text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">Got it.</p>
@@ -240,7 +246,7 @@ export const ContactPageClient: FC = () => {
 									action={action}
 									onSubmit={handleSubmit}
 									exit={{ opacity: 0, filter: "blur(12px)" }}
-									transition={{ duration: 0.6, ease: [0.87, 0, 0.13, 1] }}
+									transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.6, ease: [0.87, 0, 0.13, 1] }}
 									className="space-y-10"
 									noValidate
 								>
@@ -451,7 +457,7 @@ export const ContactPageClient: FC = () => {
 												initial={{ opacity: 0, y: -4 }}
 												animate={{ opacity: 1, y: 0 }}
 												exit={{ opacity: 0, y: -4 }}
-												transition={{ duration: 0.2, ease: "easeOut" }}
+												transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
 												className="text-caption text-rose-600"
 											>
 												{state.message}
