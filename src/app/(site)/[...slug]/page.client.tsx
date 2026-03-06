@@ -240,6 +240,32 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							</div>
 						</section>
 					))}
+
+					<section className="layout-grid items-center border-t border-foreground/10 py-10" aria-label="Contact">
+						<div className="col-span-4 space-y-2">
+							<div className="flex items-center gap-2">
+								<span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" aria-hidden="true" />
+								<p className="text-caption text-foreground/40">Available for projects</p>
+							</div>
+						</div>
+						<div className="col-span-8 col-start-5 flex justify-end">
+							<Link href="/contact" className="group inline-flex items-baseline gap-2" aria-label="Contact Benjamin Wagner">
+								<span className="relative">
+									<span className="text-[clamp(2em,8vw,4em)] uppercase tracking-[-.04em] leading-[.8]">Get in touch</span>
+									<span
+										className="absolute right-0 bottom-0 left-0 h-px origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100"
+										aria-hidden="true"
+									/>
+								</span>
+								<span
+									className="text-[clamp(2em,8vw,4em)] leading-[.8] transition-transform duration-short ease-default group-hover:translate-x-1"
+									aria-hidden="true"
+								>
+									→
+								</span>
+							</Link>
+						</div>
+					</section>
 				</div>
 			</Wrapper>
 		);
@@ -295,7 +321,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 					</AnimatePresence>
 				</motion.div>
 				<div className="layout-grid z-20 h-full py-4 text-background mix-blend-difference ">
-					<nav className="links-container col-span-6 flex flex-wrap gap-4 self-end" aria-label="Project links">
+					<nav className="links-container col-span-6 flex flex-wrap gap-4.5 self-end" aria-label="Project links">
 						{projects.map((project) => (
 							<div key={project.id} className="relative">
 								<Link
@@ -307,7 +333,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									onMouseLeave={() => !isTouchDevice && handleLeave()}
 									aria-label={`Visit ${project.name} website`}
 									className={cn(
-										"project-link | after:-left-2 after:-right-2 after:-top-1.5 after:-bottom-1.5 relative inline-flex text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:origin-right after:scale-x-0 after:bg-background after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
+										"project-link | after:-left-2 after:-right-2 after:-top-2.5 after:-bottom-2.5 relative inline-flex text-[clamp(2em,3.8vw,5em)] uppercase leading-[.8] tracking-[-.04em] after:absolute after:inset-x-0 after:origin-right after:scale-x-0 after:bg-background after:mix-blend-difference after:transition-transform after:duration-long after:ease-default hover:after:origin-left hover:after:scale-x-100",
 										{ "project-link--active": clickedProjectId === project.id && isTouchDevice },
 									)}
 								>

@@ -47,15 +47,12 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 			<div className="layout-grid">
 				<div className="col-span-4 flex items-start md:col-span-2">
 					<Link
-						href="/"
+						href={"/"}
 						onClick={haptic}
+						className="relative inline-flex inline-block text-caption"
 						aria-label="Home - Benjamin Wagner"
-						className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
-						<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-						<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
-							Benjamin Wagner
-						</ScrambleText>
+						<ScrambleText className="transition-colors duration-short ease-default">Benjamin Wagner</ScrambleText>
 					</Link>
 				</div>
 				<div className="col-span-2 max-md:hidden" aria-label="Location">
