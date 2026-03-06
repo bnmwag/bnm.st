@@ -70,6 +70,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${fonts.sans.variable} bg-black text-black`}>
+				<a href="#main-content" className="skip-link">
+					Skip to main content
+				</a>
 				<TransitionProvider>
 					<PageTransition>
 						<Navigation />
