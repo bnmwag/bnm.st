@@ -70,6 +70,7 @@ export const Info: FC = () => {
 	const content = useRef<HTMLDivElement>(null);
 	const scrollWrapper = useRef<HTMLDivElement>(null);
 	const blend = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<Element | null>(null);
 
 	const router = useRouter();
 	const pathname = usePathname();
@@ -77,6 +78,23 @@ export const Info: FC = () => {
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => setMounted(true), []);
+
+	// ─── Focus management ─────────────────────────────────────────────────────
+	useEffect(() => {
+		if (!mounted) return;
+		if (pathname === "/info") {
+			triggerRef.current = document.activeElement;
+			const timer = setTimeout(
+				() => {
+					content.current?.focus();
+				},
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 300,
+			);
+			return () => clearTimeout(timer);
+		} else {
+			(triggerRef.current as HTMLElement | null)?.focus();
+		}
+	}, [mounted, pathname]);
 
 	// ─── Lenis scroll inside panel ────────────────────────────────────────────
 	useEffect(() => {
@@ -129,6 +147,13 @@ export const Info: FC = () => {
 			// Opening — reset guard and ensure element starts from closed state
 			// (GSAP may have left inline styles from a previous close animation).
 			isAnimatingOut.current = false;
+
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				gsap.set(content.current, { clipPath: "inset(0 0 0% 0)", pointerEvents: "auto" });
+				gsap.set(blend.current, { opacity: 1, pointerEvents: "auto" });
+				return;
+			}
+
 			gsap.set(content.current, { clipPath: "inset(0 0 100% 0)", pointerEvents: "none" });
 			gsap.set(blend.current, { opacity: 0, pointerEvents: "none" });
 
@@ -144,6 +169,13 @@ export const Info: FC = () => {
 		// Forward navigation away from /info — animate out without router.back()
 		if (!isAnimatingOut.current) {
 			isAnimatingOut.current = true;
+
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				gsap.set(content.current, { clipPath: "inset(0 0 100% 0)", pointerEvents: "none" });
+				gsap.set(blend.current, { opacity: 0, pointerEvents: "none" });
+				return;
+			}
+
 			const tl = gsap.timeline({ defaults: { ease: "expo.inOut" } });
 			tl.to(content.current, { clipPath: "inset(100% 0 0 0)", duration: 0.9 });
 			tl.to(blend.current, { opacity: 0, duration: 0.7 }, "-=0.4");
@@ -158,6 +190,14 @@ export const Info: FC = () => {
 	const handleBack = () => {
 		if (isAnimatingOut.current) return;
 		isAnimatingOut.current = true;
+
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			gsap.set(content.current, { clipPath: "inset(0 0 100% 0)", pointerEvents: "none" });
+			gsap.set(blend.current, { opacity: 0, pointerEvents: "none" });
+			router.back();
+			return;
+		}
+
 		const tl = gsap.timeline({
 			defaults: { ease: "expo.inOut" },
 			onComplete: () => router.back(),
@@ -198,7 +238,33 @@ export const Info: FC = () => {
 				data-lenis-prevent
 				aria-modal="true"
 				aria-labelledby="info-heading"
+				tabIndex={-1}
 				className="translate-z-0 pointer-events-none fixed inset-y-2 right-2 z-30 w-[calc(100%-1rem)] max-w-xl overflow-hidden bg-foreground text-background will-change-[clip-path] [clip-path:inset(0_0_100%_0)]"
+				onKeyDown={(e) => {
+					if (e.key === "Escape") {
+						e.preventDefault();
+						handleBack();
+						return;
+					}
+					if (e.key !== "Tab") return;
+					const focusable = content.current?.querySelectorAll<HTMLElement>(
+						'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+					);
+					if (!focusable?.length) return;
+					const first = focusable[0];
+					const last = focusable[focusable.length - 1];
+					if (e.shiftKey) {
+						if (document.activeElement === first) {
+							e.preventDefault();
+							last.focus();
+						}
+					} else {
+						if (document.activeElement === last) {
+							e.preventDefault();
+							first.focus();
+						}
+					}
+				}}
 			>
 				<div className="absolute inset-x-2 top-2 z-10 mix-blend-difference">
 					<h2
