@@ -367,7 +367,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 									}}
 									initial="hidden"
 									animate={hoverStack[hoverStack.length - 1]?.id === project.id ? "show" : "hidden"}
-									transition={{ duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
+									transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.64, ease: [0.87, 0, 0.13, 1] }}
 									key={project.id}
 									className="space-y-2"
 									aria-label={`Details for ${project.name}`}
