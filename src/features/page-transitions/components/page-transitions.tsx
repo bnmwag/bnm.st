@@ -65,7 +65,9 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		// Clear residual transform/clip props from any interrupted previous
 		// entry animation (covers popstate and rapid navigation).
 		gsap.set(content, { clearProps: "clipPath,x,y,scale,opacity" });
-		activeTransitionRef.current.setInitialState(content);
+		if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			activeTransitionRef.current.setInitialState(content);
+		}
 	}, [pathname]);
 
 	// ─── Entry animation ──────────────────────────────────────────────────────
@@ -113,8 +115,15 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		const runPageAnimation = () => {
 			if (cancelled) return;
 
-			const fn = getEntryAnimations();
+			const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 			const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
+
+			if (reducedMotion) {
+				if (wrapper) gsap.set(wrapper, { opacity: 1 });
+				return;
+			}
+
+			const fn = getEntryAnimations();
 
 			if (fn) {
 				if (fn.length > 0) {
@@ -224,14 +233,19 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 				content.style.opacity = "0";
 				content.style.clipPath = "inset(0% 0% 100% 0%)";
 
-				const exitTween = transition.exit(ghost);
-				exitTween.eventCallback("onComplete", () => {
-					if (ghostRef.current === ghost) {
-						ghost.remove();
-						ghostRef.current = null;
-					}
-				});
-				exitTweenRef.current = exitTween;
+				if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+					ghost.remove();
+					ghostRef.current = null;
+				} else {
+					const exitTween = transition.exit(ghost);
+					exitTween.eventCallback("onComplete", () => {
+						if (ghostRef.current === ghost) {
+							ghost.remove();
+							ghostRef.current = null;
+						}
+					});
+					exitTweenRef.current = exitTween;
+				}
 			}
 
 			// Navigate immediately — exit and entry run in parallel.
