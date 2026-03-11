@@ -84,7 +84,7 @@ export default function NotFound() {
 					</div>
 					<div className="col-span-6 flex h-full items-end justify-end">
 						<Link
-							href="/contact"
+							href="/"
 							onClick={haptic}
 							className="group relative block overflow-hidden bg-background px-[0.6em] py-[0.15em] font-medium text-[clamp(2rem,5vw,3.5rem)] uppercase leading-none"
 						>
