@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import type { CollectionConfig } from "payload";
 
 export const Projects: CollectionConfig = {
@@ -8,6 +8,13 @@ export const Projects: CollectionConfig = {
 		{
 			name: "active",
 			type: "checkbox",
+			admin: { position: "sidebar" },
+		},
+		{
+			name: "slug",
+			type: "text",
+			unique: true,
+			required: true,
 			admin: { position: "sidebar" },
 		},
 		{
@@ -108,6 +115,25 @@ export const Projects: CollectionConfig = {
 		},
 	],
 	hooks: {
-		afterChange: [async () => revalidatePath("/")],
+		afterChange: [
+			async ({ doc }) => {
+				revalidatePath("/");
+				revalidateTag("projects");
+				if (doc.slug) {
+					revalidatePath(`/p/${doc.slug}`);
+					revalidateTag(`project:${doc.slug}`);
+				}
+			},
+		],
+		afterDelete: [
+			async ({ doc }) => {
+				revalidatePath("/");
+				revalidateTag("projects");
+				if (doc.slug) {
+					revalidatePath(`/p/${doc.slug}`);
+					revalidateTag(`project:${doc.slug}`);
+				}
+			},
+		],
 	},
 };

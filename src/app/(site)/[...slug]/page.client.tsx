@@ -196,10 +196,8 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 
 							<div className="relative z-10 w-full p-6 pb-12 text-white">
 								<Link
-									href={project.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									aria-label={`Visit ${project.name} website`}
+									href={`/p/${project.slug}`}
+									aria-label={`Visit ${project.name} case study`}
 									className="mb-4 inline-block text-[clamp(2em,8vw,4em)] uppercase leading-[.8] tracking-[-.04em]"
 								>
 									{project.name}
@@ -295,9 +293,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 						{projects.map((project) => (
 							<div key={project.id} className="relative">
 								<Link
-									href={project.url}
-									target="_blank"
-									rel="noopener noreferrer"
+									href={`/p/${project.slug}`}
 									onClick={(e) => handleClick(e, project.id)}
 									onMouseEnter={() => !isTouchDevice && handleEnter(project.id)}
 									onMouseLeave={() => !isTouchDevice && handleLeave()}
