@@ -69,7 +69,11 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 
 		// Clear residual transform/clip props from any interrupted previous
 		// entry animation (covers popstate and rapid navigation).
-		gsap.set(content, { clearProps: "clipPath,x,y,scale,opacity" });
+		if (activeTransitionRef.current.skipWrapperHide) {
+			gsap.set(content, { clearProps: "clipPath,x,y,scale" });
+		} else {
+			gsap.set(content, { clearProps: "clipPath,x,y,scale,opacity" });
+		}
 		if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 			activeTransitionRef.current.setInitialState(content);
 		}
@@ -235,9 +239,7 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 				// it is invisible even if React 18 concurrent mode paints before
 				// useLayoutEffect fires. Both are cleared by clearProps in
 				// useLayoutEffect before setInitialState re-applies the correct hide.
-				if (transition.skipWrapperHide) {
-					content.style.opacity = "0";
-				} else {
+				if (!transition.skipWrapperHide) {
 					content.style.opacity = "0";
 					content.style.clipPath = "inset(0% 0% 100% 0%)";
 				}
