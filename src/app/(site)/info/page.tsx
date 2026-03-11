@@ -1,6 +1,6 @@
 import { Info } from "@/components/layout/info";
 import { getProjects } from "@/data/get-projects";
-import { IndexPageClient } from "../[...slug]/page.client";
+import { IndexPageClient } from "@/app/(site)/[...slug]/page.client";
 
 export const metadata = {
 	title: "Info — Benjamin Wagner",

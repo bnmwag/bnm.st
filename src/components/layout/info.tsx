@@ -2,6 +2,7 @@
 
 import { gsap } from "gsap";
 import Lenis from "lenis";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type FC, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -360,7 +361,7 @@ export const Info: FC = () => {
 									I&apos;ll tell you honestly if it&apos;s something I can help with.
 								</p>
 							</div>
-							<a
+							<Link
 								href="/contact"
 								className="group relative block w-full overflow-hidden bg-background px-[0.6em] py-[0.15em] font-medium text-[clamp(2rem,5vw,3.5rem)] uppercase leading-none"
 							>
@@ -368,7 +369,7 @@ export const Info: FC = () => {
 								<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">
 									Get in touch
 								</ScrambleText>
-							</a>
+							</Link>
 						</div>
 					</div>
 				</div>
