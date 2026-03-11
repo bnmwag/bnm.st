@@ -6,12 +6,16 @@ import { useTransition } from "@/features/page-transitions/context/page-transiti
 import { gsap } from "@/lib/gsap";
 import cn from "clsx";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { type FC, useActionState, useEffect, useRef, useState } from "react";
+import { type FC, useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { type ContactState, submitContact } from "./actions";
 
+const SCRAMBLE_CHARS = "\u2599\u259A\u259E\u259D\u2580\u2596\u259C\u259B\u259F";
+const SCRAMBLE_DURATION = 400;
+const SCRAMBLE_FRAMES_PER_CHAR = 4;
+
 const TYPES = ["Freelance", "Collaboration", "Just saying hi"] as const;
-const TIMELINES = ["ASAP", "1–3 months", "3–6 months", "Just exploring"] as const;
-const BUDGETS = ["< €1k", "€1k–5k", "€5k–15k", "€15k+", "Not sure yet"] as const;
+const TIMELINES = ["ASAP", "1-3 months", "3-6 months", "Just exploring"] as const;
+const BUDGETS = ["< €1k", "€1k-5k", "€5k-15k", "€15k+", "Not sure yet"] as const;
 
 const INITIAL_STATE: ContactState = { status: "idle" };
 
@@ -41,6 +45,83 @@ const ErrorMessage: FC<{ message?: string }> = ({ message }) => {
 	);
 };
 
+interface IChipButtonProps {
+	label: string;
+	active: boolean;
+	onClick: () => void;
+}
+
+const ChipButton: FC<IChipButtonProps> = ({ label, active, onClick }) => {
+	const btnRef = useRef<HTMLButtonElement>(null);
+	const textRef = useRef<HTMLSpanElement>(null);
+	const rafRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const prevActive = useRef(active);
+	const shouldReduceMotion = useReducedMotion();
+
+	useEffect(() => {
+		const btn = btnRef.current;
+		if (!btn) return;
+		btn.style.width = `${btn.offsetWidth}px`;
+	}, []);
+
+	const runScramble = useCallback(() => {
+		if (shouldReduceMotion) return;
+		const el = textRef.current;
+		if (!el) return;
+		if (rafRef.current) clearTimeout(rafRef.current);
+
+		const original = label;
+		let frame = 0;
+		const totalFrames = original.length * SCRAMBLE_FRAMES_PER_CHAR;
+		const frameInterval = SCRAMBLE_DURATION / totalFrames;
+
+		const tick = () => {
+			const resolved = Math.floor(frame / SCRAMBLE_FRAMES_PER_CHAR);
+			el.textContent = original
+				.split("")
+				.map((c, i) => {
+					if (c === " ") return " ";
+					if (i < resolved) return c;
+					return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+				})
+				.join("");
+			frame++;
+			if (frame <= totalFrames) {
+				rafRef.current = setTimeout(tick, frameInterval);
+			} else {
+				el.textContent = original;
+			}
+		};
+		tick();
+	}, [label, shouldReduceMotion]);
+
+	useEffect(() => {
+		if (prevActive.current !== active) {
+			runScramble();
+			prevActive.current = active;
+		}
+	}, [active, runScramble]);
+
+	return (
+		<button
+			ref={btnRef}
+			type="button"
+			onClick={onClick}
+			className="group relative overflow-hidden whitespace-nowrap px-2 py-0.5 text-caption transition-colors duration-short hover:border-foreground/50"
+		>
+			<span
+				className={cn(
+					"absolute top-0 right-0 left-0 h-3.5 bg-foreground transition-transform duration-short ease-default",
+					active ? "origin-left scale-x-100" : "origin-right scale-x-0",
+				)}
+			/>
+			<span ref={textRef} className="relative text-background mix-blend-difference transition-colors duration-short ease-default">
+				{label}
+			</span>
+		</button>
+	);
+};
+
 export const ContactPageClient: FC = () => {
 	const [state, action, isPending] = useActionState(submitContact, INITIAL_STATE);
 	const mountedAtRef = useRef(Date.now());
@@ -63,20 +144,73 @@ export const ContactPageClient: FC = () => {
 	const { setEntryAnimations } = useTransition();
 
 	useEffect(() => {
+		const SCRAMBLE_CHARS = "\u2599\u259A\u259E\u259D\u2580\u2596\u259C\u259B\u259F";
+		const FRAMES_PER_CHAR = 3;
+
+		const collectTextNodes = (el: Node): Text[] => {
+			const nodes: Text[] = [];
+			for (const child of Array.from(el.childNodes)) {
+				if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
+					nodes.push(child as Text);
+				} else if (child.nodeType === Node.ELEMENT_NODE) {
+					nodes.push(...collectTextNodes(child));
+				}
+			}
+			return nodes;
+		};
+
+		const scrambleNode = (textNode: Text, duration: number, delay: number, tl: gsap.core.Timeline) => {
+			const original = textNode.textContent || "";
+			const len = original.length;
+			if (!len) return;
+
+			const totalFrames = len * FRAMES_PER_CHAR;
+			const proxy = { frame: 0 };
+
+			textNode.textContent = original
+				.split("")
+				.map((c) => (c.trim() === "" ? c : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]))
+				.join("");
+
+			tl.to(
+				proxy,
+				{
+					frame: totalFrames,
+					duration,
+					ease: "none",
+					onUpdate: () => {
+						const resolved = Math.floor(proxy.frame / FRAMES_PER_CHAR);
+						textNode.textContent = original
+							.split("")
+							.map((c, i) => {
+								if (c.trim() === "") return c;
+								if (i < resolved) return c;
+								return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+							})
+							.join("");
+					},
+					onComplete: () => {
+						textNode.textContent = original;
+					},
+				},
+				delay,
+			);
+		};
+
 		setEntryAnimations(() => {
 			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 			if (!containerRef.current) return;
 			const container = containerRef.current;
 
-			// ── Title lines ─────────────────────────────────────────────────────
-			// Filter to only visible lines (desktop vs mobile, one set is display:none)
+			const masterTl = gsap.timeline();
+
+			// ── Title lines: bar wipe ────────────────────────────────────────
 			const titleLines = Array.from(container.querySelectorAll<HTMLElement>(".title-line-inner")).filter(
 				(el) => el.offsetHeight > 0,
 			);
 
 			gsap.set(titleLines, { opacity: 0 });
 
-			// Fixed bars outside any stacking context so they render as solid black
 			const titleBars = titleLines.map((line) => {
 				const rect = line.getBoundingClientRect();
 				const bar = document.createElement("div");
@@ -96,42 +230,6 @@ export const ContactPageClient: FC = () => {
 				return bar;
 			});
 
-			// ── Form row blend overlays ──────────────────────────────────────────
-			const fieldRows = Array.from(container.querySelectorAll<HTMLElement>("[data-field-row]"));
-			const containerRect = container.getBoundingClientRect();
-
-			const blendData = fieldRows.map((row) => {
-				const rect = row.getBoundingClientRect();
-				const top = rect.top - containerRect.top;
-				const left = rect.left - containerRect.left;
-
-				const blend = document.createElement("div");
-				blend.style.cssText = `position:absolute;top:${top}px;left:${left}px;width:${rect.width}px;height:${rect.height}px;z-index:10;pointer-events:none;`;
-
-				const black = document.createElement("div");
-				black.style.cssText = "position:absolute;inset:0;background:#000;";
-
-				const white = document.createElement("div");
-				white.style.cssText = "position:absolute;inset:0;background:#fff;mix-blend-mode:difference;";
-
-				blend.appendChild(black);
-				blend.appendChild(white);
-				container.appendChild(blend);
-
-				gsap.set([black, white], { clipPath: "inset(0% 0% 0% 0%)" });
-
-				return { blend, black, white };
-			});
-
-			// ── Master timeline ──────────────────────────────────────────────────
-			const masterTl = gsap.timeline({
-				onComplete: () => {
-					for (const bar of titleBars) bar.remove();
-					gsap.set(titleLines, { clearProps: "opacity" });
-				},
-			});
-
-			// Title lines: bar wipes in from left → line revealed → bar exits right
 			titleLines.forEach((line, i) => {
 				const bar = titleBars[i];
 				const offset = i * 0.1;
@@ -141,14 +239,62 @@ export const ContactPageClient: FC = () => {
 				masterTl.to(bar, { scaleX: 0, duration: 0.65, ease: "expo.out" }, offset + 0.55);
 			});
 
-			// Form rows: white wipes up (turns black), then black wipes up (reveals field).
-			blendData.forEach(({ blend, white, black }, i) => {
-				const rowTl = gsap.timeline({ onComplete: () => blend.remove() });
-				rowTl
-					.to(white, { clipPath: "inset(0% 0% 100% 0%)", duration: 1.2, ease: "expo.inOut" })
-					.to(black, { clipPath: "inset(0% 0% 100% 0%)", duration: 1.2, ease: "expo.inOut" }, "<0.3");
-				masterTl.add(rowTl, 0.15 + i * 0.1);
+			masterTl.eventCallback("onComplete", () => {
+				for (const bar of titleBars) bar.remove();
+				gsap.set(titleLines, { clearProps: "opacity" });
 			});
+
+			// ── Form rows: label scramble + input border fade ────────────────
+			const fieldRows = Array.from(container.querySelectorAll<HTMLElement>("[data-field-row]"));
+
+			fieldRows.forEach((row, i) => {
+				const offset = 0.25 + i * 0.1;
+
+				const labels = row.querySelectorAll<HTMLElement>("label, p.text-caption");
+				for (const label of Array.from(labels)) {
+					for (const node of collectTextNodes(label)) {
+						scrambleNode(node, 0.6, offset, masterTl);
+					}
+				}
+
+				const inputs = row.querySelectorAll<HTMLElement>("input:not([type=hidden]), textarea");
+				for (const input of Array.from(inputs)) {
+					gsap.set(input, { borderColor: "transparent" });
+					masterTl.to(
+						input,
+						{
+							borderColor: "",
+							duration: 0.8,
+							ease: "expo.out",
+							clearProps: "borderColor",
+						},
+						offset + 0.1,
+					);
+				}
+
+				const buttons = row.querySelectorAll<HTMLElement>("button[type=button]");
+				if (buttons.length) {
+					gsap.set(buttons, { opacity: 0, scale: 0.8 });
+					masterTl.to(
+						buttons,
+						{
+							opacity: 1,
+							scale: 1,
+							duration: 0.4,
+							stagger: 0.03,
+							ease: "back.out(1.7)",
+							clearProps: "transform,opacity",
+						},
+						offset + 0.05,
+					);
+				}
+			});
+
+			const submitBtn = container.querySelector<HTMLElement>("button[type=submit]");
+			if (submitBtn) {
+				gsap.set(submitBtn, { opacity: 0, y: 12 });
+				masterTl.to(submitBtn, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", clearProps: "all" }, 0.6);
+			}
 		});
 	}, [setEntryAnimations]);
 
@@ -188,7 +334,6 @@ export const ContactPageClient: FC = () => {
 	return (
 		<Wrapper>
 			<article id="main-content" ref={containerRef} className="relative min-h-svh pt-[25vh] pb-[25vh] md:pb-4">
-				{/* ── Left: headline — fixed bottom-left on desktop ── */}
 				<div className="fixed bottom-4 left-4 z-10 space-y-6 max-md:hidden">
 					<p className="max-w-xs text-caption text-foreground/50">
 						Available for freelance work, collaborations, and interesting experiments.
@@ -204,7 +349,6 @@ export const ContactPageClient: FC = () => {
 				</div>
 
 				<div className="layout-grid items-start gap-y-16">
-					{/* ── Left: headline — inline on mobile only ── */}
 					<div className="col-span-full space-y-6 md:hidden">
 						<p className="max-w-xs text-caption text-foreground/50">
 							Available for freelance work, collaborations, and interesting experiments.
@@ -219,7 +363,6 @@ export const ContactPageClient: FC = () => {
 						</h1>
 					</div>
 
-					{/* ── Right: form or success ── */}
 					<div className="col-span-full md:col-span-6 md:col-start-7">
 						<AnimatePresence mode="wait">
 							{state.status === "success" ? (
@@ -250,21 +393,19 @@ export const ContactPageClient: FC = () => {
 									className="space-y-10"
 									noValidate
 								>
-									{/* Honeypot */}
 									<input
 										name="website"
 										type="text"
 										tabIndex={-1}
 										aria-hidden="true"
 										autoComplete="off"
-										className="absolute -left-[9999px] h-0 w-0 opacity-0"
+										className="-left-2500 absolute h-0 w-0 opacity-0"
 									/>
 									<input type="hidden" name="_mountedAt" defaultValue={String(mountedAtRef.current)} />
 									<input type="hidden" name="type" value={type} />
 									<input type="hidden" name="timeline" value={timeline} />
 									<input type="hidden" name="budget" value={budget} />
 
-									{/* Name + Email */}
 									<div data-field-row className="grid grid-cols-2 gap-6">
 										<div ref={nameScope} className="space-y-3">
 											<label
@@ -312,7 +453,6 @@ export const ContactPageClient: FC = () => {
 										</div>
 									</div>
 
-									{/* Company + Website */}
 									<div data-field-row className="grid grid-cols-2 gap-6">
 										<div className="space-y-3">
 											<label htmlFor="company" className="text-caption">
@@ -354,73 +494,33 @@ export const ContactPageClient: FC = () => {
 										</div>
 									</div>
 
-									{/* Type */}
 									<div data-field-row className="space-y-3">
 										<p className="text-caption">Type</p>
 										<div className="flex flex-wrap gap-2">
 											{TYPES.map((t) => (
-												<button
-													key={t}
-													type="button"
-													onClick={() => setType(t)}
-													className={cn(
-														"px-2 py-0.5 text-caption transition-colors duration-short",
-														type === t
-															? "bg-foreground text-background"
-															: "border border-foreground/20 text-foreground hover:border-foreground/50",
-													)}
-												>
-													{t}
-												</button>
+												<ChipButton key={t} label={t} active={type === t} onClick={() => setType(t)} />
 											))}
 										</div>
 									</div>
 
-									{/* Timeline */}
 									<div data-field-row className="space-y-3">
 										<p className="text-caption">Timeline</p>
 										<div className="flex flex-wrap gap-2">
 											{TIMELINES.map((t) => (
-												<button
-													key={t}
-													type="button"
-													onClick={() => setTimeline(t)}
-													className={cn(
-														"px-2 py-0.5 text-caption transition-colors duration-short",
-														timeline === t
-															? "bg-foreground text-background"
-															: "border border-foreground/20 text-foreground hover:border-foreground/50",
-													)}
-												>
-													{t}
-												</button>
+												<ChipButton key={t} label={t} active={timeline === t} onClick={() => setTimeline(t)} />
 											))}
 										</div>
 									</div>
 
-									{/* Budget */}
 									<div data-field-row className="space-y-3">
 										<p className="text-caption">Budget</p>
 										<div className="flex flex-wrap gap-2">
 											{BUDGETS.map((b) => (
-												<button
-													key={b}
-													type="button"
-													onClick={() => setBudget(b)}
-													className={cn(
-														"px-2 py-0.5 text-caption transition-colors duration-short",
-														budget === b
-															? "bg-foreground text-background"
-															: "border border-foreground/20 text-foreground hover:border-foreground/50",
-													)}
-												>
-													{b}
-												</button>
+												<ChipButton key={b} label={b} active={budget === b} onClick={() => setBudget(b)} />
 											))}
 										</div>
 									</div>
 
-									{/* Message */}
 									<div data-field-row ref={messageScope} className="space-y-3">
 										<label
 											htmlFor="message"
@@ -450,7 +550,6 @@ export const ContactPageClient: FC = () => {
 										<ErrorMessage message={errors.message} />
 									</div>
 
-									{/* Server error */}
 									<AnimatePresence>
 										{(state.status === "error" || state.status === "rate_limited") && (
 											<motion.p
@@ -465,7 +564,6 @@ export const ContactPageClient: FC = () => {
 										)}
 									</AnimatePresence>
 
-									{/* Submit */}
 									<div data-field-row className="flex w-fit">
 										<button
 											type="submit"
