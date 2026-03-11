@@ -1,6 +1,15 @@
 import "./globals.css";
 
+import { ConsentManager } from "@/components/consent/consent-manager";
+import { Grid } from "@/components/dev";
+import Noise from "@/components/gl/noise";
+import { Navigation } from "@/components/layout/navigation";
+import { Preloader } from "@/components/layout/preloader";
+import { PageTransition } from "@/features/page-transitions/components/page-transitions";
+import { TransitionProvider } from "@/features/page-transitions/context/page-transition.context";
+import { ConsentAnalytics } from "@/components/consent/consent-analytics";
 import type { Metadata, Viewport } from "next";
+import { fonts } from "./fonts";
 
 export const viewport: Viewport = {
 	viewportFit: "cover",
@@ -51,15 +60,6 @@ export const metadata: Metadata = {
 	},
 };
 
-import { Grid } from "@/components/dev";
-import Noise from "@/components/gl/noise";
-import { Navigation } from "@/components/layout/navigation";
-import { Preloader } from "@/components/layout/preloader";
-import { PageTransition } from "@/features/page-transitions/components/page-transitions";
-import { TransitionProvider } from "@/features/page-transitions/context/page-transition.context";
-import { Analytics } from "@vercel/analytics/react";
-import { fonts } from "./fonts";
-
 export default function RootLayout({
 	children,
 	modal,
@@ -70,31 +70,36 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${fonts.sans.variable} bg-black text-black`}>
-				<a href="#main-content" className="skip-link">
-					Skip to main content
-				</a>
-				<TransitionProvider>
-					<PageTransition>
-						<Navigation />
-						<div className="-bottom-64 -top-64 pointer-events-none fixed inset-x-0 z-300 mix-blend-difference motion-reduce-hidden" aria-hidden="true">
-							<div className="pointer-events-none absolute top-0 left-0 hidden h-full w-full flex-col justify-between md:flex">
-								{Array.from({ length: 200 }).map((_, index) => (
-									<div key={`tv_line-${index + 1}`} className="h-px w-full bg-white/10" />
-								))}
+				<ConsentManager>
+					<a href="#main-content" className="skip-link">
+						Skip to main content
+					</a>
+					<TransitionProvider>
+						<PageTransition>
+							<Navigation />
+							<div
+								className="-bottom-64 -top-64 motion-reduce-hidden pointer-events-none fixed inset-x-0 z-300 mix-blend-difference"
+								aria-hidden="true"
+							>
+								<div className="pointer-events-none absolute top-0 left-0 hidden h-full w-full flex-col justify-between md:flex">
+									{Array.from({ length: 200 }).map((_, index) => (
+										<div key={`tv_line-${index + 1}`} className="h-px w-full bg-white/10" />
+									))}
+								</div>
+								<Noise patternAlpha={25} />
 							</div>
-							<Noise patternAlpha={25} />
-						</div>
-						<main className="page-content min-h-svh w-full bg-white antialiased">
-							<div data-page-wrapper className="opacity-0">
-								{children}
-							</div>
-						</main>
-					</PageTransition>
-					<Preloader />
-					{modal}
-				</TransitionProvider>
-				<Grid />
-				<Analytics />
+							<main className="page-content min-h-svh w-full bg-white antialiased">
+								<div data-page-wrapper className="opacity-0">
+									{children}
+								</div>
+							</main>
+						</PageTransition>
+						<Preloader />
+						{modal}
+					</TransitionProvider>
+					<Grid />
+					<ConsentAnalytics />
+				</ConsentManager>
 			</body>
 		</html>
 	);
