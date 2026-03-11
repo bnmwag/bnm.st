@@ -1,5 +1,73 @@
 import { revalidatePath, revalidateTag } from "next/cache";
-import type { CollectionConfig } from "payload";
+import type { Block, CollectionConfig } from "payload";
+
+const RichTextBlock: Block = {
+	slug: "richText",
+	labels: { singular: "Rich Text", plural: "Rich Text" },
+	fields: [
+		{
+			name: "title",
+			type: "text",
+			required: true,
+		},
+		{
+			name: "content",
+			type: "richText",
+			required: true,
+		},
+	],
+};
+
+const ImageBlock: Block = {
+	slug: "image",
+	labels: { singular: "Image", plural: "Images" },
+	fields: [
+		{
+			name: "image",
+			type: "upload",
+			relationTo: "media",
+			required: true,
+		},
+		{
+			name: "caption",
+			type: "text",
+		},
+		{
+			name: "size",
+			type: "select",
+			defaultValue: "full",
+			options: [
+				{ label: "Full Width", value: "full" },
+				{ label: "Half Width", value: "half" },
+			],
+		},
+	],
+};
+
+const ImageGridBlock: Block = {
+	slug: "imageGrid",
+	labels: { singular: "Image Grid", plural: "Image Grids" },
+	fields: [
+		{
+			name: "images",
+			type: "array",
+			minRows: 2,
+			maxRows: 4,
+			fields: [
+				{
+					name: "image",
+					type: "upload",
+					relationTo: "media",
+					required: true,
+				},
+				{
+					name: "caption",
+					type: "text",
+				},
+			],
+		},
+	],
+};
 
 export const Projects: CollectionConfig = {
 	slug: "projects",
@@ -112,6 +180,11 @@ export const Projects: CollectionConfig = {
 					required: true,
 				},
 			],
+		},
+		{
+			name: "layout",
+			type: "blocks",
+			blocks: [RichTextBlock, ImageBlock, ImageGridBlock],
 		},
 	],
 	hooks: {

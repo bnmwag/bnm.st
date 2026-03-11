@@ -179,6 +179,51 @@ export interface Project {
   services?: ('dev' | 'design' | 'infra')[] | null;
   type: 'web' | 'tool' | 'other';
   year: string;
+  layout?:
+    | (
+        | {
+            title: string;
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            image: number | Media;
+            caption?: string | null;
+            size?: ('full' | 'half') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            images?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'imageGrid';
+          }
+      )[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -315,6 +360,40 @@ export interface ProjectsSelect<T extends boolean = true> {
   services?: T;
   type?: T;
   year?: T;
+  layout?:
+    | T
+    | {
+        richText?:
+          | T
+          | {
+              title?: T;
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              caption?: T;
+              size?: T;
+              id?: T;
+              blockName?: T;
+            };
+        imageGrid?:
+          | T
+          | {
+              images?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
 }

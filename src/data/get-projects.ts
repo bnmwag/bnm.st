@@ -37,3 +37,16 @@ export const getProjectBySlug = (slug: string) =>
 		[`project-by-slug-${slug}`],
 		{ tags: ["projects", `project:${slug}`] },
 	)();
+
+export const getNextProject = (currentSlug: string) =>
+	cache(
+		async () => {
+			const projects = await getProjects();
+			const currentIndex = projects.findIndex((p) => p.slug === currentSlug);
+			if (currentIndex === -1) return projects[0] ?? null;
+
+			return projects[(currentIndex + 1) % projects.length];
+		},
+		[`next-project-${currentSlug}`],
+		{ tags: ["projects"] },
+	)();

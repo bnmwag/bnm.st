@@ -54,11 +54,16 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		const content = document.querySelector<HTMLElement>(".page-content");
 		if (!content) return;
 
-		// Reset wrapper — GSAP inline opacity:1 from the previous navigation
-		// overrides the Tailwind opacity-0 class, so new content would flash
-		// visible before the entry animation fires.
 		const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
-		if (wrapper) gsap.set(wrapper, { opacity: 0 });
+
+		if (activeTransitionRef.current?.skipWrapperHide) {
+			if (wrapper) gsap.set(wrapper, { opacity: 1 });
+		} else {
+			// Reset wrapper — GSAP inline opacity:1 from the previous navigation
+			// overrides the Tailwind opacity-0 class, so new content would flash
+			// visible before the entry animation fires.
+			if (wrapper) gsap.set(wrapper, { opacity: 0 });
+		}
 
 		if (!activeTransitionRef.current) return;
 
@@ -230,8 +235,12 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 				// it is invisible even if React 18 concurrent mode paints before
 				// useLayoutEffect fires. Both are cleared by clearProps in
 				// useLayoutEffect before setInitialState re-applies the correct hide.
-				content.style.opacity = "0";
-				content.style.clipPath = "inset(0% 0% 100% 0%)";
+				if (transition.skipWrapperHide) {
+					content.style.opacity = "0";
+				} else {
+					content.style.opacity = "0";
+					content.style.clipPath = "inset(0% 0% 100% 0%)";
+				}
 
 				if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 					ghost.remove();
