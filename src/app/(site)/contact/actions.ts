@@ -72,8 +72,14 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
 		.trim()
 		.slice(0, 2000);
 
+	const privacy = String(formData.get("privacy") ?? "").trim();
+
 	if (!name || !email || !type || !timeline || !budget || !message) {
 		return { status: "error", message: "All fields are required." };
+	}
+
+	if (privacy !== "on") {
+		return { status: "error", message: "Please accept the privacy policy." };
 	}
 
 	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

@@ -20,7 +20,7 @@ const BUDGETS = ["< €1k", "€1k-5k", "€5k-15k", "€15k+", "Not sure yet"] 
 const INITIAL_STATE: ContactState = { status: "idle" };
 
 const inputClass =
-	"w-full border-b bg-transparent pb-2 pt-1 font-medium text-[clamp(.625rem,.5vw,.75rem)] leading-none focus:outline-none transition-colors duration-short placeholder:text-foreground/30";
+	"w-full border-b bg-transparent pb-2 pt-1 font-medium text-[clamp(.625rem,.5vw,.75rem)] leading-none focus:outline-none focus-visible:outline-none transition-colors duration-short placeholder:text-foreground/30";
 
 function validateEmail(value: string) {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -107,7 +107,7 @@ const ChipButton: FC<IChipButtonProps> = ({ label, active, onClick }) => {
 			ref={btnRef}
 			type="button"
 			onClick={onClick}
-			className="group relative overflow-hidden whitespace-nowrap px-2 py-0.5 text-caption transition-colors duration-short hover:border-foreground/50"
+			className="group relative overflow-hidden whitespace-nowrap px-2 py-0.5 text-caption transition-colors duration-short border border-foreground"
 		>
 			<span
 				className={cn(
@@ -130,10 +130,17 @@ export const ContactPageClient: FC = () => {
 	const [type, setType] = useState("");
 	const [timeline, setTimeline] = useState("");
 	const [budget, setBudget] = useState("");
+	const [privacy, setPrivacy] = useState(false);
 	const [submittedName, setSubmittedName] = useState("");
 	const [submittedEmail, setSubmittedEmail] = useState("");
 
-	const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string; current_website?: string }>({});
+	const [errors, setErrors] = useState<{
+		name?: string;
+		email?: string;
+		message?: string;
+		current_website?: string;
+		privacy?: string;
+	}>({});
 
 	const nameScope = useRef<HTMLDivElement>(null);
 	const emailScope = useRef<HTMLDivElement>(null);
@@ -315,6 +322,7 @@ export const ContactPageClient: FC = () => {
 			}
 		}
 		if (!message) errs.message = "Tell me more about your project.";
+		if (fd.get("privacy") !== "on") errs.privacy = "Please accept the privacy policy.";
 		return errs;
 	};
 
@@ -405,6 +413,7 @@ export const ContactPageClient: FC = () => {
 									<input type="hidden" name="type" value={type} />
 									<input type="hidden" name="timeline" value={timeline} />
 									<input type="hidden" name="budget" value={budget} />
+									<input type="hidden" name="privacy" value={privacy ? "on" : ""} />
 
 									<div data-field-row className="grid grid-cols-2 gap-6">
 										<div ref={nameScope} className="space-y-3">
@@ -424,7 +433,7 @@ export const ContactPageClient: FC = () => {
 													inputClass,
 													errors.name
 														? "border-rose-600 focus:border-rose-600"
-														: "border-foreground/20 focus:border-foreground/60",
+														: "border-foreground/20 focus:border-foreground",
 												)}
 											/>
 											<ErrorMessage message={errors.name} />
@@ -446,7 +455,7 @@ export const ContactPageClient: FC = () => {
 													inputClass,
 													errors.email
 														? "border-rose-600 focus:border-rose-600"
-														: "border-foreground/20 focus:border-foreground/60",
+														: "border-foreground/20 focus:border-foreground",
 												)}
 											/>
 											<ErrorMessage message={errors.email} />
@@ -463,7 +472,7 @@ export const ContactPageClient: FC = () => {
 												name="company"
 												type="text"
 												autoComplete="organization"
-												className={cn(inputClass, "border-foreground/20 focus:border-foreground/60")}
+												className={cn(inputClass, "border-foreground/20 focus:border-foreground")}
 											/>
 										</div>
 										<div className="space-y-3">
@@ -487,7 +496,7 @@ export const ContactPageClient: FC = () => {
 													inputClass,
 													errors.current_website
 														? "border-rose-600 focus:border-rose-600"
-														: "border-foreground/20 focus:border-foreground/60",
+														: "border-foreground/20 focus:border-foreground",
 												)}
 											/>
 											<ErrorMessage message={errors.current_website} />
@@ -544,7 +553,7 @@ export const ContactPageClient: FC = () => {
 												"resize-none overflow-hidden",
 												errors.message
 													? "border-rose-600 focus:border-rose-600"
-													: "border-foreground/20 focus:border-foreground/60",
+													: "border-foreground/20 focus:border-foreground",
 											)}
 										/>
 										<ErrorMessage message={errors.message} />
@@ -564,10 +573,60 @@ export const ContactPageClient: FC = () => {
 										)}
 									</AnimatePresence>
 
+									<div data-field-row className="space-y-2">
+										<label
+											htmlFor="privacy"
+											className={cn("flex cursor-pointer items-start gap-3", errors.privacy ? "text-rose-600" : "")}
+										>
+											<span
+												className={cn(
+													"mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center border",
+													privacy
+														? "border-foreground bg-foreground"
+														: errors.privacy
+															? "border-rose-600"
+															: "border-foreground/40",
+												)}
+												aria-hidden="true"
+											>
+												{privacy && (
+													<svg width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<title>Check</title>
+														<path
+															d="M1 3L3 5L7 1"
+															stroke="var(--background)"
+															strokeWidth="1.5"
+															strokeLinecap="round"
+															strokeLinejoin="round"
+														/>
+													</svg>
+												)}
+											</span>
+											<span className="pt-1 text-caption">
+												I have read and agree to the{" "}
+												<a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+													privacy policy
+												</a>
+												.
+											</span>
+										</label>
+										<input
+											id="privacy"
+											type="checkbox"
+											checked={privacy}
+											onChange={(e) => {
+												setPrivacy(e.target.checked);
+												if (errors.privacy) setErrors((prev) => ({ ...prev, privacy: undefined }));
+											}}
+											className="sr-only"
+										/>
+										<ErrorMessage message={errors.privacy} />
+									</div>
+
 									<div data-field-row className="flex w-fit">
 										<button
 											type="submit"
-											disabled={isPending || !type || !timeline || !budget}
+											disabled={isPending || !type || !timeline || !budget || !privacy}
 											className="group relative bg-foreground px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none disabled:cursor-not-allowed disabled:opacity-40"
 										>
 											<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100 group-disabled:hidden" />
