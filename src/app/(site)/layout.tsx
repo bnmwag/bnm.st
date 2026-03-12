@@ -1,13 +1,14 @@
 import "./globals.css";
 
+import { ConsentAnalytics } from "@/components/consent/consent-analytics";
 import { ConsentManager } from "@/components/consent/consent-manager";
 import { Grid } from "@/components/dev";
 import Noise from "@/components/gl/noise";
+import { GSAP } from "@/components/gsap";
 import { Navigation } from "@/components/layout/navigation";
 import { Preloader } from "@/components/layout/preloader";
 import { PageTransition } from "@/features/page-transitions/components/page-transitions";
 import { TransitionProvider } from "@/features/page-transitions/context/page-transition.context";
-import { ConsentAnalytics } from "@/components/consent/consent-analytics";
 import type { Metadata, Viewport } from "next";
 import { fonts } from "./fonts";
 
@@ -96,6 +97,7 @@ export default function RootLayout({
 						</PageTransition>
 						<Preloader />
 						{modal}
+						<GSAP />
 					</TransitionProvider>
 					<Grid />
 					<ConsentAnalytics />
