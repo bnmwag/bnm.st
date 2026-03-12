@@ -8,7 +8,7 @@ export const getProjects = cache(
 
 		const { docs } = await payload.find({
 			collection: "projects",
-			where: { active: { equals: true } },
+			where: { active: { equals: true }, slug: { exists: true } },
 			sort: "-year",
 		});
 
