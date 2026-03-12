@@ -191,20 +191,20 @@ export const Projects: CollectionConfig = {
 		afterChange: [
 			async ({ doc }) => {
 				revalidatePath("/");
-				revalidateTag("projects");
+				revalidateTag("projects", "default");
 				if (doc.slug) {
 					revalidatePath(`/p/${doc.slug}`);
-					revalidateTag(`project:${doc.slug}`);
+					revalidateTag(`project:${doc.slug}`, "default");
 				}
 			},
 		],
 		afterDelete: [
 			async ({ doc }) => {
 				revalidatePath("/");
-				revalidateTag("projects");
+				revalidateTag("projects", "default");
 				if (doc.slug) {
 					revalidatePath(`/p/${doc.slug}`);
-					revalidateTag(`project:${doc.slug}`);
+					revalidateTag(`project:${doc.slug}`, "default");
 				}
 			},
 		],
