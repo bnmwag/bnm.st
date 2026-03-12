@@ -132,6 +132,13 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 				return;
 			}
 
+			// Skip page-level entry animations for seamless transitions
+			// (e.g. project-to-project) — the content is already visible.
+			if (activeTransition?.skipWrapperHide) {
+				if (wrapper) gsap.set(wrapper, { opacity: 1 });
+				return;
+			}
+
 			const fn = getEntryAnimations();
 
 			if (fn) {

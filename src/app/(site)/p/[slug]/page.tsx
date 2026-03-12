@@ -1,4 +1,4 @@
-import { Media, Wrapper } from "@/components/layout";
+import { Wrapper } from "@/components/layout";
 import { ScrambleText } from "@/components/scramble-text";
 import { getNextProject, getProjectBySlug, getProjects } from "@/data";
 import type { Metadata, NextPage } from "next";
@@ -6,6 +6,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ProjectBlocks } from "./blocks";
+import { NextProjectCta } from "./next-project-cta";
+import { ProjectHero } from "./project-hero";
 
 interface IProjectPageProps {
 	params: Promise<{ slug: string }>;
@@ -46,18 +48,7 @@ const ProjectPage: NextPage<IProjectPageProps> = async ({ params }) => {
 		<Wrapper>
 			{/* bg-[#CE0F08] */}
 			<article id="main-content" className="relative min-h-svh">
-				<section className="relative h-svh p-4">
-					{project.image && (
-						<div className="absolute inset-2">
-							<Media resource={project.image} className="h-full w-full" imgClassName="h-full w-full object-cover" priority />
-						</div>
-					)}
-					<div className="layout-grid relative z-10 mx-0 h-full text-background mix-blend-difference">
-						<div className="col-span-6 self-end">
-							<h1 className="text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">{project.name}</h1>
-						</div>
-					</div>
-				</section>
+				<ProjectHero project={project} />
 				<section className="layout-grid py-12">
 					<div className="col-span-2 text-caption md:col-start-4">
 						<Link
@@ -98,24 +89,7 @@ const ProjectPage: NextPage<IProjectPageProps> = async ({ params }) => {
 					</div>
 				</section>
 				{project.layout && project.layout.length > 0 && <ProjectBlocks blocks={project.layout} className="py-24" />}
-				{nextProject && (
-					<Link href={`/p/${nextProject.slug}`} className="relative block h-svh p-4">
-						{nextProject.image && (
-							<div className="absolute inset-2">
-								<Media
-									resource={nextProject.image}
-									className="h-full w-full"
-									imgClassName="h-full w-full object-cover"
-								/>
-							</div>
-						)}
-						<div className="layout-grid relative z-10 mx-0 h-full text-background mix-blend-difference">
-							<div className="col-span-6 self-end">
-								<p className="text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">{nextProject.name}</p>
-							</div>
-						</div>
-					</Link>
-				)}
+				{nextProject && <NextProjectCta project={nextProject} />}
 			</article>
 		</Wrapper>
 	);
