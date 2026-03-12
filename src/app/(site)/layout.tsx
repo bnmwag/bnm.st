@@ -78,7 +78,7 @@ export default function RootLayout({
 					<TransitionProvider>
 						<PageTransition>
 							<Navigation />
-							{/* <div
+							<div
 								className="-bottom-64 -top-64 motion-reduce-hidden pointer-events-none fixed inset-x-0 z-300 mix-blend-difference"
 								aria-hidden="true"
 							>
@@ -88,7 +88,7 @@ export default function RootLayout({
 									))}
 								</div>
 								<Noise patternAlpha={25} />
-							</div> */}
+							</div>
 							<main className="page-content min-h-svh w-full bg-white antialiased">
 								<div data-page-wrapper className="opacity-0">
 									{children}
