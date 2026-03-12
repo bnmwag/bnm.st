@@ -15,6 +15,9 @@ importers:
       '@c15t/nextjs':
         specifier: ^1.8.3
         version: 1.8.3(@opentelemetry/api@1.9.0)(@opentelemetry/instrumentation@0.203.0(@opentelemetry/api@1.9.0))(@types/pg@8.11.6)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@vercel/postgres@0.9.0)(crossws@0.3.5)(next@16.1.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.77.4))(pg@8.16.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(ioredis@5.10.0)(pg@8.16.3))(use-sync-external-store@1.6.0(react@19.2.3))(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@c15t/react':
+        specifier: ^1.8.3
+        version: 1.8.3(@opentelemetry/api@1.9.0)(@opentelemetry/instrumentation@0.203.0(@opentelemetry/api@1.9.0))(@types/pg@8.11.6)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@vercel/postgres@0.9.0)(crossws@0.3.5)(pg@8.16.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(ioredis@5.10.0)(pg@8.16.3))(use-sync-external-store@1.6.0(react@19.2.3))(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
       '@c15t/scripts':
         specifier: ^1.0.1
         version: 1.0.1

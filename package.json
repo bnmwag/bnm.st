@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@c15t/nextjs": "^1.8.3",
+		"@c15t/react": "^1.8.3",
 		"@c15t/scripts": "^1.0.1",
 		"@gsap/react": "^2.1.2",
 		"@payloadcms/db-vercel-postgres": "^3.79.0",
