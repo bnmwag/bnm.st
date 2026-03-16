@@ -166,7 +166,7 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 				className="max-md:-bottom-64 pointer-events-none fixed inset-0 z-30 opacity-0 backdrop-blur-3xl"
 			/>
 
-			<aside
+			<div
 				ref={content}
 				role="dialog"
 				data-lenis-prevent
@@ -213,7 +213,7 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 						{children}
 					</div>
 				</div>
-			</aside>
+			</div>
 		</div>,
 		document.body,
 	);
