@@ -1,4 +1,6 @@
 export * from "./info";
+export * from "./contact-panel";
+export * from "./overlay-panel";
 export * from "./preloader";
 export * from "./link";
 export * from "./lenis";
