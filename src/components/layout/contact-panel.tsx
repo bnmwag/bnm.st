@@ -221,7 +221,7 @@ export const ContactPanel: FC = () => {
 										onChange={() => errors.name && setErrors((e) => ({ ...e, name: undefined }))}
 										className={cn(
 											inputClass,
-											errors.name ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
+											errors.name ? "border-rose-600 focus:border-rose-600" : "border-background/60 focus:border-background",
 										)}
 									/>
 									<ErrorMessage id="contact-name-error" message={errors.name} reducedMotion={shouldReduceMotion} />
@@ -243,7 +243,7 @@ export const ContactPanel: FC = () => {
 										onChange={() => errors.email && setErrors((e) => ({ ...e, email: undefined }))}
 										className={cn(
 											inputClass,
-											errors.email ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
+											errors.email ? "border-rose-600 focus:border-rose-600" : "border-background/60 focus:border-background",
 										)}
 									/>
 									<ErrorMessage id="contact-email-error" message={errors.email} reducedMotion={shouldReduceMotion} />
@@ -260,7 +260,7 @@ export const ContactPanel: FC = () => {
 										name="company"
 										type="text"
 										autoComplete="organization"
-										className={cn(inputClass, "border-background/20 focus:border-background")}
+										className={cn(inputClass, "border-background/60 focus:border-background")}
 									/>
 								</div>
 								<div className="space-y-3">
@@ -283,7 +283,7 @@ export const ContactPanel: FC = () => {
 											inputClass,
 											errors.current_website
 												? "border-rose-600 focus:border-rose-600"
-												: "border-background/20 focus:border-background",
+												: "border-background/60 focus:border-background",
 										)}
 									/>
 									<ErrorMessage id="contact-website-error" message={errors.current_website} reducedMotion={shouldReduceMotion} />
@@ -346,7 +346,7 @@ export const ContactPanel: FC = () => {
 									className={cn(
 										inputClass,
 										"resize-none overflow-hidden",
-										errors.message ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
+										errors.message ? "border-rose-600 focus:border-rose-600" : "border-background/60 focus:border-background",
 									)}
 								/>
 								<ErrorMessage id="contact-message-error" message={errors.message} reducedMotion={shouldReduceMotion} />
