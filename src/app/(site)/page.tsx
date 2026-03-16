@@ -27,7 +27,7 @@ const jsonLd = {
 		"Freelance frontend & creative developer based in Austria, building design-driven React & Next.js interfaces, WebGL experiences, and interactive digital products worldwide.",
 	email: "hello@bnm.st",
 	sameAs: ["https://github.com/bnmwag", "https://www.linkedin.com/in/benjamin-wagner-a102a0272/"],
-	address: { "@type": "PostalAddress", addressCountry: "AT" },
+	address: { "@type": "PostalAddress", addressLocality: "Linz", addressRegion: "Upper Austria", addressCountry: "AT" },
 	knowsAbout: ["React", "Next.js", "TypeScript", "WebGL", "Three.js", "GSAP", "UI Engineering", "Creative Development", "Figma"],
 	hasOccupation: {
 		"@type": "Occupation",
