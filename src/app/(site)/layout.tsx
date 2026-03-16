@@ -5,6 +5,8 @@ import { ConsentManager } from "@/components/consent/consent-manager";
 import { Grid } from "@/components/dev";
 import Noise from "@/components/gl/noise";
 import { GSAP } from "@/components/gsap";
+import { ContactPanel } from "@/components/layout/contact-panel";
+import { Info } from "@/components/layout/info";
 import { Navigation } from "@/components/layout/navigation";
 import { Preloader } from "@/components/layout/preloader";
 import { PageTransition } from "@/features/page-transitions/components/page-transitions";
@@ -96,6 +98,8 @@ export default function RootLayout({
 							</main>
 						</PageTransition>
 						<Preloader />
+						<Info />
+						<ContactPanel />
 						{modal}
 						<GSAP />
 					</TransitionProvider>

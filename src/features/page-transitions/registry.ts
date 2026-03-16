@@ -25,9 +25,14 @@ const registry: Record<string, TransitionDef> = {
 	"project-to-project": PROJECT_TRANSITION,
 };
 
+export const OVERLAY_ROUTES = ["/info", "/contact"];
+
+export const isOverlayRoute = (pathname: string): boolean => OVERLAY_ROUTES.includes(pathname);
+
 export const NAMESPACE_MAP: Record<string, string> = {
 	"/": "home",
 	"/info": "info",
+	"/contact": "contact",
 	"/resume": "resume",
 	"/imprint": "imprint",
 	"/privacy": "privacy",

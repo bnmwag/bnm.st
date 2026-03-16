@@ -8,6 +8,7 @@ import {
 	type TransitionDef,
 	getNamespace,
 	getTransition,
+	isOverlayRoute,
 } from "@/features/page-transitions/registry";
 import { gsap } from "@/lib/gsap";
 import { usePathname, useRouter } from "next/navigation";
@@ -44,12 +45,13 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 	// paints. Sets the new page's clip-path/z-index so it's hidden behind the
 	// ghost (z-index:1) from the very first frame — no flash possible.
 	useLayoutEffect(() => {
-		if (pathname === "/info") return;
-		// Coming back from /info via router.back() — the page was already visible
-		// underneath, no transition needed so don't hide the wrapper.
-		// Forward navigation FROM /info (activeTransitionRef set) falls through
-		// so the new page is hidden correctly before its entry animation.
-		if (prevPathnameRef.current === "/info" && !activeTransitionRef.current) return;
+		if (isOverlayRoute(pathname)) return;
+		// Coming back from an overlay route via router.back() — the page was
+		// already visible underneath, no transition needed so don't hide the
+		// wrapper. Forward navigation FROM an overlay (activeTransitionRef set)
+		// falls through so the new page is hidden correctly before its entry
+		// animation.
+		if (isOverlayRoute(prevPathnameRef.current) && !activeTransitionRef.current) return;
 
 		const content = document.querySelector<HTMLElement>(".page-content");
 		if (!content) return;
@@ -92,10 +94,11 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 		const content = document.querySelector<HTMLElement>(".page-content");
 		if (!content) return;
 
-		// /info renders its own fixed overlay. Kill any running entry animation
-		// and clear position/zIndex from .page-content — if left set, it creates
-		// a stacking context that traps the Info panel below the nav.
-		if (pathname === "/info") {
+		// Overlay routes (/info, /contact) render their own fixed overlay panels.
+		// Kill any running entry animation and clear position/zIndex from
+		// .page-content — if left set, it creates a stacking context that traps
+		// the overlay panel below the nav.
+		if (isOverlayRoute(pathname)) {
 			gsap.killTweensOf(content);
 			gsap.set(content, { clearProps: "clipPath,position,zIndex" });
 			const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
@@ -103,10 +106,11 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 			return;
 		}
 
-		// Coming back from /info via router.back() — page was already visible,
-		// skip transition. Forward nav FROM /info has activeTransition set,
-		// so it falls through and runs the normal entry animation.
-		if (prevPathname === "/info" && !activeTransition) {
+		// Coming back from an overlay route via router.back() — page was already
+		// visible, skip transition. Forward nav FROM an overlay has
+		// activeTransition set, so it falls through and runs the normal entry
+		// animation.
+		if (isOverlayRoute(prevPathname) && !activeTransition) {
 			const wrapper = content.querySelector<HTMLElement>("[data-page-wrapper]");
 			if (wrapper) gsap.set(wrapper, { opacity: 1 });
 			return;
@@ -198,6 +202,18 @@ export const PageTransition: FC<IPageTransitionProps> = ({ children }) => {
 			if (url === pathname || isTransitioning.current) return;
 
 			e.preventDefault();
+
+			// Overlay routes handle their own panel animations — skip the
+			// ghost/exit transition entirely and just navigate.
+			if (isOverlayRoute(url)) {
+				if (isOverlayRoute(pathname)) {
+					router.replace(url);
+				} else {
+					router.push(url);
+				}
+				return;
+			}
+
 			isTransitioning.current = true;
 
 			// Clean up any ghost from an aborted transition.
