@@ -27,7 +27,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	const [clickedProjectId, setClickedProjectId] = useState<number | null>(null);
 
 	const isTouchDevice = useTouchDevice();
-	const isMobile = useMediaQuery("(max-width: 767px)");
+	const isMobile = useMediaQuery("(max-width: 767px)", { defaultValue: false, initializeWithValue: false });
 	const { trigger } = useWebHaptics();
 	const { setEntryAnimations } = useTransition();
 	const shouldReduceMotion = useReducedMotion();
