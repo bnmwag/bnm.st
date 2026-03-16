@@ -10,12 +10,19 @@ import { type ComponentProps, type FC, useEffect, useRef } from "react";
 import { defaultPatterns } from "web-haptics";
 import { useWebHaptics } from "web-haptics/react";
 
+const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+
+const NAV_LINKS = [
+	{ href: "/resume", label: "Resume" },
+	{ href: "/imprint", label: "Imprint" },
+	{ href: "/privacy", label: "Privacy" },
+] as const;
+
 interface INavigationProps extends ComponentProps<"div"> {}
 
 export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	const router = useRouter();
 	const pathname = usePathname();
-	const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
 
 	const isInfoOpen = pathname === "/info";
 	const isContactOpen = pathname === "/contact";
@@ -30,53 +37,39 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	const prevContactLabelRef = useRef(contactLabel);
 	const reducedMotion = useReducedMotion();
 
-	const { trigger } = useWebHaptics({ debug: true });
+	const { trigger } = useWebHaptics();
 
 	useEffect(() => {
 		if (prevInfoLabelRef.current !== infoLabel) {
 			prevInfoLabelRef.current = infoLabel;
-			if (reducedMotion) {
-				infoLabelReset();
-			} else {
-				infoLabelScramble();
-			}
+			reducedMotion ? infoLabelReset() : infoLabelScramble();
 		}
 	}, [infoLabel, infoLabelScramble, infoLabelReset, reducedMotion]);
 
 	useEffect(() => {
 		if (prevContactLabelRef.current !== contactLabel) {
 			prevContactLabelRef.current = contactLabel;
-			if (reducedMotion) {
-				contactLabelReset();
-			} else {
-				contactLabelScramble();
-			}
+			reducedMotion ? contactLabelReset() : contactLabelScramble();
 		}
 	}, [contactLabel, contactLabelScramble, contactLabelReset, reducedMotion]);
 
 	const haptic = () => trigger(defaultPatterns.soft);
 
-	const handleInfoClick = () => {
+	const handleOverlayClick = (
+		isOpen: boolean,
+		closeEvent: string,
+		otherIsOpen: boolean,
+		targetRoute: string,
+		resetFn: () => void,
+	) => {
 		haptic();
-		infoLabelReset();
-		if (isInfoOpen) {
-			window.dispatchEvent(new CustomEvent("info:close"));
-		} else if (isContactOpen) {
-			router.replace("/info");
+		resetFn();
+		if (isOpen) {
+			window.dispatchEvent(new CustomEvent(closeEvent));
+		} else if (otherIsOpen) {
+			router.replace(targetRoute);
 		} else {
-			router.push("/info");
-		}
-	};
-
-	const handleContactClick = () => {
-		haptic();
-		contactLabelReset();
-		if (isContactOpen) {
-			window.dispatchEvent(new CustomEvent("contact:close"));
-		} else if (isInfoOpen) {
-			router.replace("/contact");
-		} else {
-			router.push("/contact");
+			router.push(targetRoute);
 		}
 	};
 
@@ -104,48 +97,26 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 				</div>
 				<nav className="col-span-2 md:col-start-8" aria-label="Main navigation">
 					<ul className="space-y-2">
-						<li className="flex h-fit leading-none">
-							<Link
-								href="/resume"
-								onClick={haptic}
-								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
-							>
-								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
-									Resume
-								</ScrambleText>
-							</Link>
-						</li>
-						<li className="flex h-fit leading-none">
-							<Link
-								href="/imprint"
-								onClick={haptic}
-								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
-							>
-								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
-									Imprint
-								</ScrambleText>
-							</Link>
-						</li>
-						<li className="flex h-fit leading-none">
-							<Link
-								href="/privacy"
-								onClick={haptic}
-								className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
-							>
-								<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-								<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
-									Privacy
-								</ScrambleText>
-							</Link>
-						</li>
+						{NAV_LINKS.map(({ href, label }) => (
+							<li key={href} className="flex h-fit leading-none">
+								<Link
+									href={href}
+									onClick={haptic}
+									className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+								>
+									<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
+									<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
+										{label}
+									</ScrambleText>
+								</Link>
+							</li>
+						))}
 					</ul>
 				</nav>
 				<div className="col-span-4 col-start-9 flex items-start justify-end gap-x-4 md:col-span-2 md:col-start-11">
 					<button
 						type="button"
-						onClick={handleInfoClick}
+						onClick={() => handleOverlayClick(isInfoOpen, "info:close", isContactOpen, "/info", infoLabelReset)}
 						onMouseEnter={reducedMotion ? undefined : infoLabelScramble}
 						onMouseLeave={reducedMotion ? undefined : infoLabelReset}
 						aria-label={isInfoOpen ? "Close info panel" : "Open info panel"}
@@ -164,7 +135,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					</button>
 					<button
 						type="button"
-						onClick={handleContactClick}
+						onClick={() => handleOverlayClick(isContactOpen, "contact:close", isInfoOpen, "/contact", contactLabelReset)}
 						onMouseEnter={reducedMotion ? undefined : contactLabelScramble}
 						onMouseLeave={reducedMotion ? undefined : contactLabelReset}
 						aria-label={isContactOpen ? "Close contact panel" : "Open contact panel"}

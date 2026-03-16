@@ -12,19 +12,25 @@ export function useScramble(original: string) {
 	const safetyRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const genRef = useRef(0);
 
-	// Sync display to original whenever it changes (label swap)
-	useEffect(() => {
-		genRef.current++;
+	const clearTimers = () => {
 		if (rafRef.current) clearTimeout(rafRef.current);
 		if (safetyRef.current) clearTimeout(safetyRef.current);
 		rafRef.current = null;
 		safetyRef.current = null;
+	};
+
+	const reset = useCallback(() => {
+		genRef.current++;
+		clearTimers();
 		setDisplay(original);
 	}, [original]);
 
+	useEffect(() => {
+		reset();
+	}, [reset]);
+
 	const scramble = useCallback(() => {
-		if (rafRef.current) clearTimeout(rafRef.current);
-		if (safetyRef.current) clearTimeout(safetyRef.current);
+		clearTimers();
 		const gen = ++genRef.current;
 
 		let frame = 0;
@@ -51,10 +57,11 @@ export function useScramble(original: string) {
 			} else {
 				setDisplay(original);
 				rafRef.current = null;
+				if (safetyRef.current) clearTimeout(safetyRef.current);
+				safetyRef.current = null;
 			}
 		};
 
-		// Safety net: force correct text after animation should have finished
 		safetyRef.current = setTimeout(() => {
 			if (genRef.current === gen) {
 				setDisplay(original);
@@ -62,15 +69,6 @@ export function useScramble(original: string) {
 		}, TARGET_DURATION + 200);
 
 		tick();
-	}, [original]);
-
-	const reset = useCallback(() => {
-		genRef.current++;
-		if (rafRef.current) clearTimeout(rafRef.current);
-		if (safetyRef.current) clearTimeout(safetyRef.current);
-		rafRef.current = null;
-		safetyRef.current = null;
-		setDisplay(original);
 	}, [original]);
 
 	return { display, scramble, reset };

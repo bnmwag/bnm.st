@@ -3,7 +3,8 @@
 import { type ContactState, submitContact } from "@/app/(site)/contact/actions";
 import { ScrambleText } from "@/components/scramble-text";
 import cn from "clsx";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { type FC, useActionState, useRef, useState } from "react";
 import { OverlayPanel } from "./overlay-panel";
 
@@ -16,16 +17,15 @@ const INITIAL_STATE: ContactState = { status: "idle" };
 const inputClass =
 	"w-full border-b bg-transparent pb-2 pt-1 font-medium text-[clamp(.625rem,.5vw,.75rem)] leading-none focus:outline-none focus-visible:outline-none transition-colors duration-short placeholder:text-foreground/30 placeholder:text-background/30";
 
-const ErrorMessage: FC<{ message?: string }> = ({ message }) => {
-	const shouldReduceMotion = useReducedMotion();
+const ErrorMessage: FC<{ message?: string; reducedMotion?: boolean }> = ({ message, reducedMotion }) => {
 	return (
 		<AnimatePresence>
 			{message && (
 				<motion.span
-					initial={shouldReduceMotion ? {} : { opacity: 0, y: -4, height: 0 }}
+					initial={reducedMotion ? {} : { opacity: 0, y: -4, height: 0 }}
 					animate={{ opacity: 1, y: 0, height: "auto" }}
-					exit={shouldReduceMotion ? {} : { opacity: 0, y: -4, height: 0 }}
-					transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
+					exit={reducedMotion ? {} : { opacity: 0, y: -4, height: 0 }}
+					transition={reducedMotion ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
 					className="mt-1.5 block overflow-hidden text-caption text-rose-600"
 				>
 					{message}
@@ -190,7 +190,7 @@ export const ContactPanel: FC = () => {
 											errors.name ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
 										)}
 									/>
-									<ErrorMessage message={errors.name} />
+									<ErrorMessage message={errors.name} reducedMotion={shouldReduceMotion} />
 								</div>
 								<div className="space-y-3">
 									<label
@@ -210,7 +210,7 @@ export const ContactPanel: FC = () => {
 											errors.email ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
 										)}
 									/>
-									<ErrorMessage message={errors.email} />
+									<ErrorMessage message={errors.email} reducedMotion={shouldReduceMotion} />
 								</div>
 							</div>
 
@@ -248,7 +248,7 @@ export const ContactPanel: FC = () => {
 												: "border-background/20 focus:border-background",
 										)}
 									/>
-									<ErrorMessage message={errors.current_website} />
+									<ErrorMessage message={errors.current_website} reducedMotion={shouldReduceMotion} />
 								</div>
 							</div>
 
@@ -303,7 +303,7 @@ export const ContactPanel: FC = () => {
 										errors.message ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
 									)}
 								/>
-								<ErrorMessage message={errors.message} />
+								<ErrorMessage message={errors.message} reducedMotion={shouldReduceMotion} />
 							</div>
 
 							<AnimatePresence>
@@ -363,7 +363,7 @@ export const ContactPanel: FC = () => {
 									}}
 									className="sr-only"
 								/>
-								<ErrorMessage message={errors.privacy} />
+								<ErrorMessage message={errors.privacy} reducedMotion={shouldReduceMotion} />
 							</div>
 
 							<div className="flex w-fit">

@@ -3,12 +3,14 @@
 import { gsap } from "gsap";
 import Lenis from "lenis";
 import { usePathname, useRouter } from "next/navigation";
-import { type FC, type PropsWithChildren, useEffect, useRef, useState } from "react";
+import { type FC, type PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
+type OverlayCloseEvent = "info:close" | "contact:close";
 
 interface IOverlayPanelProps extends PropsWithChildren {
 	route: string;
-	closeEvent: string;
+	closeEvent: OverlayCloseEvent;
 	heading: string;
 	headingId: string;
 }
@@ -26,15 +28,12 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 
 	useEffect(() => setMounted(true), []);
 
-	// ─── Focus management ─────────────────────────────────────────────────────
 	useEffect(() => {
 		if (!mounted) return;
 		if (pathname === route) {
 			triggerRef.current = document.activeElement;
 			const timer = setTimeout(
-				() => {
-					content.current?.focus();
-				},
+				() => content.current?.focus(),
 				window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 300,
 			);
 			return () => clearTimeout(timer);
@@ -42,7 +41,6 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 		(triggerRef.current as HTMLElement | null)?.focus();
 	}, [mounted, pathname, route]);
 
-	// ─── Lenis scroll inside panel ────────────────────────────────────────────
 	useEffect(() => {
 		if (!scrollWrapper.current || !mounted || pathname !== route) return;
 
@@ -57,10 +55,10 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 		});
 
 		let rafId: number;
-		function raf(time: number) {
+		const raf = (time: number) => {
 			lenis.raf(time);
 			rafId = requestAnimationFrame(raf);
-		}
+		};
 		rafId = requestAnimationFrame(raf);
 
 		return () => {
@@ -69,7 +67,6 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 		};
 	}, [mounted, pathname, route]);
 
-	// ─── Body scroll lock ─────────────────────────────────────────────────────
 	useEffect(() => {
 		if (!mounted) return;
 		if (pathname === route) {
@@ -82,7 +79,6 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 		};
 	}, [mounted, pathname, route]);
 
-	// ─── Open / close driven by pathname ─────────────────────────────────────
 	useEffect(() => {
 		if (!mounted) return;
 
@@ -126,8 +122,7 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 		}
 	}, [mounted, pathname, route]);
 
-	// ─── Close (nav button / backdrop) ───────────────────────────────────────
-	const handleBack = () => {
+	const handleBack = useCallback(() => {
 		if (isAnimatingOut.current) return;
 		isAnimatingOut.current = true;
 
@@ -145,13 +140,12 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 		tl.to(content.current, { clipPath: "inset(100% 0 0 0)", duration: 0.9 });
 		tl.to(blend.current, { opacity: 0, duration: 0.7 }, "-=0.4");
 		tl.set([content.current, blend.current], { pointerEvents: "none" });
-	};
+	}, [router]);
 
-	// ─── Close via custom event ─────────────────────────────────────────────
 	useEffect(() => {
 		window.addEventListener(closeEvent, handleBack);
 		return () => window.removeEventListener(closeEvent, handleBack);
-	});
+	}, [closeEvent, handleBack]);
 
 	if (!mounted) return null;
 

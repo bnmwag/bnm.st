@@ -64,9 +64,10 @@ const process = [
 	},
 ];
 
+const since = Math.floor((Date.now() - new Date("2021-06-01").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+
 export const Info: FC = () => {
 	const pathname = usePathname();
-	const since = Math.floor((Date.now() - new Date("2021-06-01").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
 
 	return (
 		<OverlayPanel route="/info" closeEvent="info:close" heading="Info" headingId="info-heading">
