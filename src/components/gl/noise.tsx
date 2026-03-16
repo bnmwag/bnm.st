@@ -1,97 +1,48 @@
-"use client";
+import cn from "clsx";
+import type { ComponentProps, FC } from "react";
 
-import type React from "react";
-import { useEffect, useRef } from "react";
-
-interface NoiseProps {
-	patternSize?: number;
-	patternScaleX?: number;
-	patternScaleY?: number;
-	patternRefreshInterval?: number;
+interface INoiseProps extends ComponentProps<"div"> {
 	patternAlpha?: number;
+	baseFrequency?: number;
 }
 
-const Noise: React.FC<NoiseProps> = ({
-	patternSize = 250,
-	patternScaleX = 1,
-	patternScaleY = 1,
-	patternRefreshInterval = 2,
-	patternAlpha = 15,
-}) => {
-	const grainRef = useRef<HTMLCanvasElement | null>(null);
-
-	useEffect(() => {
-		const canvas = grainRef.current;
-		if (!canvas) return;
-
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-		const ctx = canvas.getContext("2d", { alpha: true });
-		if (!ctx) return;
-
-		let frame = 0;
-		let animationId: number;
-		let isVisible = true;
-
-		const canvasSize = 256;
-
-		const resize = () => {
-			if (!canvas) return;
-			canvas.width = canvasSize;
-			canvas.height = canvasSize;
-
-			canvas.style.width = "100%";
-			canvas.style.height = "100%";
-		};
-
-		const imageData = ctx.createImageData(canvasSize, canvasSize);
-
-		const drawGrain = () => {
-			const data = imageData.data;
-
-			for (let i = 0; i < data.length; i += 4) {
-				const value = (Math.random() * 255) | 0;
-				data[i] = value;
-				data[i + 1] = value;
-				data[i + 2] = value;
-				data[i + 3] = patternAlpha;
-			}
-
-			ctx.putImageData(imageData, 0, 0);
-		};
-
-		const loop = () => {
-			if (isVisible && frame % patternRefreshInterval === 0) {
-				drawGrain();
-			}
-			frame++;
-			animationId = window.requestAnimationFrame(loop);
-		};
-
-		const handleVisibility = () => {
-			isVisible = document.visibilityState === "visible";
-		};
-
-		document.addEventListener("visibilitychange", handleVisibility);
-		window.addEventListener("resize", resize);
-		resize();
-		loop();
-
-		return () => {
-			document.removeEventListener("visibilitychange", handleVisibility);
-			window.removeEventListener("resize", resize);
-			window.cancelAnimationFrame(animationId);
-		};
-	}, [patternSize, patternScaleX, patternScaleY, patternRefreshInterval, patternAlpha]);
+const Noise: FC<INoiseProps> = ({ patternAlpha = 15, baseFrequency = 0.7, className, ...props }) => {
+	const opacity = patternAlpha / 255;
 
 	return (
-		<canvas
-			className="pointer-events-none absolute top-0 left-0 h-full w-full"
-			ref={grainRef}
-			style={{
-				imageRendering: "pixelated",
-			}}
-		/>
+		<div className={cn("pointer-events-none absolute inset-0", className)} {...props}>
+			<svg className="absolute h-0 w-0" aria-hidden="true">
+				<filter id="grain-filter" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+					<feTurbulence
+						type="fractalNoise"
+						baseFrequency={baseFrequency}
+						numOctaves={4}
+						stitchTiles="stitch"
+						result="noise"
+						seed="0"
+					>
+						<animate
+							attributeName="seed"
+							from="0"
+							to="100"
+							dur="0.5s"
+							repeatCount="indefinite"
+							calcMode="discrete"
+							values="0;10;20;30;40;50;60;70;80;90;100"
+							keyTimes="0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9;1"
+						/>
+					</feTurbulence>
+					<feColorMatrix type="saturate" values="0" />
+				</filter>
+			</svg>
+			<div
+				className="absolute inset-0 h-full w-full"
+				style={{
+					filter: "url(#grain-filter)",
+					opacity,
+				}}
+			/>
+		</div>
 	);
 };
 
