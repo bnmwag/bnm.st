@@ -79,8 +79,8 @@ export const ProjectHero: FC<IProjectHeroProps> = ({ project, ...props }) => {
 				</div>
 			)}
 			<div className="layout-grid relative z-10 mx-0 h-full text-background mix-blend-difference">
-				<div className="col-span-6 self-end">
-					<h1 ref={titleRef} className="text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em] w-fit">
+				<div className="col-span-full self-end">
+					<h1 ref={titleRef} className="w-fit text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">
 						{project.name}
 					</h1>
 				</div>

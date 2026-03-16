@@ -275,7 +275,7 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 							return (
 								<motion.div
 									key={item.key}
-									className="absolute inset-0"
+									className="absolute inset-0 bg-foreground"
 									style={{ zIndex: index }}
 									initial={{
 										scale: 1.15,

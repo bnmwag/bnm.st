@@ -87,7 +87,7 @@ export const NextProjectCta: FC<INextProjectCtaProps> = ({ project, ...props }) 
 				<div ref={overlayRef} className="absolute inset-2 z-10 bg-black" style={{ opacity: 0.6 }} />
 
 				<div className="layout-grid relative z-20 mx-0 h-full text-background mix-blend-difference">
-					<div className="col-span-6 self-end">
+					<div className="col-span-full self-end">
 						<p className="relative inline-block text-[clamp(2em,5vw,5.5em)] uppercase leading-[.85] tracking-[-0.04em]">
 							{project.name}
 							<span
