@@ -1,5 +1,4 @@
 import type { Metadata, NextPage } from "next";
-import { ContactPageClient } from "./page.client";
 
 export const metadata: Metadata = {
 	title: "Contact",
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const ContactPage: NextPage = () => {
-	return <ContactPageClient />;
+	return <div id="main-content" className="h-svh" />;
 };
 
 export default ContactPage;
