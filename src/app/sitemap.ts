@@ -1,7 +1,16 @@
+import { getProjects } from "@/data";
 import type { MetadataRoute } from "next";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const now = new Date();
+	const projects = await getProjects();
+
+	const projectEntries: MetadataRoute.Sitemap = projects.map((project) => ({
+		url: `https://bnm.st/p/${project.slug}`,
+		lastModified: now,
+		changeFrequency: "monthly",
+		priority: 0.8,
+	}));
 
 	return [
 		{
@@ -9,6 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			lastModified: now,
 			changeFrequency: "monthly",
 			priority: 1,
+		},
+		{
+			url: "https://bnm.st/info",
+			lastModified: now,
+			changeFrequency: "monthly",
+			priority: 0.9,
 		},
 		{
 			url: "https://bnm.st/contact",
@@ -22,5 +37,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			changeFrequency: "monthly",
 			priority: 0.7,
 		},
+		...projectEntries,
 	];
 }

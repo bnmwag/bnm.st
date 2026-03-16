@@ -66,4 +66,3 @@ const Model: FC = () => {
 	);
 };
 
-useGLTF.preload("/models/human.glb");

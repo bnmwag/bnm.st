@@ -24,6 +24,11 @@ export const generateMetadata = async ({ params }: IProjectPageProps): Promise<M
 
 	if (!project) return {};
 
+	const ogImage =
+		project.image && typeof project.image === "object" && project.image.url
+			? { url: project.image.url, width: 1200, height: 630, alt: `${project.name} — Benjamin Wagner` }
+			: { url: "/og.jpg", width: 1200, height: 630, alt: `${project.name} — Benjamin Wagner` };
+
 	return {
 		title: project.name,
 		description: `${project.name} — ${project.type} project by Benjamin Wagner (${project.year})`,
@@ -32,6 +37,7 @@ export const generateMetadata = async ({ params }: IProjectPageProps): Promise<M
 			url: `https://bnm.st/p/${slug}`,
 			title: `${project.name} — Benjamin Wagner`,
 			description: `${project.name} — ${project.type} project by Benjamin Wagner (${project.year})`,
+			images: [ogImage],
 		},
 	};
 };

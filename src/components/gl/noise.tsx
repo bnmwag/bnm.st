@@ -24,13 +24,16 @@ const Noise: React.FC<NoiseProps> = ({
 		const canvas = grainRef.current;
 		if (!canvas) return;
 
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
 		const ctx = canvas.getContext("2d", { alpha: true });
 		if (!ctx) return;
 
 		let frame = 0;
 		let animationId: number;
+		let isVisible = true;
 
-		const canvasSize = 1024;
+		const canvasSize = 256;
 
 		const resize = () => {
 			if (!canvas) return;
@@ -41,12 +44,13 @@ const Noise: React.FC<NoiseProps> = ({
 			canvas.style.height = "100%";
 		};
 
+		const imageData = ctx.createImageData(canvasSize, canvasSize);
+
 		const drawGrain = () => {
-			const imageData = ctx.createImageData(canvasSize, canvasSize);
 			const data = imageData.data;
 
 			for (let i = 0; i < data.length; i += 4) {
-				const value = Math.random() * 255;
+				const value = (Math.random() * 255) | 0;
 				data[i] = value;
 				data[i + 1] = value;
 				data[i + 2] = value;
@@ -57,18 +61,24 @@ const Noise: React.FC<NoiseProps> = ({
 		};
 
 		const loop = () => {
-			if (frame % patternRefreshInterval === 0) {
+			if (isVisible && frame % patternRefreshInterval === 0) {
 				drawGrain();
 			}
 			frame++;
 			animationId = window.requestAnimationFrame(loop);
 		};
 
+		const handleVisibility = () => {
+			isVisible = document.visibilityState === "visible";
+		};
+
+		document.addEventListener("visibilitychange", handleVisibility);
 		window.addEventListener("resize", resize);
 		resize();
 		loop();
 
 		return () => {
+			document.removeEventListener("visibilitychange", handleVisibility);
 			window.removeEventListener("resize", resize);
 			window.cancelAnimationFrame(animationId);
 		};

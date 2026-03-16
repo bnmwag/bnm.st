@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const ImprintPage: NextPage = () => {
 	return (
 		<Wrapper>
-			<div className="relative space-y-24 py-[25vh]">
+			<div id="main-content" className="relative space-y-24 py-[25vh]">
 				<div className="layout-grid">
 					<div className="col-span-full text-caption max-md:pb-10 md:col-span-2 md:col-start-3">
 						<h1>Imprint</h1>

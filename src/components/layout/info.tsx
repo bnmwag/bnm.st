@@ -1,12 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { FC } from "react";
 
-import { Human } from "../gl/human";
 import { ScrambleText } from "../scramble-text";
 import { OverlayPanel } from "./overlay-panel";
+
+const Human = dynamic(() => import("../gl/human").then((m) => ({ default: m.Human })), {
+	ssr: false,
+});
 
 const services = [
 	{

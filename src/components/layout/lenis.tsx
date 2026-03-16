@@ -41,10 +41,7 @@ export function Lenis({ root, options, children, snap: snapConfig }: LenisProps)
 		if (!snapConfig?.enabled) return;
 
 		const timer = setTimeout(() => {
-			if (!lenisRef.current?.lenis) {
-				console.log("Lenis not ready");
-				return;
-			}
+			if (!lenisRef.current?.lenis) return;
 
 			const selector = snapConfig.selector || ".project-section";
 			const align = snapConfig.align || ["start", "end"];
@@ -57,13 +54,8 @@ export function Lenis({ root, options, children, snap: snapConfig }: LenisProps)
 
 			const els = Array.from(document.querySelectorAll(selector)) as HTMLElement[];
 
-			console.log("Found elements:", els.length);
-
 			if (els.length > 0) {
 				snap.addElements(els, { align });
-				console.log("Snap initialized with", els.length, "elements");
-			} else {
-				console.warn("No elements found for selector:", selector);
 			}
 		}, 100);
 

@@ -102,6 +102,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 								<Link
 									href={href}
 									onClick={haptic}
+									aria-current={pathname === href ? "page" : undefined}
 									className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 								>
 									<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />

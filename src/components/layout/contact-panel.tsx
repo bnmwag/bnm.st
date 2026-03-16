@@ -17,11 +17,13 @@ const INITIAL_STATE: ContactState = { status: "idle" };
 const inputClass =
 	"w-full border-b bg-transparent pb-2 pt-1 font-medium text-[clamp(.625rem,.5vw,.75rem)] leading-none focus:outline-none focus-visible:outline-none transition-colors duration-short placeholder:text-foreground/30 placeholder:text-background/30";
 
-const ErrorMessage: FC<{ message?: string; reducedMotion?: boolean }> = ({ message, reducedMotion }) => {
+const ErrorMessage: FC<{ id?: string; message?: string; reducedMotion?: boolean }> = ({ id, message, reducedMotion }) => {
 	return (
 		<AnimatePresence>
 			{message && (
 				<motion.span
+					id={id}
+					role="alert"
 					initial={reducedMotion ? {} : { opacity: 0, y: -4, height: 0 }}
 					animate={{ opacity: 1, y: 0, height: "auto" }}
 					exit={reducedMotion ? {} : { opacity: 0, y: -4, height: 0 }}
@@ -45,6 +47,8 @@ const ChipButton: FC<IChipButtonProps> = ({ label, active, onClick }) => {
 	return (
 		<button
 			type="button"
+			role="radio"
+			aria-checked={active}
 			onClick={onClick}
 			className={cn(
 				"whitespace-nowrap border px-2 py-0.5 text-caption transition-colors duration-short",
@@ -184,13 +188,15 @@ export const ContactPanel: FC = () => {
 										name="name"
 										type="text"
 										autoComplete="name"
+										aria-describedby={errors.name ? "contact-name-error" : undefined}
+										aria-invalid={!!errors.name}
 										onChange={() => errors.name && setErrors((e) => ({ ...e, name: undefined }))}
 										className={cn(
 											inputClass,
 											errors.name ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
 										)}
 									/>
-									<ErrorMessage message={errors.name} reducedMotion={shouldReduceMotion} />
+									<ErrorMessage id="contact-name-error" message={errors.name} reducedMotion={shouldReduceMotion} />
 								</div>
 								<div className="space-y-3">
 									<label
@@ -204,13 +210,15 @@ export const ContactPanel: FC = () => {
 										name="email"
 										type="email"
 										autoComplete="email"
+										aria-describedby={errors.email ? "contact-email-error" : undefined}
+										aria-invalid={!!errors.email}
 										onChange={() => errors.email && setErrors((e) => ({ ...e, email: undefined }))}
 										className={cn(
 											inputClass,
 											errors.email ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
 										)}
 									/>
-									<ErrorMessage message={errors.email} reducedMotion={shouldReduceMotion} />
+									<ErrorMessage id="contact-email-error" message={errors.email} reducedMotion={shouldReduceMotion} />
 								</div>
 							</div>
 
@@ -240,6 +248,8 @@ export const ContactPanel: FC = () => {
 										type="url"
 										autoComplete="url"
 										placeholder="https://"
+										aria-describedby={errors.current_website ? "contact-website-error" : undefined}
+										aria-invalid={!!errors.current_website}
 										onChange={() => errors.current_website && setErrors((e) => ({ ...e, current_website: undefined }))}
 										className={cn(
 											inputClass,
@@ -248,13 +258,13 @@ export const ContactPanel: FC = () => {
 												: "border-background/20 focus:border-background",
 										)}
 									/>
-									<ErrorMessage message={errors.current_website} reducedMotion={shouldReduceMotion} />
+									<ErrorMessage id="contact-website-error" message={errors.current_website} reducedMotion={shouldReduceMotion} />
 								</div>
 							</div>
 
 							<div className="space-y-3">
-								<p className="text-caption">Type</p>
-								<div className="flex flex-wrap gap-2">
+								<p className="text-caption" id="contact-type-label">Type</p>
+								<div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="contact-type-label">
 									{TYPES.map((t) => (
 										<ChipButton key={t} label={t} active={type === t} onClick={() => setType(t)} />
 									))}
@@ -262,8 +272,8 @@ export const ContactPanel: FC = () => {
 							</div>
 
 							<div className="space-y-3">
-								<p className="text-caption">Timeline</p>
-								<div className="flex flex-wrap gap-2">
+								<p className="text-caption" id="contact-timeline-label">Timeline</p>
+								<div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="contact-timeline-label">
 									{TIMELINES.map((t) => (
 										<ChipButton key={t} label={t} active={timeline === t} onClick={() => setTimeline(t)} />
 									))}
@@ -271,8 +281,8 @@ export const ContactPanel: FC = () => {
 							</div>
 
 							<div className="space-y-3">
-								<p className="text-caption">Budget</p>
-								<div className="flex flex-wrap gap-2">
+								<p className="text-caption" id="contact-budget-label">Budget</p>
+								<div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="contact-budget-label">
 									{BUDGETS.map((b) => (
 										<ChipButton key={b} label={b} active={budget === b} onClick={() => setBudget(b)} />
 									))}
@@ -291,6 +301,8 @@ export const ContactPanel: FC = () => {
 									name="message"
 									rows={4}
 									maxLength={2000}
+									aria-describedby={errors.message ? "contact-message-error" : undefined}
+									aria-invalid={!!errors.message}
 									onChange={() => errors.message && setErrors((e) => ({ ...e, message: undefined }))}
 									onInput={(e) => {
 										const el = e.currentTarget;
@@ -303,7 +315,7 @@ export const ContactPanel: FC = () => {
 										errors.message ? "border-rose-600 focus:border-rose-600" : "border-background/20 focus:border-background",
 									)}
 								/>
-								<ErrorMessage message={errors.message} reducedMotion={shouldReduceMotion} />
+								<ErrorMessage id="contact-message-error" message={errors.message} reducedMotion={shouldReduceMotion} />
 							</div>
 
 							<AnimatePresence>
