@@ -18,29 +18,65 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 	const age = Math.floor((Date.now() - new Date("2005-06-28").getTime()) / (1000 * 60 * 60 * 24 * 365.25));
 
 	const isInfoOpen = pathname === "/info";
-	const label = isInfoOpen ? "Back" : "Info";
-	const { display: labelDisplay, scramble: labelScramble, reset: labelReset } = useScramble(label);
-	const prevLabelRef = useRef(label);
+	const isContactOpen = pathname === "/contact";
+
+	const infoLabel = isInfoOpen ? "Back" : "Info";
+	const contactLabel = isContactOpen ? "Back" : "Contact";
+
+	const { display: infoLabelDisplay, scramble: infoLabelScramble, reset: infoLabelReset } = useScramble(infoLabel);
+	const { display: contactLabelDisplay, scramble: contactLabelScramble, reset: contactLabelReset } = useScramble(contactLabel);
+
+	const prevInfoLabelRef = useRef(infoLabel);
+	const prevContactLabelRef = useRef(contactLabel);
 	const reducedMotion = useReducedMotion();
 
 	const { trigger } = useWebHaptics({ debug: true });
 
-	// Scramble text whenever the label changes (Info ↔ Back)
 	useEffect(() => {
-		if (prevLabelRef.current !== label) {
-			prevLabelRef.current = label;
-			if (!reducedMotion) labelScramble();
+		if (prevInfoLabelRef.current !== infoLabel) {
+			prevInfoLabelRef.current = infoLabel;
+			if (reducedMotion) {
+				infoLabelReset();
+			} else {
+				infoLabelScramble();
+			}
 		}
-	}, [label, labelScramble]);
+	}, [infoLabel, infoLabelScramble, infoLabelReset, reducedMotion]);
+
+	useEffect(() => {
+		if (prevContactLabelRef.current !== contactLabel) {
+			prevContactLabelRef.current = contactLabel;
+			if (reducedMotion) {
+				contactLabelReset();
+			} else {
+				contactLabelScramble();
+			}
+		}
+	}, [contactLabel, contactLabelScramble, contactLabelReset, reducedMotion]);
 
 	const haptic = () => trigger(defaultPatterns.soft);
 
 	const handleInfoClick = () => {
 		haptic();
+		infoLabelReset();
 		if (isInfoOpen) {
 			window.dispatchEvent(new CustomEvent("info:close"));
+		} else if (isContactOpen) {
+			router.replace("/info");
 		} else {
 			router.push("/info");
+		}
+	};
+
+	const handleContactClick = () => {
+		haptic();
+		contactLabelReset();
+		if (isContactOpen) {
+			window.dispatchEvent(new CustomEvent("contact:close"));
+		} else if (isInfoOpen) {
+			router.replace("/contact");
+		} else {
+			router.push("/contact");
 		}
 	};
 
@@ -110,33 +146,41 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					<button
 						type="button"
 						onClick={handleInfoClick}
-						onMouseEnter={reducedMotion ? undefined : labelScramble}
-						onMouseLeave={reducedMotion ? undefined : labelReset}
+						onMouseEnter={reducedMotion ? undefined : infoLabelScramble}
+						onMouseLeave={reducedMotion ? undefined : infoLabelReset}
 						aria-label={isInfoOpen ? "Close info panel" : "Open info panel"}
 						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-						{/* Invisible copy reserves the width of the longer word */}
 						<span className="invisible" aria-hidden="true">
 							Back
 						</span>
 						<span
 							className="absolute inset-0 flex items-center justify-center text-foreground transition-colors duration-short ease-default group-hover:text-background"
-							aria-label={label}
+							aria-label={infoLabel}
 						>
-							{labelDisplay}
+							{infoLabelDisplay}
 						</span>
 					</button>
-					<Link
-						href="/contact"
-						onClick={haptic}
+					<button
+						type="button"
+						onClick={handleContactClick}
+						onMouseEnter={reducedMotion ? undefined : contactLabelScramble}
+						onMouseLeave={reducedMotion ? undefined : contactLabelReset}
+						aria-label={isContactOpen ? "Close contact panel" : "Open contact panel"}
 						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
-						<ScrambleText className="text-foreground transition-colors duration-short ease-default group-hover:text-background">
+						<span className="invisible" aria-hidden="true">
 							Contact
-						</ScrambleText>
-					</Link>
+						</span>
+						<span
+							className="absolute inset-0 flex items-center justify-center text-foreground transition-colors duration-short ease-default group-hover:text-background"
+							aria-label={contactLabel}
+						>
+							{contactLabelDisplay}
+						</span>
+					</button>
 				</div>
 			</div>
 		</header>
