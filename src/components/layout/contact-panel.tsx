@@ -2,9 +2,9 @@
 
 import { type ContactState, submitContact } from "@/app/(site)/contact/actions";
 import { ScrambleText } from "@/components/scramble-text";
-import cn from "clsx";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useScramble } from "@/hooks/use-scramble";
+import cn from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useActionState, useRef, useState } from "react";
 import { OverlayPanel } from "./overlay-panel";
@@ -67,7 +67,9 @@ const ChipButton: FC<IChipButtonProps> = ({ label, active, onClick }) => {
 					active ? "scale-x-100" : "scale-x-0",
 				)}
 			/>
-			<span className="invisible" aria-hidden="true">{label}</span>
+			<span className="invisible" aria-hidden="true">
+				{label}
+			</span>
 			<span
 				className={cn(
 					"absolute inset-0 flex items-center justify-center transition-colors duration-short ease-default",
@@ -150,6 +152,12 @@ export const ContactPanel: FC = () => {
 						<p className="text-caption leading-normal opacity-60">
 							Available for freelance work, collaborations, and interesting experiments. Based in Austria, working with clients
 							worldwide.
+						</p>
+						<p className="text-caption leading-normal">
+							Just wanna connect or Prefer email?{" "}
+							<a href="mailto:hello@bnm.st" className="text-background underline underline-offset-2 opacity-100">
+								hello@bnm.st
+							</a>
 						</p>
 					</div>
 				</div>
@@ -283,7 +291,9 @@ export const ContactPanel: FC = () => {
 							</div>
 
 							<div className="space-y-3">
-								<p className="text-caption" id="contact-type-label">Type</p>
+								<p className="text-caption" id="contact-type-label">
+									Type
+								</p>
 								<div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="contact-type-label">
 									{TYPES.map((t) => (
 										<ChipButton key={t} label={t} active={type === t} onClick={() => setType(t)} />
@@ -292,7 +302,9 @@ export const ContactPanel: FC = () => {
 							</div>
 
 							<div className="space-y-3">
-								<p className="text-caption" id="contact-timeline-label">Timeline</p>
+								<p className="text-caption" id="contact-timeline-label">
+									Timeline
+								</p>
 								<div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="contact-timeline-label">
 									{TIMELINES.map((t) => (
 										<ChipButton key={t} label={t} active={timeline === t} onClick={() => setTimeline(t)} />
@@ -301,7 +313,9 @@ export const ContactPanel: FC = () => {
 							</div>
 
 							<div className="space-y-3">
-								<p className="text-caption" id="contact-budget-label">Budget</p>
+								<p className="text-caption" id="contact-budget-label">
+									Budget
+								</p>
 								<div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="contact-budget-label">
 									{BUDGETS.map((b) => (
 										<ChipButton key={b} label={b} active={budget === b} onClick={() => setBudget(b)} />
