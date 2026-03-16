@@ -32,13 +32,21 @@ export const IndexPageClient: FC<IIndexPageClientProps> = ({ projects, className
 	const { setEntryAnimations } = useTransition();
 	const shouldReduceMotion = useReducedMotion();
 
-	// Preload all project hover images in the background so they're in cache on first hover
 	useEffect(() => {
+		const vw = window.innerWidth;
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		const targetWidth = vw * dpr;
+		const validWidths = [640, 750, 828, 1080, 1200, 1920, 2048, 3840];
+		const w = validWidths.find((v) => v >= targetWidth) ?? validWidths[validWidths.length - 1];
+
 		for (const project of projects) {
 			const img = project.image;
 			if (img && typeof img === "object" && img.url) {
-				const el = new window.Image();
-				el.src = img.url;
+				const link = document.createElement("link");
+				link.rel = "prefetch";
+				link.as = "image";
+				link.href = `/_next/image?url=${encodeURIComponent(img.url)}&w=${w}&q=75`;
+				document.head.appendChild(link);
 			}
 		}
 	}, [projects]);
