@@ -14,7 +14,11 @@ export const metadata: Metadata = {
 };
 
 const ContactPage: NextPage = () => {
-	return <div id="main-content" className="h-svh" />;
+	return (
+		<div id="main-content" className="h-svh">
+			<h1 className="sr-only">Contact — Benjamin Wagner</h1>
+		</div>
+	);
 };
 
 export default ContactPage;

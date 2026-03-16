@@ -50,9 +50,22 @@ const ProjectPage: NextPage<IProjectPageProps> = async ({ params }) => {
 
 	const nextProject = await getNextProject(slug);
 
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "CreativeWork",
+		name: project.name,
+		url: `https://bnm.st/p/${slug}`,
+		author: { "@type": "Person", name: "Benjamin Wagner", url: "https://bnm.st" },
+		dateCreated: project.year,
+		description: `${project.name} — ${project.type} project by Benjamin Wagner (${project.year})`,
+		...(project.image && typeof project.image === "object" && project.image.url
+			? { image: project.image.url }
+			: {}),
+	};
+
 	return (
 		<Wrapper>
-			{/* bg-[#CE0F08] */}
+			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 			<article id="main-content" className="relative min-h-svh">
 				<ProjectHero project={project} />
 				<section className="layout-grid py-12">

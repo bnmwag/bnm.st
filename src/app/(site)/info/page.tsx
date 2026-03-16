@@ -14,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function InfoPage() {
-	return <div id="main-content" className="h-svh" />;
+	return (
+		<div id="main-content" className="h-svh">
+			<h1 className="sr-only">Info — Benjamin Wagner</h1>
+		</div>
+	);
 }
