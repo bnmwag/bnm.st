@@ -36,12 +36,12 @@ type BlockOfType<T extends LayoutBlock["blockType"]> = Extract<LayoutBlock, { bl
 const RichTextBlock: FC<{ block: BlockOfType<"richText"> }> = ({ block }) => {
 	return (
 		<div className="layout-grid py-12">
-			<div className="col-span-2 text-caption md:col-start-4">
+			<div className="col-span-2 text-caption md:col-start-3 xl:col-start-4">
 				<h3 className="w-fit bg-foreground px-1 py-px text-background" aria-label={block.title}>
 					{block.title}
 				</h3>
 			</div>
-			<div className="col-span-full col-start-6 text-caption md:col-span-4">
+			<div className="col-span-full col-start-4 text-caption md:col-span-6 xl:col-span-4 xl:col-start-6">
 				<RichText data={block.content} />
 			</div>
 		</div>
@@ -53,7 +53,7 @@ const ImageBlock: FC<{ block: BlockOfType<"image"> }> = ({ block }) => {
 
 	return (
 		<figure className="layout-grid py-12">
-			<div className={isHalf ? "col-span-full md:col-span-6 md:col-start-4" : "col-span-full"}>
+			<div className={isHalf ? "col-span-full md:col-span-8 md:col-start-3 xl:col-span-6 xl:col-start-4" : "col-span-full"}>
 				<Media resource={block.image} className="w-full" imgClassName="w-full" />
 				{block.caption && <figcaption className="mt-2 text-caption text-foreground-muted">{block.caption}</figcaption>}
 			</div>
@@ -65,10 +65,10 @@ const ImageGridBlock: FC<{ block: BlockOfType<"imageGrid"> }> = ({ block }) => {
 	if (!block.images?.length) return null;
 
 	const count = block.images.length;
-	const colSpan = count === 2 ? "col-span-6" : count === 3 ? "col-span-4" : "col-span-3";
+	const colSpan = count === 2 ? "col-span-full md:col-span-6" : count === 3 ? "col-span-4" : "col-span-3";
 
 	return (
-		<div className="layout-grid gap-y-2 py-12">
+		<div className="layout-grid gap-y-4 py-12">
 			{block.images.map((item) => (
 				<figure key={item.id} className={colSpan}>
 					<Media resource={item.image} className="w-full" imgClassName="w-full" />
