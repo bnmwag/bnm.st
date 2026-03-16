@@ -7,74 +7,9 @@ import { type ElementType, Fragment, type Ref, forwardRef, useEffect, useRef } f
 
 import type { Media as MediaType } from "@/payload-types";
 
-export const getServerSideURL = () => {
-	let url = process.env.NEXT_PUBLIC_SERVER_URL;
-
-	if (!url) {
-		url = "http://localhost:3000";
-	}
-
-	return url;
-};
-
-export const isDom = !!(typeof window !== "undefined" && window.document && window.document.createElement);
-
-export const getClientSideURL = () => {
-	if (isDom) {
-		const protocol = window.location.protocol;
-		const domain = window.location.hostname;
-		const port = window.location.port;
-
-		return `${protocol}//${domain}${port ? `:${port}` : ""}`;
-	}
-
-	return process.env.NEXT_PUBLIC_SERVER_URL || "";
-};
-
-/**
- * Processes media resource URL to ensure proper formatting
- * @param url The original URL from the resource
- * @param cacheTag Optional cache tag to append to the URL
- * @returns Properly formatted URL with cache tag if provided
- */
-export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
+export const getMediaUrl = (url: string | null | undefined): string => {
 	if (!url) return "";
-
-	let finalUrl: string;
-
-	// Check if URL already has http/https protocol (S3 URLs)
-	if (url.startsWith("http://") || url.startsWith("https://")) {
-		// For S3 URLs, avoid adding cache tags that might cause issues
-		// S3 handles its own caching and versioning
-		finalUrl = url;
-
-		// Add timestamp parameter to S3 URLs to help with cache busting if needed
-		// This can help when S3 credentials are refreshed or bucket policies change
-		if (typeof window !== "undefined" && cacheTag) {
-			// Only add cache busting in browser and if we have a cache tag
-			const separator = url.includes("?") ? "&" : "?";
-			const shortTag = encodeURIComponent(cacheTag.slice(-8));
-			finalUrl = `${url}${separator}t=${shortTag}`;
-		}
-	} else {
-		// Otherwise prepend client-side URL for local media
-		const baseUrl = getClientSideURL();
-		const fullUrl = `${baseUrl}${url}`;
-
-		// Only add cache tag for local media, and make it more robust
-		if (cacheTag && typeof cacheTag === "string" && cacheTag.length > 0) {
-			// Create a shorter, more reliable cache tag
-			const shortCacheTag = encodeURIComponent(cacheTag.slice(-10));
-			finalUrl = `${fullUrl}?v=${shortCacheTag}`;
-		} else {
-			finalUrl = fullUrl;
-		}
-	}
-
-	// Don't log URL generation as a "load attempt" - only log actual browser load events
-	// The mediaDebugger should only track real load attempts in the browser
-
-	return finalUrl;
+	return url;
 };
 
 export interface Props {
@@ -190,10 +125,7 @@ export const ImageMedia: React.FC<Props> = (props) => {
 		height = fullHeight || undefined;
 		alt = altFromResource || "";
 
-		// Only use cache tag for local media, not S3 URLs
-		const cacheTag = url?.startsWith("http") ? null : resource.updatedAt;
-
-		src = getMediaUrl(url, cacheTag);
+		src = getMediaUrl(url);
 	}
 
 	// Don't render if no valid src
@@ -218,13 +150,9 @@ export const ImageMedia: React.FC<Props> = (props) => {
 			<NextImage
 				alt={finalAlt}
 				className={cn(imgClassName)}
-				unoptimized
 				fill={fill}
 				height={!fill ? height : undefined}
-				// placeholder="blur"
-				// blurDataURL={placeholderBlur}
 				priority={priority}
-				quality={100}
 				loading={loading}
 				sizes={sizes}
 				src={src}
