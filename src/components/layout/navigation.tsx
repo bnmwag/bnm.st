@@ -96,14 +96,14 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 					</p>
 				</div>
 				<nav className="col-span-2 md:col-start-8" aria-label="Main navigation">
-					<ul className="space-y-2">
+					<ul className="-space-y-1">
 						{NAV_LINKS.map(({ href, label }) => (
 							<li key={href} className="flex h-fit leading-none">
 								<Link
 									href={href}
 									onClick={haptic}
 									aria-current={pathname === href ? "page" : undefined}
-									className="group relative inline-flex items-center overflow-hidden px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+									className="group relative inline-flex items-center overflow-hidden px-2 py-2 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 								>
 									<span className="absolute inset-0 origin-right scale-x-0 bg-background transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
 									<ScrambleText className="text-background transition-colors duration-short ease-default group-hover:text-foreground">
@@ -121,7 +121,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						onMouseEnter={reducedMotion ? undefined : infoLabelScramble}
 						onMouseLeave={reducedMotion ? undefined : infoLabelReset}
 						aria-label={isInfoOpen ? "Close info panel" : "Open info panel"}
-						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+						className="group relative overflow-hidden bg-background px-2 py-2 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
 						<span className="invisible" aria-hidden="true">
@@ -140,7 +140,7 @@ export const Navigation: FC<INavigationProps> = ({ className, ...props }) => {
 						onMouseEnter={reducedMotion ? undefined : contactLabelScramble}
 						onMouseLeave={reducedMotion ? undefined : contactLabelReset}
 						aria-label={isContactOpen ? "Close contact panel" : "Open contact panel"}
-						className="group relative overflow-hidden bg-background px-2 py-0.5 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
+						className="group relative overflow-hidden bg-background px-2 py-2 font-medium text-[clamp(.625rem,.5vw,.75rem)] uppercase leading-none"
 					>
 						<span className="absolute inset-0 origin-right scale-x-0 bg-foreground transition-transform duration-short ease-default group-hover:origin-left group-hover:scale-x-100" />
 						<span className="invisible" aria-hidden="true">

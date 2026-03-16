@@ -168,6 +168,7 @@ export const OverlayPanel: FC<IOverlayPanelProps> = ({ route, closeEvent, headin
 
 			<aside
 				ref={content}
+				role="dialog"
 				data-lenis-prevent
 				aria-modal="true"
 				aria-labelledby={headingId}

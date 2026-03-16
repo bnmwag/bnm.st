@@ -31,11 +31,10 @@ export const ScrambleText: FC<ScrambleTextProps> = ({ children, className }) => 
 
 	return (
 		<>
-			<span className="invisible">{children}</span>
+			<span className="invisible" aria-hidden="true">{children}</span>
 			<span
 				ref={ref}
 				className={cn("absolute inset-0 flex items-center justify-center", className)}
-				aria-hidden="true"
 			>
 				{reducedMotion ? children : display}
 			</span>
