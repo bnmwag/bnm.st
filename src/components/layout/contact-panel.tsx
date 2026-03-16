@@ -4,6 +4,7 @@ import { type ContactState, submitContact } from "@/app/(site)/contact/actions";
 import { ScrambleText } from "@/components/scramble-text";
 import cn from "clsx";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useScramble } from "@/hooks/use-scramble";
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useActionState, useRef, useState } from "react";
 import { OverlayPanel } from "./overlay-panel";
@@ -44,18 +45,37 @@ interface IChipButtonProps {
 }
 
 const ChipButton: FC<IChipButtonProps> = ({ label, active, onClick }) => {
+	const { display, scramble } = useScramble(label);
+	const reducedMotion = useReducedMotion();
+
+	const handleClick = () => {
+		if (!reducedMotion) scramble();
+		onClick();
+	};
+
 	return (
 		<button
 			type="button"
 			role="radio"
 			aria-checked={active}
-			onClick={onClick}
-			className={cn(
-				"whitespace-nowrap border px-2 py-0.5 text-caption transition-colors duration-short",
-				active ? "border-background bg-background text-foreground" : "border-background/40 bg-transparent text-background",
-			)}
+			onClick={handleClick}
+			className="relative overflow-hidden whitespace-nowrap border border-background/40 px-2 py-0.5 text-caption"
 		>
-			{label}
+			<span
+				className={cn(
+					"absolute inset-0 origin-left bg-background transition-transform duration-short ease-default",
+					active ? "scale-x-100" : "scale-x-0",
+				)}
+			/>
+			<span className="invisible" aria-hidden="true">{label}</span>
+			<span
+				className={cn(
+					"absolute inset-0 flex items-center justify-center transition-colors duration-short ease-default",
+					active ? "text-foreground" : "text-background",
+				)}
+			>
+				{reducedMotion ? label : display}
+			</span>
 		</button>
 	);
 };
